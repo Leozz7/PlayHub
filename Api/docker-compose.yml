@@ -1,0 +1,94 @@
+name: playhub
+version: "3.9"
+
+# ─────────────────────────────────────────────────────────────────────────────
+# PlayHub — docker-compose.yml
+# Serviços: api | mongo | mongo-express
+# ─────────────────────────────────────────────────────────────────────────────
+
+services:
+
+  # ── API .NET ───────────────────────────────────────────────────────────────
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    container_name: playhub_api
+    restart: unless-stopped
+    ports:
+      - "5000:5000"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - MongoDB__ConnectionString=mongodb://${MONGO_USER}:${MONGO_PASS}@mongo:27017/${MONGO_DB}?authSource=admin
+      - MongoDB__DatabaseName=${MONGO_DB}
+      - Jwt__Key=${JWT_KEY}
+      - Jwt__Issuer=${JWT_ISSUER}
+      - Jwt__Audience=${JWT_AUDIENCE}
+    depends_on:
+      mongo:
+        condition: service_healthy
+    networks:
+      - playhub_net
+    volumes:
+      - .:/app # Mount para hot-reload
+      - /app/PlayHub.Api/bin # Evita conflito de binários host/container
+      - /app/PlayHub.Api/obj
+      - /app/PlayHub.Application/bin
+      - /app/PlayHub.Application/obj
+      - /app/PlayHub.Infrastructure/bin
+      - /app/PlayHub.Infrastructure/obj
+      - /app/PlayHub.Domain/bin
+      - /app/PlayHub.Domain/obj
+
+  # ── MongoDB 7 ──────────────────────────────────────────────────────────────
+  mongo:
+    image: mongo:7.0
+    container_name: playhub_mongo
+    restart: unless-stopped
+    ports:
+      - "27017:27017"
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_USER}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_PASS}
+      MONGO_INITDB_DATABASE: ${MONGO_DB}
+    volumes:
+      - mongo_data:/data/db
+      - mongo_config:/data/configdb
+    networks:
+      - playhub_net
+    healthcheck:
+      test: [ "CMD", "mongosh", "--quiet", "--eval", "db.adminCommand('ping').ok" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
+
+  # ── Mongo Express (UI) ─────────────────────────────────────────────────────
+  mongo-express:
+    image: mongo-express:1.0
+    container_name: playhub_mongo_express
+    restart: unless-stopped
+    ports:
+      - "8081:8081"
+    environment:
+      ME_CONFIG_MONGODB_ADMINUSERNAME: ${MONGO_USER}
+      ME_CONFIG_MONGODB_ADMINPASSWORD: ${MONGO_PASS}
+      ME_CONFIG_MONGODB_URL: mongodb://${MONGO_USER}:${MONGO_PASS}@mongo:27017/
+      ME_CONFIG_BASICAUTH: false
+    depends_on:
+      mongo:
+        condition: service_healthy
+    networks:
+      - playhub_net
+
+# ── Volumes ────────────────────────────────────────────────────────────────
+volumes:
+  mongo_data:
+    driver: local
+  mongo_config:
+    driver: local
+
+# ── Networks ───────────────────────────────────────────────────────────────
+networks:
+  playhub_net:
+    driver: bridge

@@ -1,0 +1,21 @@
+# docker-compose.override.yml
+# Sobrescreve configurações para desenvolvimento local.
+# Este arquivo é carregado AUTOMATICAMENTE pelo Docker Compose em dev.
+
+version: "3.9"
+
+services:
+  api:
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+    # Em dev, loga tudo
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  mongo:
+    # Em dev, expõe a porta para ferramentas externas (ex: Compass)
+    ports:
+      - "27017:27017"
