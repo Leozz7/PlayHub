@@ -1,10 +1,6 @@
 name: playhub
 version: "3.9"
 
-# ─────────────────────────────────────────────────────────────────────────────
-# PlayHub — docker-compose.yml
-# Serviços: api | mongo | mongo-express
-# ─────────────────────────────────────────────────────────────────────────────
 
 services:
 
@@ -30,15 +26,15 @@ services:
     networks:
       - playhub_net
     volumes:
-      - .:/app # Mount para hot-reload
-      - /app/PlayHub.Api/bin # Evita conflito de binários host/container
-      - /app/PlayHub.Api/obj
-      - /app/PlayHub.Application/bin
-      - /app/PlayHub.Application/obj
-      - /app/PlayHub.Infrastructure/bin
-      - /app/PlayHub.Infrastructure/obj
-      - /app/PlayHub.Domain/bin
-      - /app/PlayHub.Domain/obj
+      - .:/app 
+      - /app/src/PlayHub.Api/bin
+      - /app/src/PlayHub.Api/obj
+      - /app/src/PlayHub.Application/bin
+      - /app/src/PlayHub.Application/obj
+      - /app/src/PlayHub.Infrastructure/bin
+      - /app/src/PlayHub.Infrastructure/obj
+      - /app/src/PlayHub.Domain/bin
+      - /app/src/PlayHub.Domain/obj
 
   # ── MongoDB 7 ──────────────────────────────────────────────────────────────
   mongo:
