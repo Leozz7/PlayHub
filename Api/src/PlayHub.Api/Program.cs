@@ -8,12 +8,10 @@ using PlayHub.Infrastructure.Persistence;
 using System.Globalization;
 using System.Text;
 
-// ── Cultura ────────────────────────────────────────────────────────────────
 var culture = new CultureInfo("pt-BR");
 CultureInfo.DefaultThreadCurrentCulture = culture;
 CultureInfo.DefaultThreadCurrentUICulture = culture;
 
-// ── Builder ────────────────────────────────────────────────────────────────
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Configuration
@@ -23,10 +21,8 @@ builder.Configuration
         optional: true, reloadOnChange: true)
     .AddEnvironmentVariables();
 
-// ── Controllers ────────────────────────────────────────────────────────────
 builder.Services.AddControllers();
 
-// ── Swagger / OpenAPI ──────────────────────────────────────────────────────
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
 {
@@ -37,7 +33,6 @@ builder.Services.AddSwaggerGen(c =>
         Description = "Backend da plataforma PlayHub"
     });
 
-    // Suporte a JWT no Swagger UI
     c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
     {
         Name = "Authorization",
@@ -64,7 +59,6 @@ builder.Services.AddSwaggerGen(c =>
     });
 });
 
-// ── CORS ───────────────────────────────────────────────────────────────────
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("PlayHubPolicy", policy =>
@@ -82,11 +76,9 @@ builder.Services.AddCors(options =>
     });
 });
 
-// ── Application + Infrastructure ───────────────────────────────────────────
 builder.Services.AddApplication();
 builder.Services.AddInfrastructure(builder.Configuration);
 
-// ── JWT Authentication ─────────────────────────────────────────────────────
 var jwtSection = builder.Configuration.GetSection("Jwt");
 var jwtKey = jwtSection["Key"]
     ?? throw new InvalidOperationException("Jwt:Key is not configured.");
@@ -109,13 +101,10 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 
 builder.Services.AddAuthorization();
 
-// ── Kestrel ─────────────────────────────────────────────────────────────────
 builder.WebHost.UseUrls("http://0.0.0.0:5000");
 
-// ── Build ───────────────────────────────────────────────────────────────────
 var app = builder.Build();
 
-// ── Swagger (sempre disponível em dev) ────────────────────────────────────
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
@@ -126,13 +115,11 @@ if (app.Environment.IsDevelopment())
     });
 }
 
-// ── Middlewares ────────────────────────────────────────────────────────────
 app.UseCors("PlayHubPolicy");
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
 
-// ── Seed ───────────────────────────────────────────────────────────────────
 using (var scope = app.Services.CreateScope())
 {
     var services = scope.ServiceProvider;
@@ -153,5 +140,4 @@ using (var scope = app.Services.CreateScope())
     }
 }
 
-// ── Run ────────────────────────────────────────────────────────────────────
 await app.RunAsync();

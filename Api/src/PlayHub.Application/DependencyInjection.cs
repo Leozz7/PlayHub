@@ -16,7 +16,6 @@ public static class DependencyInjection
 
         services.AddValidatorsFromAssembly(typeof(DependencyInjection).Assembly);
 
-        // PasswordHasher registrado aqui para ser usado nos handlers
         services.AddSingleton<PasswordHasher>();
 
         return services;

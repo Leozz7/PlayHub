@@ -20,7 +20,6 @@ public class CreateUserHandler : IRequestHandler<CreateUserCommand, UserDto>
 
     public async Task<UserDto> Handle(CreateUserCommand request, CancellationToken ct)
     {
-        // Verifica se email já existe
         var exists = await _db.Users
             .Find(u => u.Email == request.Email.ToLowerInvariant())
             .AnyAsync(ct);

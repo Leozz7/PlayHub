@@ -33,7 +33,6 @@ public static class DependencyInjection
         services.AddSingleton<IApplicationDbContext>(provider =>
             provider.GetRequiredService<MongoDbContext>());
 
-        // ── JWT ─────────────────────────────────────────────────────────────
         services.AddScoped<IJwtTokenService, JwtTokenService>();
 
         return services;
