@@ -1,0 +1,6 @@
+@PlayHub.Api_HostAddress = http://localhost:5171
+
+GET {{PlayHub.Api_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

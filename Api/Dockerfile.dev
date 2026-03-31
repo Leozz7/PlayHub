@@ -1,0 +1,20 @@
+FROM mcr.microsoft.com/dotnet/sdk:10.0 AS base
+
+WORKDIR /app
+
+# Copia os csproj na ordem correta para aproveitar cache de layers
+COPY PlayHub.Domain/PlayHub.Domain.csproj               ./PlayHub.Domain/
+COPY PlayHub.Application/PlayHub.Application.csproj     ./PlayHub.Application/
+COPY PlayHub.Infrastructure/PlayHub.Infrastructure.csproj ./PlayHub.Infrastructure/
+COPY PlayHub.Api/PlayHub.Api.csproj                     ./PlayHub.Api/
+
+# Restore isolado (cached layer) — só invalida se um .csproj mudar
+RUN dotnet restore ./PlayHub.Api/PlayHub.Api.csproj
+
+# Copia o restante do código
+COPY . .
+
+EXPOSE 5000
+
+# Hot-reload com dotnet watch para desenvolvimento
+CMD ["dotnet", "watch", "--project", "./PlayHub.Api/PlayHub.Api.csproj", "run", "--urls", "http://0.0.0.0:5000"]
