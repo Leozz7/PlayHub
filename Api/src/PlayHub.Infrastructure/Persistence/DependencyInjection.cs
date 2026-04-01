@@ -34,6 +34,7 @@ public static class DependencyInjection
             provider.GetRequiredService<MongoDbContext>());
 
         services.AddScoped<IJwtTokenService, JwtTokenService>();
+        services.AddScoped<IEncryptionService, Security.EncryptionService>();
 
         return services;
     }

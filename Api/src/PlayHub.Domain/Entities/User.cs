@@ -6,6 +6,7 @@ public class User : BaseEntity
 {
     public string Name { get; private set; } = null!;
     public string Email { get; private set; } = null!;
+    public string EmailIndex { get; private set; } = null!;
     public string PasswordHash { get; private set; } = null!;
     public string Role { get; private set; } = "User";
 
@@ -14,24 +15,28 @@ public class User : BaseEntity
 
     private User() { }
 
-    public User(string name, string email, string passwordHash, string role = "User")
+    public User(string name, string email, string emailIndex, string passwordHash, string role = "User")
     {
         if (string.IsNullOrWhiteSpace(name))
             throw new DomainException("Name is required.");
 
         if (string.IsNullOrWhiteSpace(email))
             throw new DomainException("Email is required.");
+
+        if (string.IsNullOrWhiteSpace(emailIndex))
+            throw new DomainException("EmailIndex is required.");
 
         if (string.IsNullOrWhiteSpace(passwordHash))
             throw new DomainException("PasswordHash is required.");
 
         Name = name;
-        Email = email.ToLowerInvariant();
+        Email = email;
+        EmailIndex = emailIndex;
         PasswordHash = passwordHash;
         Role = role;
     }
 
-    public void UpdateDetails(string name, string email, string role)
+    public void UpdateDetails(string name, string email, string emailIndex, string role)
     {
         if (string.IsNullOrWhiteSpace(name))
             throw new DomainException("Name is required.");
@@ -39,8 +44,12 @@ public class User : BaseEntity
         if (string.IsNullOrWhiteSpace(email))
             throw new DomainException("Email is required.");
 
+        if (string.IsNullOrWhiteSpace(emailIndex))
+            throw new DomainException("EmailIndex is required.");
+
         Name = name;
-        Email = email.ToLowerInvariant();
+        Email = email;
+        EmailIndex = emailIndex;
         Role = role;
     }
 

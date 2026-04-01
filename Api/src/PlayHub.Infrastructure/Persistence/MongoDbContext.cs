@@ -23,7 +23,7 @@ public sealed class MongoDbContext : IApplicationDbContext
     private void ConfigureIndexes()
     {
         var emailIndex = new CreateIndexModel<User>(
-            Builders<User>.IndexKeys.Ascending(u => u.Email),
+            Builders<User>.IndexKeys.Ascending(u => u.EmailIndex),
             new CreateIndexOptions { Unique = true, Name = "email_unique" });
 
         Users.Indexes.CreateOne(emailIndex);

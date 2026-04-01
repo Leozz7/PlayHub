@@ -2,22 +2,18 @@ using Isopoh.Cryptography.Argon2;
 
 namespace PlayHub.Application.Common.Security;
 
-/// <summary>
-/// Serviço de hash de senhas usando Argon2Id — algoritmo recomendado pelo OWASP.
-/// Configurado com parâmetros seguros: memória 64MB, 3 iterações, 4 threads paralelos.
-/// </summary>
 public class PasswordHasher
 {
-    private const int MemoryCost = 65536;  // 64 MB
-    private const int TimeCost = 3;        // iterações
-    private const int Parallelism = 4;     // threads paralelos
-    private const int HashLength = 32;     // bytes do hash
+    private const int MemoryCost = 65536;  
+    private const int TimeCost = 3;        
+    private const int Parallelism = 4;     
+    private const int HashLength = 32;     
 
     public string Hash(string password)
     {
         var config = new Argon2Config
         {
-            Type = Argon2Type.DataIndependentAddressing, // Argon2Id
+            Type = Argon2Type.DataIndependentAddressing,
             Version = Argon2Version.Nineteen,
             MemoryCost = MemoryCost,
             TimeCost = TimeCost,
