@@ -9,11 +9,13 @@ public class UpdateUserHandler : IRequestHandler<UpdateUserCommand, bool>
 {
     private readonly IApplicationDbContext _context;
     private readonly PasswordHasher _passwordHasher;
+    private readonly IEncryptionService _encryptionService;
 
-    public UpdateUserHandler(IApplicationDbContext context, PasswordHasher passwordHasher)
+    public UpdateUserHandler(IApplicationDbContext context, PasswordHasher passwordHasher, IEncryptionService encryptionService)
     {
         _context = context;
         _passwordHasher = passwordHasher;
+        _encryptionService = encryptionService;
     }
 
     public async Task<bool> Handle(UpdateUserCommand request, CancellationToken cancellationToken)
@@ -24,7 +26,20 @@ public class UpdateUserHandler : IRequestHandler<UpdateUserCommand, bool>
 
         if (user is null) return false;
 
-        user.UpdateDetails(request.Name, request.Email, request.Role);
+        var newEmailIndex = _encryptionService.CreateBlindIndex(request.Email);
+
+        if (user.EmailIndex != newEmailIndex)
+        {
+            var exists = await _context.Users
+                .Find(u => u.EmailIndex == newEmailIndex && u.Id != request.Id)
+                .AnyAsync(cancellationToken);
+
+            if (exists)
+                throw new InvalidOperationException($"O e-mail '{request.Email}' já está em uso por outro usuário.");
+        }
+
+        var encryptedEmail = _encryptionService.Encrypt(request.Email);
+        user.UpdateDetails(request.Name, encryptedEmail, newEmailIndex, request.Role);
 
         if (!string.IsNullOrWhiteSpace(request.Password))
         {

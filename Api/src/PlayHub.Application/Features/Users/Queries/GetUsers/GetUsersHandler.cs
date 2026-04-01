@@ -8,9 +8,13 @@ namespace PlayHub.Application.Features.Users.Queries.GetUsers;
 public class GetUsersHandler : IRequestHandler<GetUsersQuery, List<UserDto>>
 {
     private readonly IApplicationDbContext _context;
+    private readonly IEncryptionService _encryptionService;
 
-    public GetUsersHandler(IApplicationDbContext context)
-        => _context = context;
+    public GetUsersHandler(IApplicationDbContext context, IEncryptionService encryptionService)
+    {
+        _context = context;
+        _encryptionService = encryptionService;
+    }
 
     public async Task<List<UserDto>> Handle(GetUsersQuery request, CancellationToken cancellationToken)
     {
@@ -35,7 +39,7 @@ public class GetUsersHandler : IRequestHandler<GetUsersQuery, List<UserDto>>
         {
             Id = u.Id,
             Name = u.Name,
-            Email = u.Email,
+            Email = _encryptionService.Decrypt(u.Email),
             Role = u.Role,
             Created = u.Created
         }).ToList();

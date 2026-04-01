@@ -129,8 +129,9 @@ using (var scope = app.Services.CreateScope())
     {
         var dbContext = services.GetRequiredService<MongoDbContext>();
         var hasher = services.GetRequiredService<PasswordHasher>();
+        var encryptionService = services.GetRequiredService<IEncryptionService>();
 
-        await ApplicationDbContextSeed.SeedAdminAsync(dbContext, hasher);
+        await ApplicationDbContextSeed.SeedAdminAsync(dbContext, hasher, encryptionService);
         logger.LogInformation("✅ Seed executado com sucesso.");
     }
     catch (Exception ex)

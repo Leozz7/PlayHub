@@ -9,9 +9,13 @@ public record UpdateMyProfileCommand(Guid UserId, string Name, string Email) : I
 public class UpdateMyProfileHandler : IRequestHandler<UpdateMyProfileCommand, bool>
 {
     private readonly IApplicationDbContext _context;
+    private readonly IEncryptionService _encryptionService;
 
-    public UpdateMyProfileHandler(IApplicationDbContext context)
-        => _context = context;
+    public UpdateMyProfileHandler(IApplicationDbContext context, IEncryptionService encryptionService)
+    {
+        _context = context;
+        _encryptionService = encryptionService;
+    }
 
     public async Task<bool> Handle(UpdateMyProfileCommand request, CancellationToken cancellationToken)
     {
@@ -21,7 +25,20 @@ public class UpdateMyProfileHandler : IRequestHandler<UpdateMyProfileCommand, bo
 
         if (user is null) return false;
 
-        user.UpdateDetails(request.Name, request.Email, user.Role);
+        var newEmailIndex = _encryptionService.CreateBlindIndex(request.Email);
+
+        if (user.EmailIndex != newEmailIndex)
+        {
+            var exists = await _context.Users
+                .Find(u => u.EmailIndex == newEmailIndex && u.Id != request.UserId)
+                .AnyAsync(cancellationToken);
+
+            if (exists)
+                throw new InvalidOperationException($"O e-mail '{request.Email}' já está em uso por outro usuário.");
+        }
+
+        var encryptedEmail = _encryptionService.Encrypt(request.Email);
+        user.UpdateDetails(request.Name, encryptedEmail, newEmailIndex, user.Role);
 
         var result = await _context.Users.ReplaceOneAsync(
             u => u.Id == request.UserId,
