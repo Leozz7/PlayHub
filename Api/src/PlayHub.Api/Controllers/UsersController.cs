@@ -17,15 +17,12 @@ public class UsersController : ControllerBase
     protected ISender Mediator => _mediator ??= HttpContext.RequestServices.GetRequiredService<ISender>();
     
     [HttpGet]
-    [ProducesResponseType(StatusCodes.Status200OK)]
     public async Task<ActionResult<List<UserDto>>> Get([FromQuery] GetUsersQuery query)
     {
         return await Mediator.Send(query);
     }
 
     [HttpPost]
-    [ProducesResponseType(StatusCodes.Status201Created)]
-    [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<ActionResult<UserDto>> Create(CreateUserCommand command)
     {
         var result = await Mediator.Send(command);
@@ -33,8 +30,6 @@ public class UsersController : ControllerBase
     }
 
     [HttpPut("{id}")]
-    [ProducesResponseType(StatusCodes.Status204NoContent)]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<ActionResult> Update(Guid id, UpdateUserCommand command)
     {
         if (id != command.Id)
@@ -50,8 +45,6 @@ public class UsersController : ControllerBase
     }
 
     [HttpPut("my-profile")]
-    [ProducesResponseType(StatusCodes.Status204NoContent)]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<ActionResult> UpdateMyProfile(UpdateMyProfileCommand command)
     {
         var result = await Mediator.Send(command);
@@ -62,8 +55,6 @@ public class UsersController : ControllerBase
     }
 
     [HttpDelete("{id}")]
-    [ProducesResponseType(StatusCodes.Status204NoContent)]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<ActionResult> Delete(Guid id)
     {
         var result = await Mediator.Send(new DeleteUserCommand(id));

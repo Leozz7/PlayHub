@@ -20,6 +20,11 @@
 .env
 !.env.example
 
+# App Settings
+[Aa]ppsettings.json
+[Aa]ppsettings.*.json
+![Aa]ppsettings.example.json
+
 
 # User-specific files (MonoDevelop/Xamarin Studio)
 *.userprefs

@@ -1,4 +1,6 @@
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.HttpOverrides;
+using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using PlayHub.Application;
@@ -7,6 +9,7 @@ using PlayHub.Infrastructure;
 using PlayHub.Infrastructure.Persistence;
 using System.Globalization;
 using System.Text;
+using System.Threading.RateLimiting;
 
 var culture = new CultureInfo("pt-BR");
 CultureInfo.DefaultThreadCurrentCulture = culture;
@@ -17,8 +20,6 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Configuration
     .SetBasePath(Directory.GetCurrentDirectory())
     .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
-    .AddJsonFile($"appsettings.{builder.Environment.EnvironmentName}.json",
-        optional: true, reloadOnChange: true)
     .AddEnvironmentVariables();
 
 builder.Services.AddControllers();
@@ -101,6 +102,40 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 
 builder.Services.AddAuthorization();
 
+builder.Services.Configure<ForwardedHeadersOptions>(options =>
+{
+    options.ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto;
+    options.KnownNetworks.Clear();
+    options.KnownProxies.Clear();
+});
+
+var rlConfig = builder.Configuration.GetSection("RateLimiting");
+var permitLimit = rlConfig.GetValue<int>("PermitLimit", 100);
+var windowInMinutes = rlConfig.GetValue<int>("WindowInMinutes", 1);
+
+builder.Services.AddRateLimiter(options =>
+{
+    options.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
+    
+    options.OnRejected = async (context, token) =>
+    {
+        await context.HttpContext.Response.WriteAsJsonAsync(new { 
+            message = "Limite de requisições excedido. Tente novamente mais tarde.",
+            retryAfter = "1 minute"
+        }, token);
+    };
+
+    options.AddPolicy("fixed", context =>
+        RateLimitPartition.GetFixedWindowLimiter(
+            partitionKey: context.Connection.RemoteIpAddress?.ToString() ?? "fallback",
+            factory: _ => new FixedWindowRateLimiterOptions
+            {
+                PermitLimit = permitLimit,
+                Window = TimeSpan.FromMinutes(windowInMinutes),
+                QueueLimit = rlConfig.GetValue<int>("QueueLimit", 0)
+            }));
+});
+
 builder.WebHost.UseUrls("http://0.0.0.0:5000");
 
 var app = builder.Build();
@@ -115,10 +150,12 @@ if (app.Environment.IsDevelopment())
     });
 }
 
+app.UseForwardedHeaders();
 app.UseCors("PlayHubPolicy");
+app.UseRateLimiter();
 app.UseAuthentication();
 app.UseAuthorization();
-app.MapControllers();
+app.MapControllers().RequireRateLimiting("fixed");
 
 using (var scope = app.Services.CreateScope())
 {
