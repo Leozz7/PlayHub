@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using PlayHub.Application.Common.Interfaces;
 using PlayHub.Domain.Entities;
@@ -12,10 +12,12 @@ namespace PlayHub.Infrastructure.Identity;
 public class JwtTokenService : IJwtTokenService
 {
     private readonly IConfiguration _config;
+    private readonly IEncryptionService _encryptionService;
 
-    public JwtTokenService(IConfiguration config)
+    public JwtTokenService(IConfiguration config, IEncryptionService encryptionService)
     {
         _config = config;
+        _encryptionService = encryptionService;
     }
 
     public string GenerateToken(User user)
@@ -25,10 +27,12 @@ public class JwtTokenService : IJwtTokenService
         
         var creds = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256);
 
+        var decryptedEmail = _encryptionService.Decrypt(user.Email);
+
         var claims = new[]
         {
             new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
-            new Claim(ClaimTypes.Email, user.Email),
+            new Claim(ClaimTypes.Email, decryptedEmail),
             new Claim(ClaimTypes.Name, user.Name),
             new Claim(ClaimTypes.Role, user.Role)
         };
