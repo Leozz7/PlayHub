@@ -9,6 +9,7 @@ using PlayHub.Application.Common.Interfaces;
 using PlayHub.Application.Common.Security;
 using PlayHub.Application.Features.Users.Queries.GetUserById;
 using PlayHub.Domain.Entities;
+using PlayHub.Application.Features.Users.Commands.ChangePassword;
 
 namespace PlayHub.Api.Controllers;
 
@@ -76,15 +77,9 @@ public class AuthController : ControllerBase
             .Find(u => u.EmailIndex == emailIndex)
             .FirstOrDefaultAsync(cancellationToken);
 
-        if (user == null || !_passwordHasher.Verify(request.Password, user.PasswordHash, out bool needsUpgrade))
+        if (user == null || !_passwordHasher.Verify(request.Password, user.PasswordHash))
         {
             return Unauthorized(new { message = "Usuário ou senha inválidos." });
-        }
-
-        if (needsUpgrade)
-        {
-            var newHash = _passwordHasher.Hash(request.Password);
-            user.SetNewPasswordHash(newHash);
         }
 
         var accessToken = _tokenService.GenerateToken(user);
@@ -215,23 +210,19 @@ public class AuthController : ControllerBase
     [Authorize]
     public async Task<IActionResult> ChangePassword([FromBody] ChangePasswordRequest request, CancellationToken cancellationToken)
     {
-        if (string.IsNullOrWhiteSpace(request.NewPassword) || request.NewPassword.Length < 6)
-            return BadRequest(new { message = "A nova senha deve ter pelo menos 6 caracteres." });
-
-        var user = await _context.Users
-            .Find(u => u.Id == LoggedInUserId)
-            .FirstOrDefaultAsync(cancellationToken);
+        try
+        {
+            var command = new ChangePasswordCommand(LoggedInUserId, request.CurrentPassword, request.NewPassword);
+            var result = await _mediator.Send(command, cancellationToken);
             
-        if (user == null) return NotFound();
+            if (!result) return NotFound();
 
-        if (!_passwordHasher.Verify(request.CurrentPassword, user.PasswordHash, out _))
-            return BadRequest(new { message = "Senha atual incorreta." });
-
-        var newHash = _passwordHasher.Hash(request.NewPassword);
-        user.SetNewPasswordHash(newHash);
-        
-        await _context.Users.ReplaceOneAsync(u => u.Id == user.Id, user, cancellationToken: cancellationToken);
-
-        return Ok(new { message = "Senha alterada com sucesso." });
+            Response.Cookies.Delete("refreshToken", GetRefreshTokenCookieOptions());
+            return Ok(new { message = "Senha alterada com sucesso. Sessões anteriores foram invalidadas." });
+        }
+        catch (InvalidOperationException ex)
+        {
+            return BadRequest(new { message = ex.Message });
+        }
     }
 }
