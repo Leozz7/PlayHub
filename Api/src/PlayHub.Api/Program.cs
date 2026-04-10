@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using PlayHub.Application;
+using PlayHub.Application.Common.Interfaces;
 using PlayHub.Application.Common.Security;
 using PlayHub.Infrastructure;
 using PlayHub.Infrastructure.Persistence;
@@ -105,7 +106,7 @@ builder.Services.AddAuthorization();
 builder.Services.Configure<ForwardedHeadersOptions>(options =>
 {
     options.ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto;
-    options.KnownNetworks.Clear();
+    options.KnownIPNetworks.Clear();
     options.KnownProxies.Clear();
 });
 

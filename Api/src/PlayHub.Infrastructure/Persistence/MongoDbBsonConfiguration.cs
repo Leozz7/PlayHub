@@ -49,6 +49,42 @@ public static class MongoDbBsonConfiguration
                 });
             }
 
+            if (!BsonClassMap.IsClassMapRegistered(typeof(Court)))
+            {
+                BsonClassMap.RegisterClassMap<Court>(cm =>
+                {
+                    cm.AutoMap();
+                    cm.SetIgnoreExtraElements(true);
+                });
+            }
+
+            if (!BsonClassMap.IsClassMapRegistered(typeof(Reservation)))
+            {
+                BsonClassMap.RegisterClassMap<Reservation>(cm =>
+                {
+                    cm.AutoMap();
+                    cm.SetIgnoreExtraElements(true);
+                });
+            }
+
+            if (!BsonClassMap.IsClassMapRegistered(typeof(Payment)))
+            {
+                BsonClassMap.RegisterClassMap<Payment>(cm =>
+                {
+                    cm.AutoMap();
+                    cm.SetIgnoreExtraElements(true);
+                });
+            }
+
+            if (!BsonClassMap.IsClassMapRegistered(typeof(SystemLog)))
+            {
+                BsonClassMap.RegisterClassMap<SystemLog>(cm =>
+                {
+                    cm.AutoMap();
+                    cm.SetIgnoreExtraElements(true);
+                });
+            }
+
             _configured = true;
         }
     }

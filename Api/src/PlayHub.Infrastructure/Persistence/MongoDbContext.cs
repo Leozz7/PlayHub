@@ -14,6 +14,18 @@ public sealed class MongoDbContext : IApplicationDbContext
     public IMongoCollection<User> Users =>
         _database.GetCollection<User>("users");
 
+    public IMongoCollection<Court> Courts =>
+        _database.GetCollection<Court>("courts");
+
+    public IMongoCollection<Reservation> Reservations =>
+        _database.GetCollection<Reservation>("reservations");
+
+    public IMongoCollection<Payment> Payments =>
+        _database.GetCollection<Payment>("payments");
+
+    public IMongoCollection<SystemLog> SystemLogs =>
+        _database.GetCollection<SystemLog>("system_logs");
+
     public MongoDbContext(IMongoClient client, string databaseName)
     {
         _database = client.GetDatabase(databaseName);
@@ -33,5 +45,23 @@ public sealed class MongoDbContext : IApplicationDbContext
             new CreateIndexOptions { Name = "role_idx" });
 
         Users.Indexes.CreateOne(roleIndex);
+
+        var reservationCourtIndex = new CreateIndexModel<Reservation>(
+            Builders<Reservation>.IndexKeys.Ascending(r => r.CourtId),
+            new CreateIndexOptions { Name = "court_idx" });
+
+        Reservations.Indexes.CreateOne(reservationCourtIndex);
+
+        var paymentReservationIndex = new CreateIndexModel<Payment>(
+            Builders<Payment>.IndexKeys.Ascending(p => p.ReservationId),
+            new CreateIndexOptions { Name = "reservation_idx" });
+
+        Payments.Indexes.CreateOne(paymentReservationIndex);
+
+        var logLevelIndex = new CreateIndexModel<SystemLog>(
+            Builders<SystemLog>.IndexKeys.Ascending(l => l.Level),
+            new CreateIndexOptions { Name = "level_idx" });
+
+        SystemLogs.Indexes.CreateOne(logLevelIndex);
     }
 }
