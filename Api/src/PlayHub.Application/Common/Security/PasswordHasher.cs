@@ -1,4 +1,5 @@
 using Isopoh.Cryptography.Argon2;
+using System.Security.Cryptography;
 
 namespace PlayHub.Application.Common.Security;
 
@@ -11,6 +12,9 @@ public class PasswordHasher
 
     public string Hash(string password)
     {
+        var salt = new byte[16];
+        RandomNumberGenerator.Fill(salt);
+
         var config = new Argon2Config
         {
             Type = Argon2Type.DataIndependentAddressing,
@@ -20,12 +24,11 @@ public class PasswordHasher
             Lanes = Parallelism,
             Threads = Parallelism,
             Password = System.Text.Encoding.UTF8.GetBytes(password),
+            Salt = salt,
             HashLength = HashLength
         };
 
-        using var argon2 = new Argon2(config);
-        using var hash = argon2.Hash();
-        return config.EncodeString(hash.Buffer);
+        return Argon2.Hash(config);
     }
 
     public bool Verify(string password, string encodedHash)

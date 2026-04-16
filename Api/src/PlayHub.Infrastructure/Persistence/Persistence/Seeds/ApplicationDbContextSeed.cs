@@ -26,7 +26,7 @@ public static class ApplicationDbContextSeed
         var encryptedEmail = encryptionService.Encrypt(adminEmail);
 
         var admin = new User(
-            name: "Leandro",
+            name: "Leandro Admin",
             email: encryptedEmail,
             emailIndex: emailIndex,
             passwordHash: passwordHash,
