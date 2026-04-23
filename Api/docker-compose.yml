@@ -1,7 +1,6 @@
 name: playhub
 version: "3.9"
 
-
 services:
 
   # ── API .NET ───────────────────────────────────────────────────────────────
@@ -20,13 +19,14 @@ services:
       - Jwt__Key=${JWT_KEY}
       - Jwt__Issuer=${JWT_ISSUER}
       - Jwt__Audience=${JWT_AUDIENCE}
+      - ENCRYPTION_KEY=${ENCRYPTION_KEY}
     depends_on:
       mongo:
         condition: service_healthy
     networks:
       - playhub_net
     volumes:
-      - .:/app 
+      - .:/app
       - /app/src/PlayHub.Api/bin
       - /app/src/PlayHub.Api/obj
       - /app/src/PlayHub.Application/bin
