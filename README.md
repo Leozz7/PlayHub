@@ -53,4 +53,3 @@ O ecossistema do PlayHub foca na descentralização e resiliência:
 4. Em breve, a camada de Client Side (React) possuíra seu próprio manual de compilação.
 
 ---
-Feito com dedicação 💙 para automatizar o tempo livre e focar no que os usuários amam, seja qual for a área, a bola não pode parar!
