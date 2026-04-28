@@ -1,7 +1,6 @@
-import React from 'react';
 import { QueryClientProvider } from '@tanstack/react-query';
 import { queryClient } from '@/lib/queryClient';
-import { LoginForm } from '@/features/auth/components/LoginForm';
+import { LoginForm } from '@/components/LoginForm';
 
 export function App() {
   return (

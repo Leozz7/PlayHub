@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useLogin } from '../hooks/useLogin';
+import { useLogin } from '@/features/auth/hooks/useLogin';
 
 export function LoginForm() {
   const [email, setEmail] = useState('');
