@@ -6,23 +6,28 @@ using PlayHub.Application.Features.Users.Commands.UpdateUser;
 using PlayHub.Application.Features.Users.Commands.UpdateMyProfile;
 using PlayHub.Application.Features.Users.Queries.GetUsers;
 using PlayHub.Application.Features.Users.Dtos;
+using Microsoft.AspNetCore.Authorization;
+using PlayHub.Domain.Constants;
 
 namespace PlayHub.Api.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
+[Authorize]
 public class UsersController : ControllerBase
 {
     private ISender? _mediator;
     protected ISender Mediator => _mediator ??= HttpContext.RequestServices.GetRequiredService<ISender>();
     
     [HttpGet]
+    [Authorize(Roles = AppRoles.AdminOrManager)]
     public async Task<ActionResult<List<UserDto>>> Get([FromQuery] GetUsersQuery query)
     {
         return await Mediator.Send(query);
     }
 
     [HttpPost]
+    [Authorize(Roles = AppRoles.AdminOrManager)]
     public async Task<ActionResult<UserDto>> Create(CreateUserCommand command)
     {
         var result = await Mediator.Send(command);
@@ -30,6 +35,7 @@ public class UsersController : ControllerBase
     }
 
     [HttpPut("{id}")]
+    [Authorize(Roles = AppRoles.AdminOrManager)]
     public async Task<ActionResult> Update(Guid id, UpdateUserCommand command)
     {
         if (id != command.Id)
@@ -55,6 +61,7 @@ public class UsersController : ControllerBase
     }
 
     [HttpDelete("{id}")]
+    [Authorize(Roles = AppRoles.AdminOrManager)]
     public async Task<ActionResult> Delete(Guid id)
     {
         var result = await Mediator.Send(new DeleteUserCommand(id));
