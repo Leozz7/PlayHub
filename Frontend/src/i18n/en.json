@@ -1,0 +1,347 @@
+{
+  "common": {
+    "actions": {
+      "login": "Log in",
+      "enter": "Book Now",
+      "logout": "Log out"
+    },
+    "navigation": {
+      "dashboard": "My Dashboard",
+      "courts": "Courts",
+      "leagues": "Sports"
+    }
+  },
+  "menu": {
+    "profile": {
+      "btnProfile": "My Profile"
+    }
+  },
+  "header": {
+    "userMenu": {
+      "managerPanel": "Manager Panel",
+      "generalAdmin": "Administration"
+    }
+  },
+  "footer": {
+    "description": "The definitive platform for booking sports courts. Find, book, and play without complications. Create your account for free.",
+    "navigation": {
+      "title": "Platform",
+      "championships": "Courts"
+    },
+    "institutional": {
+      "title": "Support",
+      "about": "How it Works",
+      "terms": "Terms of Use",
+      "privacy": "Privacy Policy"
+    },
+    "bottom": {
+      "contactUs": "Contact",
+      "copyright": "© {{year}} PlayHub. All rights reserved."
+    }
+  },
+  "login": {
+    "title": "Access your account",
+    "subtitle": "Welcome back to PlayHub",
+    "emailLabel": "Email",
+    "passwordLabel": "Password",
+    "submitBtn": "Log in",
+    "registerPrompt": "Don't have an account?",
+    "registerLink": "Sign up",
+    "brandingTitle": "Your game,\nyour rules.",
+    "brandingSubtitle": "The definitive platform for managing and booking sports arenas. Join the PlayHub community and don't miss out on the next match.",
+    "backToHome": "Back to home",
+    "forgotPassword": "Forgot?",
+    "authenticating": "Authenticating...",
+    "or": "or",
+    "loginSuccess": "Login successful!",
+    "loginError": "Failed to log in. Please check your credentials.",
+    "badges": [
+      "Instant booking",
+      "Secure payment",
+      "24/7 Support"
+    ]
+  },
+  "register": {
+    "title": "Create Account",
+    "subtitle": "Join the biggest courts platform",
+    "nameLabel": "First Name",
+    "lastNameLabel": "Last Name",
+    "emailLabel": "Email",
+    "passwordLabel": "Password",
+    "confirmPasswordLabel": "Confirm Password",
+    "confirmLabelShort": "Confirm",
+    "submitBtn": "Create account",
+    "loginPrompt": "Already have an account?",
+    "loginLink": "Log in",
+    "brandingTitle": "Start your\njourney.",
+    "brandingSubtitle": "Join the largest community of athletes in Brazil. Book your court with one click and live the full PlayHub experience.",
+    "securityDivider": "Security",
+    "termsNotice": "By creating your account you agree to our",
+    "termsLink": "Terms of Use",
+    "privacyLink": "Privacy Policy",
+    "creatingAccount": "Creating account...",
+    "registerSuccess": "Account created successfully! Log in to continue.",
+    "registerError": "Failed to create account. Please try again.",
+    "steps": [
+      {
+        "n": "01",
+        "label": "Create your free account in seconds"
+      },
+      {
+        "n": "02",
+        "label": "Find courts in your area"
+      },
+      {
+        "n": "03",
+        "label": "Book and play without bureaucracy"
+      }
+    ]
+  },
+  "index": {
+    "marquee": {
+      "item1": "INSTANT BOOKING",
+      "item2": "SECURE PAYMENT",
+      "item3": "BEST COURTS",
+      "item4": "24H AVAILABILITY",
+      "item5": "FREE CANCELLATION",
+      "item6": "24/7 SUPPORT"
+    },
+    "sports": {
+      "title": "Featured Sports",
+      "subtitle": "Choose your sport and see available courts now.",
+      "viewAll": "View all",
+      "bookNow": "Book Now →",
+      "perHour": " / hour"
+    },
+    "hero": {
+      "titleLine1": "Book your court",
+      "titleLine2": "with one click!",
+      "subtitle": "Football, Beach Volley, Tennis and more — real-time availability, secure payment, and immediate confirmation.",
+      "badges": "The ideal court • The ideal place • Your schedule",
+      "stats": {
+        "courts": "courts",
+        "bookings": "bookings",
+        "satisfaction": "satisfaction"
+      },
+      "explore": "Explore more"
+    },
+    "howItWorks": {
+      "title": "How it works",
+      "subtitle": "Four simple steps to your next match."
+    },
+    "testimonials": {
+      "title": "What people say",
+      "subtitle": "Feedback from those who live the PlayHub experience."
+    },
+    "paymentMethods": {
+      "title": "Secure & Easy Payment"
+    },
+    "cta": {
+      "title": "Ready for your next match?",
+      "subtitle": "Join the biggest community of athletes and book your court in seconds.",
+      "createAccount": "Create account now →",
+      "viewSports": "View sports"
+    },
+    "stats": {
+      "courts": "Registered Courts",
+      "bookings": "Bookings Made",
+      "satisfaction": "Satisfaction",
+      "sports": "Sports"
+    },
+    "steps": {
+      "step1": {
+        "title": "Create your account",
+        "desc": "Free registration in seconds. No credit card required."
+      },
+      "step2": {
+        "title": "Choose the court",
+        "desc": "Filter by sport, location, time, and price."
+      },
+      "step3": {
+        "title": "Book and pay",
+        "desc": "Immediate confirmation and receipt in your email."
+      },
+      "step4": {
+        "title": "Play and enjoy!",
+        "desc": "Arrive on time and enjoy your match without bureaucracy."
+      }
+    },
+    "feedback": {
+      "t1": {
+        "role": "Amateur player",
+        "text": "Finally found an easy way to book courts. In less than 2 minutes my match is confirmed!"
+      },
+      "t2": {
+        "role": "Court owner",
+        "text": "PlayHub transformed my management. Reduced calls by 80% and have full control of bookings."
+      },
+      "t3": {
+        "role": "Beach tennis coach",
+        "text": "I recommend it to all my students. The platform is intuitive and support is excellent."
+      }
+    }
+  },
+  "contact": {
+    "title": "Contact Us",
+    "subtitle": "We are here to help. Send your questions, suggestions or partnership requests.",
+    "infoTitle": "Our Channels",
+    "formTitle": "Send a message",
+    "nameLabel": "Your Name",
+    "emailLabel": "Your Email",
+    "subjectLabel": "Subject",
+    "messageLabel": "Message",
+    "submitBtn": "Send Message",
+    "successMessage": "Your message was sent successfully! We will get back to you soon."
+  },
+  "about": {
+    "eyebrow": "Who We Are",
+    "heroTitle1": "Connecting athletes",
+    "heroTitle2": "to the best courts.",
+    "subtitle": "The definitive platform connecting passionate athletes to the best sports courts — simple, fast and secure.",
+    "stat1": "Partner Courts",
+    "stat2": "Bookings Made",
+    "stat3": "Satisfaction",
+    "stat4": "Sports",
+    "missionTitle": "Our Mission",
+    "missionText": "Make sports accessible. We believe that exercising, gathering friends and playing should be as simple as ordering food.",
+    "missionComplement": "We built PlayHub to eliminate the bureaucracy between you and your next match. No calls, no unanswered messages — just book and play.",
+    "forUsersEyebrow": "For Athletes",
+    "forUsersTitle": "Your next match one click away.",
+    "forUsersText": "Stop texting multiple arenas hoping for a free slot. With PlayHub you filter courts in your area, pick the perfect time, and book in seconds.",
+    "forUsersBadges": [
+      "Book in seconds",
+      "Secure payment",
+      "Invite friends",
+      "Split the bill"
+    ],
+    "userCta": "Create free account",
+    "userFeature1Title": "Smart search",
+    "userFeature1Desc": "Filter by sport, location, price, and real-time availability.",
+    "userFeature2Title": "24h availability",
+    "userFeature2Desc": "See open slots on the map and book whenever you want, any time.",
+    "userFeature3Title": "Secure payment",
+    "userFeature3Desc": "Credit card or Pix — everything encrypted and protected.",
+    "userFeature4Title": "Invite your crew",
+    "userFeature4Desc": "Share the booking link, split the cost and play with your friends.",
+    "forManagersEyebrow": "Manager Panel",
+    "forManagersSection": "For Managers",
+    "forManagersTitle": "Your arena on autopilot.",
+    "forManagersText": "Digitize your arena and end ghost time slots. Automate bookings, receive online payments, and have full control of your business.",
+    "forManagersComplement": "Managers using PlayHub report up to 80% fewer calls and a significant increase in court occupancy rates.",
+    "forManagersBadges": [
+      "Full dashboard",
+      "Revenue reports",
+      "Schedule management",
+      "Automatic notifications"
+    ],
+    "managerCta": "Register my arena",
+    "managerFeature1Title": "Real-time reports",
+    "managerFeature1Desc": "Track revenue, occupancy, and trends directly on the dashboard.",
+    "managerFeature2Title": "Automatic notifications",
+    "managerFeature2Desc": "Client reminders, cancellation alerts, and automatic confirmations.",
+    "managerFeature3Title": "Pix & Card integrated",
+    "managerFeature3Desc": "Receive online payments without hassle. Money goes straight to your account.",
+    "managerFeature4Title": "Verified reviews",
+    "managerFeature4Desc": "Build reputation with real reviews from players on the platform.",
+    "managerHighlightLabel": "Reduction in calls",
+    "diffEyebrow": "Why PlayHub?",
+    "diffTitle": "What makes us different",
+    "diff1Title": "100% Secure",
+    "diff1Desc": "Encrypted payments and protected data. Your privacy is our priority.",
+    "diff2Title": "Instant",
+    "diff2Desc": "Immediate booking confirmation and receipt in your email within seconds.",
+    "diff3Title": "Active Community",
+    "diff3Desc": "Over 12,000 active athletes. Find playing partners in your area.",
+    "joinUsTitle": "Join the Sports Revolution",
+    "joinUsText": "Whether you are a weekend athlete or the owner of the biggest arena in town, PlayHub is your home.",
+    "ctaUser": "Book now",
+    "ctaManager": "Register my arena"
+  },
+  "catalog": {
+    "title": "Catalog",
+    "heading": "Find your ideal court.",
+    "description": "{{count}} courts available across Brazil. Use filters to find the perfect one for you.",
+    "searchPlaceholder": "Court name or location...",
+    "filtersTitle": "Filters",
+    "clearAll": "Clear all",
+    "sport": "Sport",
+    "city": "City",
+    "status": "Status",
+    "statusLabels": {
+      "available": "Available",
+      "busy": "Busy",
+      "closed": "Closed"
+    },
+    "minRating": "Minimum rating",
+    "anyRating": "Any",
+    "ratingOrMore": "{{rating}}★ or more",
+    "maxPrice": "Max price / hour",
+    "availability": "Availability",
+    "selectDate": "Select a date to check availability:",
+    "showingCourtsFor": "Showing available courts on {{date}}",
+    "availableToday": "Available today",
+    "hide": "Hide",
+    "courtsFound": "courts found",
+    "sortKeys": {
+      "rating": "Top rated",
+      "price_asc": "Lowest price",
+      "price_desc": "Highest price",
+      "reviews": "Most reviewed"
+    },
+    "noCourts": "No courts found",
+    "noCourtsDesc": "Try adjusting your filters or clearing your search.",
+    "clearFiltersBtn": "Clear filters"
+  },
+  "details": {
+    "backToCatalog": "Back to catalog",
+    "seeMore": "See more",
+    "reviews": "Reviews",
+    "rating": "Rating",
+    "price": "Price",
+    "hours": "Hours",
+    "city": "City",
+    "sports": "Sports",
+    "amenities": "Amenities",
+    "scheduling": "Scheduling",
+    "schedulingDesc": "Select the desired day and times. You can book multiple consecutive hours.",
+    "fullyBooked": "Full",
+    "otherDates": "Other",
+    "selectOtherDateTitle": "Select another date",
+    "courtUnavailable": "Court unavailable on this day",
+    "tryAnotherDate": "Select another date to check availability.",
+    "statusAvailable": "Available",
+    "statusBusy": "Busy",
+    "statusSelected": "Selected",
+    "hoursSelected": "hour(s) selected",
+    "leaveReview": "Leave a Review",
+    "loginToReview": "You must be logged in to leave a review.",
+    "loginBtn": "Log in",
+    "yourRating": "Your rating:",
+    "reviewPlaceholder": "Share your experience with this court...",
+    "publishReview": "Publish review",
+    "bookingSummary": "Booking Summary",
+    "confirmDetails": "Confirm the details before proceeding",
+    "noSlotSelected": "No time slot selected",
+    "hoursCount": "hour(s)",
+    "total": "Total",
+    "bookHours": "Book {{count}} hour(s)",
+    "securePayment": "100% secure and encrypted payment",
+    "notFound": "Court not found",
+    "bookingConfirmed": "Booking confirmed!",
+    "bookingSuccess": "Your booking at",
+    "bookingSuccessSuffix": "was successfully made. You will receive a confirmation email shortly.",
+    "goToHome": "Go to home",
+    "viewCatalog": "View catalog"
+  },
+  "forgotPassword": {
+    "title": "Recover password",
+    "subtitle": "Enter your email to receive a password reset link.",
+    "emailLabel": "EMAIL",
+    "submitBtn": "SEND LINK",
+    "sending": "SENDING...",
+    "backToLogin": "Back to login",
+    "successMsg": "If the email exists, a reset link has been sent!",
+    "brandingTitle": "Regain access\nto your PlayHub account.",
+    "brandingSubtitle": "It's fast, easy, and secure. Get back to the courts as soon as possible."
+  }
+}

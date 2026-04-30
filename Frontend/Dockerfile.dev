@@ -1,0 +1,15 @@
+FROM node:20-alpine
+
+WORKDIR /app
+
+# Ativa polling para o Vite identificar as mudanças de arquivo no Docker (Hot Reload)
+ENV CHOKIDAR_USEPOLLING=true
+
+COPY package*.json ./
+RUN npm install
+
+COPY . .
+
+EXPOSE 8080
+
+CMD ["npm", "run", "dev", "--", "--host", "0.0.0.0", "--port", "8080"]

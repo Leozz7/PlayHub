@@ -1,0 +1,347 @@
+{
+  "common": {
+    "actions": {
+      "login": "Entrar",
+      "enter": "Reservar Ahora",
+      "logout": "Cerrar sesión"
+    },
+    "navigation": {
+      "dashboard": "Mi Panel",
+      "courts": "Canchas",
+      "leagues": "Deportes"
+    }
+  },
+  "menu": {
+    "profile": {
+      "btnProfile": "Mi Perfil"
+    }
+  },
+  "header": {
+    "userMenu": {
+      "managerPanel": "Panel de Gestor",
+      "generalAdmin": "Administración"
+    }
+  },
+  "footer": {
+    "description": "La plataforma definitiva para reservas de canchas deportivas. Encuentra, reserva y juega sin complicaciones. Crea tu cuenta gratis.",
+    "navigation": {
+      "title": "Plataforma",
+      "championships": "Canchas"
+    },
+    "institutional": {
+      "title": "Soporte",
+      "about": "Cómo Funciona",
+      "terms": "Términos de Uso",
+      "privacy": "Privacidad"
+    },
+    "bottom": {
+      "contactUs": "Contacto",
+      "copyright": "© {{year}} PlayHub. Todos los derechos reservados."
+    }
+  },
+  "login": {
+    "title": "Accede a tu cuenta",
+    "subtitle": "Bienvenido de vuelta a PlayHub",
+    "emailLabel": "Correo electrónico",
+    "passwordLabel": "Contraseña",
+    "submitBtn": "Entrar",
+    "registerPrompt": "¿Aún no tienes cuenta?",
+    "registerLink": "Regístrate",
+    "brandingTitle": "Tu juego,\ntus reglas.",
+    "brandingSubtitle": "La plataforma definitiva para gestionar y reservar arenas deportivas. Únete a la comunidad PlayHub y no te quedes fuera del próximo partido.",
+    "backToHome": "Volver al inicio",
+    "forgotPassword": "¿Olvidaste?",
+    "authenticating": "Autenticando...",
+    "or": "o",
+    "loginSuccess": "¡Inicio de sesión exitoso!",
+    "loginError": "Error al iniciar sesión. Por favor, verifica tus credenciales.",
+    "badges": [
+      "Reserva inmediata",
+      "Pago seguro",
+      "Soporte 24/7"
+    ]
+  },
+  "register": {
+    "title": "Crear Cuenta",
+    "subtitle": "Únete a la mayor plataforma de canchas",
+    "nameLabel": "Nombre",
+    "lastNameLabel": "Apellido",
+    "emailLabel": "Correo electrónico",
+    "passwordLabel": "Contraseña",
+    "confirmPasswordLabel": "Confirmar Contraseña",
+    "confirmLabelShort": "Confirmar",
+    "submitBtn": "Crear cuenta",
+    "loginPrompt": "¿Ya tienes cuenta?",
+    "loginLink": "Inicia sesión",
+    "brandingTitle": "Comienza tu\nvoyaje.",
+    "brandingSubtitle": "Únete a la comunidad de atletas más grande de Brasil. Reserva tu cancha con un clic y vive la experiencia completa de PlayHub.",
+    "securityDivider": "Seguridad",
+    "termsNotice": "Al crear tu cuenta aceptas nuestros",
+    "termsLink": "Términos de Uso",
+    "privacyLink": "Política de Privacidad",
+    "creatingAccount": "Creando cuenta...",
+    "registerSuccess": "¡Cuenta creada con éxito! Inicia sesión para continuar.",
+    "registerError": "Error ao criar conta. Por favor, intenta de nuevo.",
+    "steps": [
+      {
+        "n": "01",
+        "label": "Crea tu cuenta gratuita en segundos"
+      },
+      {
+        "n": "02",
+        "label": "Encuentra canchas en tu zona"
+      },
+      {
+        "n": "03",
+        "label": "Reserva y juega sin burocracia"
+      }
+    ]
+  },
+  "index": {
+    "marquee": {
+      "item1": "RESERVA INMEDIATA",
+      "item2": "PAGO SEGURO",
+      "item3": "MEJORES CANCHAS",
+      "item4": "DISPONIBILIDAD 24H",
+      "item5": "CANCELACIÓN GRATIS",
+      "item6": "SOPORTE 24/7"
+    },
+    "sports": {
+      "title": "Modalidades Destacadas",
+      "subtitle": "Elige tu deporte y mira las canchas disponibles ahora.",
+      "viewAll": "Ver todas",
+      "bookNow": "Reservar →",
+      "perHour": " / hora"
+    },
+    "hero": {
+      "titleLine1": "Reserva tu cancha",
+      "titleLine2": "¡con un clic!",
+      "subtitle": "Fútbol, Vóley playa, Tenis y mucho más — disponibilidad en tiempo real, pago seguro y confirmación inmediata.",
+      "badges": "La cancha ideal • El lugar ideal • Tu horario",
+      "stats": {
+        "courts": "canchas",
+        "bookings": "reservas",
+        "satisfaction": "satisfacción"
+      },
+      "explore": "Explorar más"
+    },
+    "howItWorks": {
+      "title": "Cómo funciona",
+      "subtitle": "Cuatro pasos simples para tu próximo partido."
+    },
+    "testimonials": {
+      "title": "Lo que dicen de nosotros",
+      "subtitle": "Comentarios de quienes ya viven la experiencia PlayHub."
+    },
+    "paymentMethods": {
+      "title": "Pago Seguro y Fácil"
+    },
+    "cta": {
+      "title": "¿Listo para tu próximo partido?",
+      "subtitle": "Únete a la mayor comunidad de atletas y reserva tu cancha en segundos.",
+      "createAccount": "Crear cuenta ahora →",
+      "viewSports": "Ver deportes"
+    },
+    "stats": {
+      "courts": "Canchas Registradas",
+      "bookings": "Reservas Realizadas",
+      "satisfaction": "Satisfacción",
+      "sports": "Deportes"
+    },
+    "steps": {
+      "step1": {
+        "title": "Crea tu cuenta",
+        "desc": "Registro gratuito en segundos. Sin tarjeta de crédito."
+      },
+      "step2": {
+        "title": "Elige la cancha",
+        "desc": "Filtra por deporte, ubicación, horario y precio."
+      },
+      "step3": {
+        "title": "Reserva y paga",
+        "desc": "Confirmación inmediata y comprobante en tu correo."
+      },
+      "step4": {
+        "title": "¡Juega y disfruta!",
+        "desc": "Llega a tiempo y disfruta de tu partido sin burocracia."
+      }
+    },
+    "feedback": {
+      "t1": {
+        "role": "Jugadora aficionada",
+        "text": "Al fin encontré una forma fácil de reservar canchas. ¡En menos de 2 minutos ya tengo mi partido confirmado!"
+      },
+      "t2": {
+        "role": "Dueño de cancha",
+        "text": "PlayHub transformó mi gestión. Reduje un 80% las llamadas y tengo control total de las reservas."
+      },
+      "t3": {
+        "role": "Profesora de tenis",
+        "text": "Lo recomiendo a todos mis alumnos. La plataforma es intuitiva y el soporte es excelente."
+      }
+    }
+  },
+  "contact": {
+    "title": "Contáctenos",
+    "subtitle": "Estamos aquí para ayudar. Envíe sus preguntas, sugerencias o solicitudes de asociación.",
+    "infoTitle": "Nuestros Canales",
+    "formTitle": "Enviar un mensaje",
+    "nameLabel": "Su Nombre",
+    "emailLabel": "Su Correo",
+    "subjectLabel": "Asunto",
+    "messageLabel": "Mensaje",
+    "submitBtn": "Enviar Mensaje",
+    "successMessage": "¡Su mensaje fue enviado con éxito! Le responderemos pronto."
+  },
+  "about": {
+    "eyebrow": "Quiénes Somos",
+    "heroTitle1": "Conectando atletas",
+    "heroTitle2": "con las mejores canchas.",
+    "subtitle": "La plataforma definitiva que conecta atletas apasionados con las mejores canchas deportivas — simple, rápido y seguro.",
+    "stat1": "Canchas Asociadas",
+    "stat2": "Reservas Realizadas",
+    "stat3": "Satisfacción",
+    "stat4": "Deportes",
+    "missionTitle": "Nuestra Misión",
+    "missionText": "Facilitar el acceso al deporte. Creemos que hacer ejercicio, reunir amigos y jugar debería ser tan sencillo como pedir comida a domicilio.",
+    "missionComplement": "Creamos PlayHub para eliminar la burocracia entre tú y tu próximo partido. Sin llamadas, sin mensajes sin respuesta — solo reserva y juega.",
+    "forUsersEyebrow": "Para Atletas",
+    "forUsersTitle": "Tu próximo partido a un clic de distancia.",
+    "forUsersText": "Deja de enviar mensajes a varias arenas esperando un horario libre. Con PlayHub filtras las canchas de tu zona, eliges el horario perfecto y reservas en segundos.",
+    "forUsersBadges": [
+      "Reserva en segundos",
+      "Pago seguro",
+      "Invita amigos",
+      "Divide la cuenta"
+    ],
+    "userCta": "Crear cuenta gratis",
+    "userFeature1Title": "Búsqueda inteligente",
+    "userFeature1Desc": "Filtra por deporte, ubicación, precio y disponibilidad en tiempo real.",
+    "userFeature2Title": "Disponibilidad 24h",
+    "userFeature2Desc": "Ve los horarios libres en el mapa y reserva cuando quieras, a cualquier hora.",
+    "userFeature3Title": "Pago seguro",
+    "userFeature3Desc": "Tarjeta de crédito o transferencia — todo encriptado y protegido.",
+    "userFeature4Title": "Invita a tus amigos",
+    "userFeature4Desc": "Comparte el enlace de la reserva, divide el costo y juega con tus amigos.",
+    "forManagersEyebrow": "Panel del Gestor",
+    "forManagersSection": "Para Gestores",
+    "forManagersTitle": "Tu arena en piloto automático.",
+    "forManagersText": "Digitaliza tu arena y acaba con los horarios fantasma. Automatiza reservas, recibe pagos online y ten el control total de tu negocio.",
+    "forManagersComplement": "Los gestores que usan PlayHub reportan hasta un 80% menos de llamadas y un aumento significativo en la tasa de ocupación de canchas.",
+    "forManagersBadges": [
+      "Panel completo",
+      "Informes de ingresos",
+      "Gestión de horarios",
+      "Notificaciones automáticas"
+    ],
+    "managerCta": "Registrar mi cancha",
+    "managerFeature1Title": "Informes en tiempo real",
+    "managerFeature1Desc": "Sigue ingresos, ocupación y tendencias directamente en el panel.",
+    "managerFeature2Title": "Notificaciones automáticas",
+    "managerFeature2Desc": "Recordatorios para clientes, alertas de cancelación y confirmaciones automáticas.",
+    "managerFeature3Title": "Pago integrado",
+    "managerFeature3Desc": "Recibe pagos online sin burocracia. El dinero va directo a tu cuenta.",
+    "managerFeature4Title": "Reseñas verificadas",
+    "managerFeature4Desc": "Construye reputación con reseñas reales de jugadores de la plataforma.",
+    "managerHighlightLabel": "Reducción de llamadas",
+    "diffEyebrow": "¿Por qué PlayHub?",
+    "diffTitle": "Lo que nos hace diferentes",
+    "diff1Title": "100% Seguro",
+    "diff1Desc": "Pagos encriptados y datos protegidos. Tu privacidad es nuestra prioridad.",
+    "diff2Title": "Instantáneo",
+    "diff2Desc": "Confirmación inmediata de reserva y comprobante en tu correo en segundos.",
+    "diff3Title": "Comunidad Activa",
+    "diff3Desc": "Más de 12.000 atletas activos. Encuentra compañeros de juego en tu zona.",
+    "joinUsTitle": "Únete a la Revolución Deportiva",
+    "joinUsText": "Ya seas un atleta de fin de semana o el dueño de la mayor arena de la ciudad, PlayHub es tu hogar.",
+    "ctaUser": "Quiero reservar ahora",
+    "ctaManager": "Registrar mi cancha"
+  },
+  "catalog": {
+    "title": "Catálogo",
+    "heading": "Encuentra tu cancha ideal.",
+    "description": "{{count}} canchas disponibles en todo Brasil. Usa los filtros para encontrar la perfecta para ti.",
+    "searchPlaceholder": "Nombre de la cancha o ubicación...",
+    "filtersTitle": "Filtros",
+    "clearAll": "Limpiar todo",
+    "sport": "Deporte",
+    "city": "Ciudad",
+    "status": "Estado",
+    "statusLabels": {
+      "available": "Disponible",
+      "busy": "Ocupada",
+      "closed": "Cerrada"
+    },
+    "minRating": "Calificación mínima",
+    "anyRating": "Cualquiera",
+    "ratingOrMore": "{{rating}}★ o más",
+    "maxPrice": "Precio máximo / hora",
+    "availability": "Disponibilidad",
+    "selectDate": "Selecciona una fecha para consultar disponibilidad:",
+    "showingCourtsFor": "Mostrando canchas disponibles el {{date}}",
+    "availableToday": "Disponible hoy",
+    "hide": "Ocultar",
+    "courtsFound": "canchas encontradas",
+    "sortKeys": {
+      "rating": "Mejor evaluada",
+      "price_asc": "Menor precio",
+      "price_desc": "Mayor precio",
+      "reviews": "Más evaluados"
+    },
+    "noCourts": "Ninguna cancha encontrada",
+    "noCourtsDesc": "Intenta ajustar los filtros o limpiar la búsqueda.",
+    "clearFiltersBtn": "Limpiar filtros"
+  },
+  "details": {
+    "backToCatalog": "Volver al catálogo",
+    "seeMore": "Ver más",
+    "reviews": "Reseñas",
+    "rating": "Calificación",
+    "price": "Precio",
+    "hours": "Horario",
+    "city": "Ciudad",
+    "sports": "Deportes",
+    "amenities": "Comodidades",
+    "scheduling": "Agenda",
+    "schedulingDesc": "Selecciona el día y los horarios deseados. Puedes reservar múltiples horas consecutivas.",
+    "fullyBooked": "Lleno",
+    "otherDates": "Otras",
+    "selectOtherDateTitle": "Seleccionar otra fecha",
+    "courtUnavailable": "Cancha no disponible este día",
+    "tryAnotherDate": "Selecciona otra fecha para verificar disponibilidad.",
+    "statusAvailable": "Disponible",
+    "statusBusy": "Ocupado",
+    "statusSelected": "Seleccionado",
+    "hoursSelected": "hora(s) seleccionada(s)",
+    "leaveReview": "Dejar Reseña",
+    "loginToReview": "Debes iniciar sesión para dejar una reseña.",
+    "loginBtn": "Iniciar sesión",
+    "yourRating": "Tu nota:",
+    "reviewPlaceholder": "Comparte tu experiencia con esta cancha...",
+    "publishReview": "Publicar reseña",
+    "bookingSummary": "Resumen de la Reserva",
+    "confirmDetails": "Confirma los detalles antes de continuar",
+    "noSlotSelected": "Ningún horario seleccionado",
+    "hoursCount": "hora(s)",
+    "total": "Total",
+    "bookHours": "Reservar {{count}} hora(s)",
+    "securePayment": "Pago 100% seguro y encriptado",
+    "notFound": "Cancha no encontrada",
+    "bookingConfirmed": "¡Reserva confirmada!",
+    "bookingSuccess": "Tu reserva en",
+    "bookingSuccessSuffix": "se realizó con éxito. Recibirás un correo electrónico de confirmación en breve.",
+    "goToHome": "Ir al inicio",
+    "viewCatalog": "Ver catálogo"
+  },
+  "forgotPassword": {
+    "title": "Recuperar contraseña",
+    "subtitle": "Ingresa tu correo electrónico para recibir un enlace de recuperación.",
+    "emailLabel": "CORREO ELECTRÓNICO",
+    "submitBtn": "ENVIAR ENLACE",
+    "sending": "ENVIANDO...",
+    "backToLogin": "Volver a iniciar sesión",
+    "successMsg": "Si el correo existe, se ha enviado un enlace de recuperación.",
+    "brandingTitle": "Recupera el acceso\na tu cuenta PlayHub.",
+    "brandingSubtitle": "Es rápido, fácil y seguro. Regresa a las canchas lo antes posible."
+  }
+}

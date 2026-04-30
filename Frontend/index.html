@@ -1,13 +1,35 @@
 <!doctype html>
-<html lang="en">
+<html lang="pt-BR">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="description" content="PlayHub - Manage your sports and courts perfectly" />
-    <title>PlayHub Frontend</title>
+    <link rel="icon" type="image/png" href="/assets/logo.png" />
+    
+    <!-- Meta tags de responsividade e PWA/Mobile -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0" />
+    <meta name="theme-color" content="#8CE600" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    
+    <!-- SEO Básico -->
+    <meta name="description" content="PlayHub - O lugar ideal para reservar sua quadra esportiva em segundos. Futebol, vôlei, beach tennis e muito mais." />
+    <meta name="keywords" content="esporte, quadra, reserva, futebol, beach tennis, vôlei, arena" />
+    <meta name="author" content="PlayHub" />
+    
+    <!-- Open Graph / Social Media -->
+    <meta property="og:title" content="PlayHub - Reserve sua quadra com um clique!" />
+    <meta property="og:description" content="A maior comunidade de atletas do Brasil. Reserve quadras de esporte em segundos com confirmação imediata." />
+    <meta property="og:type" content="website" />
+    <meta property="og:image" content="/assets/logo.png" />
+    
+    <!-- Pré-carregamento de fontes e recursos essenciais -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    
+    <title>PlayHub | Reservas de Quadras Esportivas</title>
   </head>
   <body>
+    <noscript>Você precisa habilitar o JavaScript para rodar esta aplicação.</noscript>
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
   </body>

@@ -1,0 +1,242 @@
+import { useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import { useForm } from 'react-hook-form';
+import { z } from 'zod';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { useTranslation } from 'react-i18next';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { toast } from 'sonner';
+import { ArrowLeft, User, Mail, Lock, ShieldCheck } from 'lucide-react';
+import { HeroBackground } from '@/components/ui/HeroBackground';
+import logo from '/assets/logo.png';
+
+const registerSchema = z.object({
+  firstName: z.string().min(2, 'O nome deve ter pelo menos 2 caracteres'),
+  lastName: z.string().min(2, 'O sobrenome deve ter pelo menos 2 caracteres'),
+  email: z.string().email('E-mail inválido'),
+  password: z.string().min(6, 'A senha deve ter pelo menos 6 caracteres'),
+  confirmPassword: z.string()
+}).refine((data) => data.password === data.confirmPassword, {
+  message: "As senhas não coincidem",
+  path: ["confirmPassword"],
+});
+
+type RegisterFormValues = z.infer<typeof registerSchema>;
+
+export default function Register() {
+  const navigate = useNavigate();
+  const [isLoading, setIsLoading] = useState(false);
+  const { t } = useTranslation();
+
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<RegisterFormValues>({
+    resolver: zodResolver(registerSchema),
+  });
+
+  const onSubmit = async (_data: RegisterFormValues) => {
+    setIsLoading(true);
+    try {
+      await new Promise(resolve => setTimeout(resolve, 1500));
+      toast.success(t('register.registerSuccess'));
+      navigate('/login');
+    } catch (err: any) {
+      toast.error(err?.response?.data?.message || t('register.registerError'));
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  return (
+    <div className="min-h-screen w-full flex bg-white dark:bg-gray-950 transition-colors duration-500">
+      {/* Painel Esquerdo: Branding */}
+      <div className="hidden lg:flex w-1/2 relative bg-gray-50 dark:bg-gray-900 items-center justify-center overflow-hidden border-r border-gray-100 dark:border-gray-800">
+        <HeroBackground />
+        <div className="relative z-10 p-12 max-w-xl text-center">
+          <img src={logo} alt="PlayHub" className="h-16 w-auto object-contain mx-auto mb-8" />
+          <h2 className="text-4xl lg:text-5xl font-black tracking-tighter text-gray-900 dark:text-white mb-6 leading-tight whitespace-pre-line">
+            {t('register.brandingTitle')}
+          </h2>
+          <p className="text-lg text-gray-600 dark:text-gray-400 font-light leading-relaxed">
+            {t('register.brandingSubtitle')}
+          </p>
+
+          <div className="mt-10 flex flex-col gap-4 text-left">
+            {(t('register.steps', { returnObjects: true }) as {n: string, label: string}[]).map(step => (
+              <div key={step.n} className="flex items-center gap-4 bg-white/60 dark:bg-gray-800/60 backdrop-blur-sm rounded-2xl px-5 py-3.5 border border-gray-100 dark:border-gray-700/50">
+                <span className="text-xs font-black text-[#8CE600]">{step.n}</span>
+                <span className="text-sm font-semibold text-gray-700 dark:text-gray-300">{step.label}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {/* Painel Direito: Formulário */}
+      <div className="w-full lg:w-1/2 flex flex-col relative bg-white dark:bg-gray-950 overflow-y-auto">
+
+        <div className="absolute top-4 left-6 z-20">
+          <Link to="/" className="flex items-center gap-3 text-sm font-bold text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white transition-colors group">
+            <div className="w-10 h-10 rounded-full bg-gray-50 dark:bg-gray-900 flex items-center justify-center group-hover:bg-[#8CE600] group-hover:text-gray-950 transition-all border border-gray-100 dark:border-gray-800 group-hover:border-transparent">
+              <ArrowLeft className="w-4 h-4" />
+            </div>
+            <span className="hidden sm:block">{t('login.backToHome')}</span>
+          </Link>
+        </div>
+
+        <div className="flex-1 flex items-center justify-center p-8 sm:p-12 pt-24 lg:pt-12">
+          <div className="w-full max-w-md animate-in fade-in slide-in-from-bottom-8 duration-700">
+
+            <div className="mb-8">
+              <h1 className="text-3xl font-black tracking-tighter text-gray-900 dark:text-white mb-1.5">
+                {t('register.title')}
+              </h1>
+              <p className="text-sm text-gray-500 dark:text-gray-400">
+                {t('register.subtitle')}
+              </p>
+            </div>
+
+            <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+
+              <div className="grid grid-cols-2 gap-3">
+                <div className="space-y-1.5">
+                  <Label htmlFor="firstName" className="text-[10px] font-black uppercase tracking-widest text-gray-500 dark:text-gray-400">
+                    {t('register.nameLabel')}
+                  </Label>
+                  <div className="relative">
+                    <User className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
+                    <Input
+                      id="firstName"
+                      placeholder="João"
+                      className="pl-11 bg-gray-50/50 dark:bg-gray-900/50 border-gray-200 dark:border-gray-800 h-13 rounded-2xl font-medium transition-all focus:bg-white dark:focus:bg-gray-900 focus-visible:ring-2 focus-visible:ring-[#8CE600] focus-visible:ring-offset-2 dark:focus-visible:ring-offset-gray-950"
+                      {...register('firstName')}
+                    />
+                  </div>
+                  {errors.firstName && <p className="text-xs text-red-500 font-medium">{errors.firstName.message}</p>}
+                </div>
+
+                <div className="space-y-1.5">
+                  <Label htmlFor="lastName" className="text-[10px] font-black uppercase tracking-widest text-gray-500 dark:text-gray-400">
+                    {t('register.lastNameLabel')}
+                  </Label>
+                  <div className="relative">
+                    <User className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
+                    <Input
+                      id="lastName"
+                      placeholder="Silva"
+                      className="pl-11 bg-gray-50/50 dark:bg-gray-900/50 border-gray-200 dark:border-gray-800 h-13 rounded-2xl font-medium transition-all focus:bg-white dark:focus:bg-gray-900 focus-visible:ring-2 focus-visible:ring-[#8CE600] focus-visible:ring-offset-2 dark:focus-visible:ring-offset-gray-950"
+                      {...register('lastName')}
+                    />
+                  </div>
+                  {errors.lastName && <p className="text-xs text-red-500 font-medium">{errors.lastName.message}</p>}
+                </div>
+              </div>
+
+              <div className="space-y-1.5">
+                <Label htmlFor="email" className="text-[10px] font-black uppercase tracking-widest text-gray-500 dark:text-gray-400">
+                  {t('register.emailLabel')}
+                </Label>
+                <div className="relative">
+                  <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
+                  <Input
+                    id="email"
+                    type="email"
+                    placeholder="seu@email.com"
+                    className="pl-11 bg-gray-50/50 dark:bg-gray-900/50 border-gray-200 dark:border-gray-800 h-13 rounded-2xl font-medium transition-all focus:bg-white dark:focus:bg-gray-900 focus-visible:ring-2 focus-visible:ring-[#8CE600] focus-visible:ring-offset-2 dark:focus-visible:ring-offset-gray-950"
+                    {...register('email')}
+                  />
+                </div>
+                {errors.email && <p className="text-xs text-red-500 font-medium">{errors.email.message}</p>}
+              </div>
+
+              <div className="flex items-center gap-3 py-1">
+                <div className="flex-1 h-px bg-gray-100 dark:bg-gray-800" />
+                <span className="text-[10px] font-bold uppercase tracking-widest text-gray-400">{t('register.securityDivider')}</span>
+                <div className="flex-1 h-px bg-gray-100 dark:bg-gray-800" />
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div className="space-y-1.5">
+                  <Label htmlFor="password" className="text-[10px] font-black uppercase tracking-widest text-gray-500 dark:text-gray-400">
+                    {t('register.passwordLabel')}
+                  </Label>
+                  <div className="relative">
+                    <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
+                    <Input
+                      id="password"
+                      type="password"
+                      placeholder="••••••••"
+                      className="pl-11 bg-gray-50/50 dark:bg-gray-900/50 border-gray-200 dark:border-gray-800 h-13 rounded-2xl font-medium transition-all focus:bg-white dark:focus:bg-gray-900 focus-visible:ring-2 focus-visible:ring-[#8CE600] focus-visible:ring-offset-2 dark:focus-visible:ring-offset-gray-950"
+                      {...register('password')}
+                    />
+                  </div>
+                  {errors.password && <p className="text-xs text-red-500 font-medium">{errors.password.message}</p>}
+                </div>
+
+                <div className="space-y-1.5">
+                  <Label htmlFor="confirmPassword" className="text-[10px] font-black uppercase tracking-widest text-gray-500 dark:text-gray-400">
+                    {t('register.confirmLabelShort')}
+                  </Label>
+                  <div className="relative">
+                    <ShieldCheck className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
+                    <Input
+                      id="confirmPassword"
+                      type="password"
+                      placeholder="••••••••"
+                      className="pl-11 bg-gray-50/50 dark:bg-gray-900/50 border-gray-200 dark:border-gray-800 h-13 rounded-2xl font-medium transition-all focus:bg-white dark:focus:bg-gray-900 focus-visible:ring-2 focus-visible:ring-[#8CE600] focus-visible:ring-offset-2 dark:focus-visible:ring-offset-gray-950"
+                      {...register('confirmPassword')}
+                    />
+                  </div>
+                  {errors.confirmPassword && <p className="text-xs text-red-500 font-medium">{errors.confirmPassword.message}</p>}
+                </div>
+              </div>
+
+              <p className="text-[11px] text-gray-400 dark:text-gray-500 leading-relaxed">
+                {t('register.termsNotice')}{' '}
+                <Link to="/terms" className="text-gray-600 dark:text-gray-300 underline underline-offset-2 hover:text-[#8CE600] transition-colors">{t('register.termsLink')}</Link>
+                {' '}{t('footer.institutional.privacy').toLowerCase() === 'privacidade' ? 'e' : (t('footer.institutional.privacy').toLowerCase() === 'privacy' ? 'and' : 'y')}{' '}
+                <Link to="/privacy" className="text-gray-600 dark:text-gray-300 underline underline-offset-2 hover:text-[#8CE600] transition-colors">{t('register.privacyLink')}</Link>.
+              </p>
+
+              <div className="pt-1">
+                <Button
+                  type="submit"
+                  disabled={isLoading}
+                  className="w-full h-13 rounded-2xl bg-[#8CE600] hover:bg-[#7bc900] text-gray-950 font-black tracking-widest uppercase text-[11px] shadow-xl shadow-[#8CE600]/20 hover:shadow-[#8CE600]/30 transition-all active:scale-[0.98] disabled:opacity-60"
+                >
+                  {isLoading ? (
+                    <span className="flex items-center gap-2">
+                      <svg className="animate-spin w-4 h-4" viewBox="0 0 24 24" fill="none">
+                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z" />
+                      </svg>
+                      {t('register.creatingAccount')}
+                    </span>
+                  ) : t('register.submitBtn')}
+                </Button>
+              </div>
+            </form>
+
+            <div className="mt-8 flex items-center gap-4">
+              <div className="flex-1 h-px bg-gray-100 dark:bg-gray-800" />
+              <span className="text-[11px] font-bold uppercase tracking-widest text-gray-400">{t('login.or')}</span>
+              <div className="flex-1 h-px bg-gray-100 dark:bg-gray-800" />
+            </div>
+
+            <p className="mt-6 text-sm text-center text-gray-600 dark:text-gray-400 font-medium pb-8 lg:pb-0">
+              {t('register.loginPrompt')}{' '}
+              <Link to="/login" className="font-bold text-gray-900 dark:text-white hover:text-[#8CE600] dark:hover:text-[#8CE600] transition-colors underline underline-offset-4 decoration-gray-200 dark:decoration-gray-700 hover:decoration-[#8CE600]">
+                {t('register.loginLink')}
+              </Link>
+            </p>
+
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
