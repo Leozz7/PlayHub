@@ -13,13 +13,12 @@ class SignalRService {
       .withUrl(this.url, {
         accessTokenFactory: () => token,
       })
-      .withAutomaticReconnect([0, 2000, 10000, 30000]) // Retry policy
+      .withAutomaticReconnect([0, 2000, 10000, 30000])
       .configureLogging(signalR.LogLevel.Information)
       .build();
 
     try {
       await this.connection.start();
-      console.log('SignalR Connected.');
     } catch (err) {
       console.error('SignalR Connection Error: ', err);
       setTimeout(() => this.startConnection(token), 5000);

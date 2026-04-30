@@ -10,11 +10,14 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.AspNetCore.Authorization;
+using PlayHub.Domain.Constants;
 
 namespace PlayHub.Api.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
+[Authorize]
 public class PaymentsController : ControllerBase
 {
     private ISender? _mediator;
@@ -49,6 +52,7 @@ public class PaymentsController : ControllerBase
     }
 
     [HttpPost("{id}/process")]
+    [Authorize(Roles = AppRoles.AdminOrManager)]
     public async Task<ActionResult> Process(Guid id, [FromBody] ProcessPaymentDto request)
     {
         var command = new ProcessPaymentCommand(id, request.TransactionId, request.PaymentDate);
@@ -58,6 +62,7 @@ public class PaymentsController : ControllerBase
     }
 
     [HttpDelete("{id}")]
+    [Authorize(Roles = AppRoles.AdminOrManager)]
     public async Task<ActionResult> Delete(Guid id)
     {
         var result = await Mediator.Send(new DeletePaymentCommand(id));

@@ -1,0 +1,347 @@
+{
+  "common": {
+    "actions": {
+      "login": "Entrar",
+      "enter": "Reservar Agora",
+      "logout": "Sair da conta"
+    },
+    "navigation": {
+      "dashboard": "Meu Painel",
+      "courts": "Quadras",
+      "leagues": "Esportes"
+    }
+  },
+  "menu": {
+    "profile": {
+      "btnProfile": "Meu Perfil"
+    }
+  },
+  "header": {
+    "userMenu": {
+      "managerPanel": "Painel do Gestor",
+      "generalAdmin": "Administração"
+    }
+  },
+  "footer": {
+    "description": "A plataforma definitiva para reservas de quadras esportivas. Encontre, reserve e jogue sem complicação. Crie sua conta gratuitamente.",
+    "navigation": {
+      "title": "Plataforma",
+      "championships": "Quadras"
+    },
+    "institutional": {
+      "title": "Suporte",
+      "about": "Como Funciona",
+      "terms": "Termos de Uso",
+      "privacy": "Privacidade"
+    },
+    "bottom": {
+      "contactUs": "Contato",
+      "copyright": "© {{year}} PlayHub. Todos os direitos reservados."
+    }
+  },
+  "login": {
+    "title": "Acesse sua conta",
+    "subtitle": "Bem-vindo de volta ao PlayHub",
+    "emailLabel": "E-mail",
+    "passwordLabel": "Senha",
+    "submitBtn": "Entrar",
+    "registerPrompt": "Ainda não tem conta?",
+    "registerLink": "Cadastre-se",
+    "brandingTitle": "Seu jogo,\nsuas regras.",
+    "brandingSubtitle": "A plataforma definitiva para gerenciar e reservar arenas esportivas. Entre na comunidade PlayHub e não fique de fora da próxima partida.",
+    "backToHome": "Voltar ao início",
+    "forgotPassword": "Esqueceu?",
+    "authenticating": "Autenticando...",
+    "or": "ou",
+    "loginSuccess": "Login realizado com sucesso!",
+    "loginError": "Falha ao realizar login. Verifique suas credenciais.",
+    "badges": [
+      "Reserva imediata",
+      "Pagamento seguro",
+      "Suporte 24/7"
+    ]
+  },
+  "register": {
+    "title": "Criar Conta",
+    "subtitle": "Junte-se à maior plataforma de quadras",
+    "nameLabel": "Nome",
+    "lastNameLabel": "Sobrenome",
+    "emailLabel": "E-mail",
+    "passwordLabel": "Senha",
+    "confirmPasswordLabel": "Confirmar Senha",
+    "confirmLabelShort": "Confirmar",
+    "submitBtn": "Criar conta",
+    "loginPrompt": "Já tem conta?",
+    "loginLink": "Faça login",
+    "brandingTitle": "Comece sua\njornada.",
+    "brandingSubtitle": "Junte-se à maior comunidade de atletas do Brasil. Reserve sua quadra com um clique e viva a experiência completa PlayHub.",
+    "securityDivider": "Segurança",
+    "termsNotice": "Ao criar sua conta você concorda com nossos",
+    "termsLink": "Termos de Uso",
+    "privacyLink": "Política de Privacidade",
+    "creatingAccount": "Criando conta...",
+    "registerSuccess": "Conta criada com sucesso! Faça login para continuar.",
+    "registerError": "Falha ao criar conta. Tente novamente.",
+    "steps": [
+      {
+        "n": "01",
+        "label": "Crie sua conta gratuita em segundos"
+      },
+      {
+        "n": "02",
+        "label": "Encontre quadras na sua região"
+      },
+      {
+        "n": "03",
+        "label": "Reserve e jogue sem burocracia"
+      }
+    ]
+  },
+  "index": {
+    "marquee": {
+      "item1": "RESERVA IMEDIATA",
+      "item2": "PAGAMENTO SEGURO",
+      "item3": "MELHORES ARENAS",
+      "item4": "DISPONIBILIDADE 24H",
+      "item5": "CANCELAMENTO GRÁTIS",
+      "item6": "SUPORTE 24/7"
+    },
+    "sports": {
+      "title": "Modalidades em Destaque",
+      "subtitle": "Escolha seu esporte e veja as quadras disponíveis agora.",
+      "viewAll": "Ver todas",
+      "bookNow": "Reservar →",
+      "perHour": " / hora"
+    },
+    "hero": {
+      "titleLine1": "Reserve sua quadra",
+      "titleLine2": "com um clique!",
+      "subtitle": "Futebol, FuteVolêi, vôlei e muito mais — disponibilidade em tempo real, pagamento seguro e confirmação imediata.",
+      "badges": "A quadra ideal • O lugar ideal • O seu horário",
+      "stats": {
+        "courts": "quadras",
+        "bookings": "reservas",
+        "satisfaction": "satisfação"
+      },
+      "explore": "Explore mais"
+    },
+    "howItWorks": {
+      "title": "Como funciona",
+      "subtitle": "Quatro passos simples para sua próxima partida."
+    },
+    "testimonials": {
+      "title": "O que dizem sobre nós",
+      "subtitle": "Feedback de quem já vive a experiência PlayHub."
+    },
+    "paymentMethods": {
+      "title": "Pagamento Seguro & Facilitado"
+    },
+    "cta": {
+      "title": "Pronto para sua próxima partida?",
+      "subtitle": "Junte-se à maior comunidade de atletas do Brasil e reserve sua quadra em segundos.",
+      "createAccount": "Criar conta agora →",
+      "viewSports": "Ver modalidades"
+    },
+    "stats": {
+      "courts": "Quadras Cadastradas",
+      "bookings": "Reservas Realizadas",
+      "satisfaction": "Satisfação",
+      "sports": "Modalidades"
+    },
+    "steps": {
+      "step1": {
+        "title": "Crie sua conta",
+        "desc": "Cadastro gratuito em segundos. Sem cartão de crédito necessário."
+      },
+      "step2": {
+        "title": "Escolha a quadra",
+        "desc": "Filtre por esporte, localização, horário e preço."
+      },
+      "step3": {
+        "title": "Reserve e pague",
+        "desc": "Confirmação imediata e comprovante no seu e-mail."
+      },
+      "step4": {
+        "title": "Jogue e curta!",
+        "desc": "Chegue na hora e aproveite sua partida sem burocracia."
+      }
+    },
+    "feedback": {
+      "t1": {
+        "role": "Jogadora amadora",
+        "text": "Finalmente encontrei uma forma fácil de reservar quadras. Em menos de 2 minutos já tenho minha partida confirmada!"
+      },
+      "t2": {
+        "role": "Dono de arena",
+        "text": "O PlayHub transformou minha gestão. Reduzi 80% das ligações e tenho controle total das reservas."
+      },
+      "t3": {
+        "role": "Professora de beach tennis",
+        "text": "Indico para todos os meus alunos. A plataforma é intuitiva e o suporte é excelente."
+      }
+    }
+  },
+  "contact": {
+    "title": "Fale Conosco",
+    "subtitle": "Estamos aqui para ajudar. Envie sua dúvida, sugestão ou solicitação de parceria.",
+    "infoTitle": "Nossos Canais",
+    "formTitle": "Envie uma mensagem",
+    "nameLabel": "Seu Nome",
+    "emailLabel": "Seu E-mail",
+    "subjectLabel": "Assunto",
+    "messageLabel": "Mensagem",
+    "submitBtn": "Enviar Mensagem",
+    "successMessage": "Sua mensagem foi enviada com sucesso! Retornaremos em breve."
+  },
+  "about": {
+    "eyebrow": "Quem Somos",
+    "heroTitle1": "Conectando atletas",
+    "heroTitle2": "às melhores quadras.",
+    "subtitle": "A plataforma definitiva que conecta atletas apaixonados às melhores quadras esportivas — simples, rápido e seguro.",
+    "stat1": "Quadras Parceiras",
+    "stat2": "Reservas Realizadas",
+    "stat3": "Satisfação",
+    "stat4": "Modalidades",
+    "missionTitle": "Nossa Missão",
+    "missionText": "Facilitar o acesso ao esporte. Acreditamos que praticar exercícios, reunir os amigos e jogar deveria ser tão simples quanto pedir um delivery.",
+    "missionComplement": "Criamos o PlayHub para eliminar a burocracia entre você e sua próxima partida. Nada de ligações, nada de mensagens sem resposta — apenas reserve e jogue.",
+    "forUsersEyebrow": "Para Atletas",
+    "forUsersTitle": "Sua próxima partida a um clique de distância.",
+    "forUsersText": "Chega de mandar mensagem no WhatsApp para várias arenas torcendo por um horário vago. Com o PlayHub você filtra as quadras da sua região, escolhe o horário perfeito e reserva em segundos.",
+    "forUsersBadges": [
+      "Reserva em segundos",
+      "Pagamento seguro",
+      "Convide amigos",
+      "Divida a conta"
+    ],
+    "userCta": "Criar conta grátis",
+    "userFeature1Title": "Busca inteligente",
+    "userFeature1Desc": "Filtre por esporte, localização, preço e horário disponível em tempo real.",
+    "userFeature2Title": "Disponibilidade 24h",
+    "userFeature2Desc": "Veja horários livres no mapa e reserve quando quiser, a qualquer hora.",
+    "userFeature3Title": "Pagamento seguro",
+    "userFeature3Desc": "Pix, cartão de crédito ou débito — tudo criptografado e protegido.",
+    "userFeature4Title": "Convide a galera",
+    "userFeature4Desc": "Compartilhe o link da reserva, divida o custo e jogue com seus amigos.",
+    "forManagersEyebrow": "Painel do Gestor",
+    "forManagersSection": "Para Gestores",
+    "forManagersTitle": "Sua arena no piloto automático.",
+    "forManagersText": "Digitalize sua arena e acabe com os horários fantasmas. Automatize reservas, receba online e tenha controle total do seu negócio.",
+    "forManagersComplement": "Gestores que usam o PlayHub relatam até 80% de redução nas ligações e um aumento significativo na taxa de ocupação das quadras.",
+    "forManagersBadges": [
+      "Dashboard completo",
+      "Relatórios de faturamento",
+      "Gestão de horários",
+      "Notificações automáticas"
+    ],
+    "managerCta": "Cadastrar minha arena",
+    "managerFeature1Title": "Relatórios em tempo real",
+    "managerFeature1Desc": "Acompanhe faturamento, ocupação e tendências direto no painel.",
+    "managerFeature2Title": "Notificações automáticas",
+    "managerFeature2Desc": "Lembretes para clientes, alertas de cancelamento e confirmações automáticas.",
+    "managerFeature3Title": "Pix & Cartão integrado",
+    "managerFeature3Desc": "Receba online sem burocracia. O dinheiro cai direto na sua conta.",
+    "managerFeature4Title": "Avaliações verificadas",
+    "managerFeature4Desc": "Construa reputação com avaliações reais de jogadores da plataforma.",
+    "managerHighlightLabel": "Redução em ligações",
+    "diffEyebrow": "Por que o PlayHub?",
+    "diffTitle": "O que nos torna diferentes",
+    "diff1Title": "100% Seguro",
+    "diff1Desc": "Pagamentos criptografados e dados protegidos. Sua privacidade é nossa prioridade.",
+    "diff2Title": "Instantâneo",
+    "diff2Desc": "Confirmação imediata de reserva e comprovante no seu e-mail em segundos.",
+    "diff3Title": "Comunidade Ativa",
+    "diff3Desc": "Mais de 12 mil atletas ativos. Encontre parceiros de jogo na sua região.",
+    "joinUsTitle": "Junte-se à Revolução Esportiva",
+    "joinUsText": "Seja você um atleta de fim de semana ou o dono da maior arena da cidade, o PlayHub é a sua casa.",
+    "ctaUser": "Quero reservar agora",
+    "ctaManager": "Cadastrar minha arena"
+  },
+  "catalog": {
+    "title": "Catálogo",
+    "heading": "Encontre sua quadra ideal.",
+    "description": "{{count}} quadras disponíveis em todo o Brasil. Use os filtros para encontrar a perfeita para você.",
+    "searchPlaceholder": "Nome da quadra ou localização...",
+    "filtersTitle": "Filtros",
+    "clearAll": "Limpar tudo",
+    "sport": "Esporte",
+    "city": "Cidade",
+    "status": "Status",
+    "statusLabels": {
+      "available": "Disponível",
+      "busy": "Ocupada",
+      "closed": "Fechada"
+    },
+    "minRating": "Avaliação mínima",
+    "anyRating": "Qualquer",
+    "ratingOrMore": "{{rating}}★ ou mais",
+    "maxPrice": "Preço máximo / hora",
+    "availability": "Disponibilidade",
+    "selectDate": "Selecione uma data para verificar disponibilidade:",
+    "showingCourtsFor": "Mostrando quadras disponíveis em {{date}}",
+    "availableToday": "Disponível hoje",
+    "hide": "Ocultar",
+    "courtsFound": "quadras encontradas",
+    "sortKeys": {
+      "rating": "Melhor avaliação",
+      "price_asc": "Menor preço",
+      "price_desc": "Maior preço",
+      "reviews": "Mais avaliados"
+    },
+    "noCourts": "Nenhuma quadra encontrada",
+    "noCourtsDesc": "Tente ajustar os filtros ou limpar a busca.",
+    "clearFiltersBtn": "Limpar filtros"
+  },
+  "details": {
+    "backToCatalog": "Voltar ao catálogo",
+    "seeMore": "Ver mais",
+    "reviews": "Avaliações",
+    "rating": "Avaliação",
+    "price": "Preço",
+    "hours": "Horário",
+    "city": "Cidade",
+    "sports": "Modalidades",
+    "amenities": "Comodidades",
+    "scheduling": "Agendamento",
+    "schedulingDesc": "Selecione o dia e os horários desejados. Você pode reservar múltiplas horas consecutivas.",
+    "fullyBooked": "Lotado",
+    "otherDates": "Outras",
+    "selectOtherDateTitle": "Selecionar outra data",
+    "courtUnavailable": "Quadra indisponível neste dia",
+    "tryAnotherDate": "Selecione outra data para verificar disponibilidade.",
+    "statusAvailable": "Disponível",
+    "statusBusy": "Ocupado",
+    "statusSelected": "Selecionado",
+    "hoursSelected": "hora(s) selecionada(s)",
+    "leaveReview": "Deixar Avaliação",
+    "loginToReview": "Você precisa estar logado para deixar uma avaliação.",
+    "loginBtn": "Fazer login",
+    "yourRating": "Sua nota:",
+    "reviewPlaceholder": "Compartilhe sua experiência com esta quadra...",
+    "publishReview": "Publicar avaliação",
+    "bookingSummary": "Resumo da Reserva",
+    "confirmDetails": "Confirme os detalhes antes de prosseguir",
+    "noSlotSelected": "Nenhum horário selecionado",
+    "hoursCount": "hora(s)",
+    "total": "Total",
+    "bookHours": "Reservar {{count}} hora(s)",
+    "securePayment": "Pagamento 100% seguro e criptografado",
+    "notFound": "Quadra não encontrada",
+    "bookingConfirmed": "Reserva confirmada!",
+    "bookingSuccess": "Sua reserva em",
+    "bookingSuccessSuffix": "foi realizada com sucesso. Você receberá um e-mail de confirmação em breve.",
+    "goToHome": "Ir para o início",
+    "viewCatalog": "Ver catálogo"
+  },
+  "forgotPassword": {
+    "title": "Recuperar senha",
+    "subtitle": "Informe seu e-mail para enviarmos o link de redefinição de senha.",
+    "emailLabel": "E-MAIL",
+    "submitBtn": "ENVIAR LINK",
+    "sending": "ENVIANDO...",
+    "backToLogin": "Voltar para o login",
+    "successMsg": "Se o e-mail existir, um link de redefinição foi enviado!",
+    "brandingTitle": "Recupere o acesso\nà sua conta PlayHub.",
+    "brandingSubtitle": "É rápido, fácil e seguro. Retorne às quadras o quanto antes."
+  }
+}

@@ -7,11 +7,14 @@ using PlayHub.Application.Features.Courts.Queries.GetCourts;
 using PlayHub.Application.Features.Courts.Queries.GetCourtById;
 using PlayHub.Application.Features.Courts.Dtos;
 using System.Collections.Generic;
+using Microsoft.AspNetCore.Authorization;
+using PlayHub.Domain.Constants;
 
 namespace PlayHub.Api.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
+[Authorize]
 public class CourtsController : ControllerBase
 {
     private ISender? _mediator;
@@ -32,6 +35,7 @@ public class CourtsController : ControllerBase
     }
 
     [HttpPost]
+    [Authorize(Roles = AppRoles.AdminOrManager)]
     public async Task<ActionResult<CourtDto>> Create(CreateCourtCommand command)
     {
         var result = await Mediator.Send(command);
@@ -39,6 +43,7 @@ public class CourtsController : ControllerBase
     }
 
     [HttpPut("{id}")]
+    [Authorize(Roles = AppRoles.AdminOrManager)]
     public async Task<ActionResult> Update(Guid id, UpdateCourtCommand command)
     {
         if (id != command.Id)
@@ -52,6 +57,7 @@ public class CourtsController : ControllerBase
     }
 
     [HttpDelete("{id}")]
+    [Authorize(Roles = AppRoles.AdminOrManager)]
     public async Task<ActionResult> Delete(Guid id)
     {
         var result = await Mediator.Send(new DeleteCourtCommand(id));
