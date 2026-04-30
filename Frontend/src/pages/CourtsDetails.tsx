@@ -178,7 +178,6 @@ export default function CourtsDetails() {
     const days = useMemo(() => getNext7Days(), []);
     const isSelectedInDays = days.some(d => format(d, 'yyyy-MM-dd') === format(selectedDay, 'yyyy-MM-dd'));
 
-    // Generate busy slots deterministically based on day + court id
     const busySlots = useMemo(() => {
         if (!court) return [];
         const seed = selectedDay.getDate() + court.id;
@@ -245,7 +244,7 @@ export default function CourtsDetails() {
         <div className="min-h-screen bg-white dark:bg-gray-950 text-gray-900 dark:text-gray-100 font-sans antialiased flex flex-col">
             <Header />
 
-            // Galeria de imagens 
+            {/* Galeria de imagens */}
             <section className="pt-24 bg-gray-50 dark:bg-gray-900">
                 {(() => {
                     const imgs = [
@@ -271,7 +270,7 @@ export default function CourtsDetails() {
                                 </div>
                                 {imgs.slice(1).map((src, i) => (
                                     <div key={i} className="relative overflow-hidden cursor-pointer group" onClick={() => setGalleryIdx(i + 1)}>
-                                        <img src={src} alt={`${court.name} ${i+2}`} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" />
+                                        <img src={src} alt={`${court.name} ${i+2}`} loading="lazy" className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" />
                                         <div className={`absolute inset-0 transition-colors ${galleryIdx === i+1 ? 'bg-[#8CE600]/20 ring-2 ring-inset ring-[#8CE600]' : 'bg-black/10 hover:bg-black/0'}`} />
                                         {i === 2 && (
                                             <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
@@ -291,7 +290,7 @@ export default function CourtsDetails() {
                 })()}
             </section>
 
-            // Conteúdo principal
+            {/* Conteúdo principal */}
             <div className="max-w-7xl mx-auto px-6 py-12 w-full flex gap-10 flex-col lg:flex-row">
 
                 <div className="flex-1 min-w-0 space-y-10">
@@ -538,7 +537,7 @@ export default function CourtsDetails() {
                     </div>
                 </div>
 
-                // Coluna lateral: Resumo da reserva
+                {/* Coluna lateral: Resumo da reserva */}
                 <div className="w-full lg:w-80 xl:w-96 shrink-0">
                     <BookingSummary
                         court={court as any}

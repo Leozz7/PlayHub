@@ -147,7 +147,7 @@ export function Index() {
 
                 <div className={`absolute bottom-0 pb-2 left-1/2 -translate-x-1/2 z-40 transition-all duration-300 ${isDropdownOpen ? 'opacity-0 scale-95 pointer-events-none' : 'opacity-100 scale-100'}`}>
                     <Reveal delay={800} width="w-auto">
-                        <div className="flex flex-col items-center gap-2 animate-bounce cursor-pointer" onClick={() => document.getElementById('sports')?.scrollIntoView({ behavior: 'smooth' })}>
+                        <div className="flex flex-col items-center gap-2 animate-bounce cursor-pointer" onClick={() => document.getElementById('courts')?.scrollIntoView({ behavior: 'smooth' })}>
                             <span className="text-[9px] font-bold uppercase tracking-widest text-gray-600 dark:text-gray-500">{t('index.hero.explore')}</span>
                             <svg className="w-4 h-4 text-[#8CE600]" fill="none" stroke="currentColor" strokeWidth="3" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" d="M19 14l-7 7m0 0l-7-7m7 7V3" />
@@ -157,7 +157,7 @@ export function Index() {
                 </div>
             </section>
 
-            <SportCards />
+            <FeaturedCourts />
 
             <section className="relative py-24 bg-white dark:bg-gray-950 transition-colors duration-500 overflow-hidden">
                 {(() => {
@@ -180,7 +180,7 @@ export function Index() {
 
             <MarqueeBanner />
 
-            <FeaturedCourts />
+            <SportCards />
 
             <section id="how-it-works" className="relative py-24 bg-white dark:bg-gray-950 transition-colors duration-500 overflow-hidden">
                 {(() => {

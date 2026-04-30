@@ -81,8 +81,8 @@ export const STEPS = [
 ];
 
 export const STATS = [
-    { value: 500, suffix: '+', label: 'index.stats.courts' },
-    { value: 12, suffix: 'k+', label: 'index.stats.bookings' },
+    { value: 50, suffix: '+', label: 'index.stats.courts' },
+    { value: 1, suffix: 'k+', label: 'index.stats.bookings' },
     { value: 98, suffix: '%', label: 'index.stats.satisfaction' },
     { value: 6, suffix: '+', label: 'index.stats.sports' },
 ];

@@ -51,6 +51,7 @@ export function FeaturedCourts() {
                                         <img
                                             src={court.img}
                                             alt={court.name}
+                                            loading="lazy"
                                             className="w-full h-full object-cover opacity-90 dark:opacity-80 group-hover:opacity-100 transition-all duration-700 group-hover:scale-105"
                                             style={{ willChange: 'transform' }}
                                         />

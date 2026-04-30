@@ -1,12 +1,12 @@
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { Reveal } from '@/components/ui/Reveal';
-import { Stars } from '@/components/ui/Stars';
 import { SPORTS } from '@/pages/IndexData';
 import { SPORT_ICONS } from '@/components/SportIcons';
 
 export function SportCards() {
     const { t } = useTranslation();
+    const navigate = useNavigate();
     const Icon1 = SPORT_ICONS[0];
     const Icon2 = SPORT_ICONS[4];
 
@@ -42,7 +42,10 @@ export function SportCards() {
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                     {SPORTS.map((sport, i) => (
                         <Reveal key={sport.name} delay={i * 100}>
-                            <div className="group cursor-pointer">
+                            <div 
+                                className="group cursor-pointer"
+                                onClick={() => navigate('/catalog', { state: { selectedSport: sport.name } })}
+                            >
                                 {/* Wrapper externo: recebe o lift — sem overflow:hidden */}
                                 <div className="relative w-full h-72 mb-4 transition-transform duration-300 group-hover:-translate-y-1">
                                     {/* Sombra numa camada própria */}
@@ -55,6 +58,7 @@ export function SportCards() {
                                         <img
                                             src={sport.img}
                                             alt={sport.name}
+                                            loading="lazy"
                                             className="w-full h-full object-cover opacity-90 dark:opacity-80 group-hover:opacity-100 transition-all duration-700 group-hover:scale-105"
                                             style={{ willChange: 'transform' }}
                                         />
@@ -63,19 +67,19 @@ export function SportCards() {
                                         </div>
                                     </div>
                                 </div>
-                                <div className="flex justify-between items-start mb-1">
-                                    <h3 className="text-base font-bold text-gray-900 dark:text-white transition-colors group-hover:text-[#8CE600]">{sport.name}</h3>
-                                    <Stars rating={sport.rating} />
-                                </div>
-                                <p className="text-gray-600 dark:text-gray-400 text-xs mb-3 transition-colors">{sport.duration}</p>
-                                <div className="flex items-center justify-between">
-                                    <p className="text-sm">
-                                        <span className="font-bold text-gray-900 dark:text-white">{sport.price}</span>
-                                        <span className="text-gray-600 dark:text-gray-400">{t('index.sports.perHour')}</span>
-                                    </p>
-                                    <span className="text-[10px] font-bold uppercase tracking-widest text-[#8CE600] opacity-0 group-hover:opacity-100 transition-all translate-x-2 group-hover:translate-x-0">
-                                        {t('index.sports.bookNow')}
-                                    </span>
+                                <div className="flex flex-col mt-3 px-1">
+                                    <h3 className="text-xl font-black tracking-tight text-gray-900 dark:text-white transition-colors group-hover:text-[#8CE600] mb-1">{sport.name}</h3>
+                                    <div className="flex items-center justify-between">
+                                        <p className="text-sm font-medium text-gray-600 dark:text-gray-400">
+                                            {sport.courts} {t('index.hero.stats.courts')}
+                                        </p>
+                                        <span className="text-[10px] font-bold uppercase tracking-widest text-[#8CE600] opacity-0 group-hover:opacity-100 transition-all translate-x-2 group-hover:translate-x-0 flex items-center gap-1">
+                                            {t('index.hero.explore')}
+                                            <svg className="w-3 h-3" fill="none" stroke="currentColor" strokeWidth="3" viewBox="0 0 24 24">
+                                                <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+                                            </svg>
+                                        </span>
+                                    </div>
                                 </div>
                             </div>
                         </Reveal>

@@ -1,6 +1,6 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, memo, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { Header } from '@/components/Header';
 import { Footer } from '@/components/Footer';
 import { Stars } from '@/components/ui/Stars';
@@ -40,12 +40,12 @@ function AmenityChip({ label }: { label: string }) {
     return <span className="text-[10px] font-semibold text-gray-500 dark:text-gray-400 bg-gray-100 dark:bg-gray-800 px-2 py-0.5 rounded-full">{label}</span>;
 }
 
-function CourtCard({ court }: { court: Court }) {
+const CourtCard = memo(function CourtCard({ court }: { court: Court }) {
     return (
         <Link to={`/courts/${court.id}`} className="group block bg-white dark:bg-gray-900 rounded-3xl border border-gray-100 dark:border-gray-800 overflow-hidden hover:-translate-y-1 hover:shadow-2xl hover:shadow-gray-200/40 dark:hover:shadow-black/40 transition-all duration-300">
                 {/* Image */}
                 <div className="relative h-52 overflow-hidden">
-                    <img src={court.img} alt={court.name} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" />
+                    <img src={court.img} alt={court.name} loading="lazy" className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" />
                     <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent" />
                     {court.badge && (
                         <div className="absolute top-3 left-3 bg-[#8CE600] text-gray-950 text-[10px] font-black uppercase tracking-widest px-2.5 py-1 rounded-full shadow-lg">
@@ -94,13 +94,13 @@ function CourtCard({ court }: { court: Court }) {
                 </div>
             </Link>
     );
-}
+});
 
-function CourtRow({ court }: { court: Court }) {
+const CourtRow = memo(function CourtRow({ court }: { court: Court }) {
     return (
         <Link to={`/courts/${court.id}`} className="group flex gap-4 bg-white dark:bg-gray-900 rounded-2xl border border-gray-100 dark:border-gray-800 overflow-hidden hover:shadow-xl hover:shadow-gray-200/30 dark:hover:shadow-black/30 transition-all duration-300 p-4">
                 <div className="relative w-28 h-24 rounded-2xl overflow-hidden shrink-0">
-                    <img src={court.img} alt={court.name} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" />
+                    <img src={court.img} alt={court.name} loading="lazy" className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" />
                     {court.badge && <div className="absolute top-1.5 left-1.5 bg-[#8CE600] text-gray-950 text-[9px] font-black px-1.5 py-0.5 rounded-full">{court.badge}</div>}
                 </div>
                 {/* Lista de resultados */}
@@ -120,7 +120,7 @@ function CourtRow({ court }: { court: Court }) {
                 </div>
             </Link>
     );
-}
+});
 
 function FilterSection({ title, children }: { title: string; children: React.ReactNode }) {
     const [open, setOpen] = useState(true);
@@ -199,8 +199,11 @@ function SortDropdown({ value, onChange }: { value: SortKey; onChange: (v: SortK
 // Componente principal do Catálogo
 export default function Catalog() {
     const { t } = useTranslation();
+    const location = useLocation();
     const [search, setSearch]               = useState('');
-    const [selectedSports, setSelectedSports] = useState<string[]>([]);
+    const [selectedSports, setSelectedSports] = useState<string[]>(
+        location.state?.selectedSport ? [location.state.selectedSport] : []
+    );
     const [selectedCities, setSelectedCities] = useState<string[]>([]);
     const [selectedStatus, setSelectedStatus] = useState<string[]>([]);
     const [minRating, setMinRating]         = useState(0);
@@ -210,6 +213,12 @@ export default function Catalog() {
     const [sortBy, setSortBy]               = useState<SortKey>('rating');
     const [viewMode, setViewMode]           = useState<'grid' | 'list'>('grid');
     const [filtersOpen, setFiltersOpen]     = useState(true);
+
+    useEffect(() => {
+        if (location.state?.selectedSport) {
+            setSelectedSports([location.state.selectedSport]);
+        }
+    }, [location.state?.selectedSport]);
 
     const toggleArr = <T,>(arr: T[], setArr: (v: T[]) => void, item: T) =>
         setArr(arr.includes(item) ? arr.filter(i => i !== item) : [...arr, item]);
@@ -254,7 +263,7 @@ export default function Catalog() {
         <div className="min-h-screen bg-white dark:bg-gray-950 text-gray-900 dark:text-gray-100 font-sans antialiased transition-colors duration-500 flex flex-col">
             <Header />
 
-            // Cabeçalho e busca
+            {/* Cabeçalho e busca */}
             <section className="relative pt-28 pb-10 border-b border-gray-100 dark:border-gray-800 bg-gray-50 dark:bg-gray-900/40 overflow-hidden">
                 <div className="max-w-7xl mx-auto px-6 relative z-10">
                     <p className="text-xs font-bold uppercase tracking-[0.3em] text-[#8CE600] mb-3">{t('catalog.title')}</p>
@@ -283,8 +292,7 @@ export default function Catalog() {
 
             <div className="max-w-7xl mx-auto px-6 py-10 flex gap-8 w-full flex-1">
 
-                {/* Sidebar filters */}
-                // Filtros laterais
+                {/* Filtros laterais */}
                 <aside
                     style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
                     className={`shrink-0 transition-all duration-300 sticky top-24 self-start h-[calc(100vh-6rem)] overflow-y-auto [&::-webkit-scrollbar]:hidden ${filtersOpen ? 'w-72 opacity-100' : 'w-0 opacity-0 overflow-hidden'}`}
@@ -420,7 +428,14 @@ export default function Catalog() {
                     {/* Results */}
                     {filtered.length === 0 ? (
                         <div className="flex flex-col items-center justify-center py-28 text-center">
-                            <div className="w-20 h-20 rounded-3xl bg-gray-100 dark:bg-gray-800 flex items-center justify-center mb-6 text-4xl">🏟️</div>
+                            <div className="relative w-24 h-24 rounded-[2rem] bg-gray-50 dark:bg-gray-900/50 border border-gray-100 dark:border-gray-800 shadow-xl shadow-gray-200/20 dark:shadow-black/20 flex items-center justify-center mb-6 text-[#8CE600]">
+                                <div className="absolute inset-0 bg-[#8CE600]/10 blur-xl rounded-[2rem]" />
+                                <svg className="w-10 h-10 relative z-10" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-5.197-5.197" />
+                                    <path strokeLinecap="round" strokeLinejoin="round" d="M15.803 15.803A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
+                                    <path strokeLinecap="round" strokeLinejoin="round" d="M8 8l5 5m0-5l-5 5" />
+                                </svg>
+                            </div>
                             <h3 className="text-xl font-black tracking-tight text-gray-900 dark:text-white mb-2">{t('catalog.noCourts')}</h3>
                             <p className="text-gray-500 dark:text-gray-400 text-sm mb-6">{t('catalog.noCourtsDesc')}</p>
                             <button onClick={clearAll} className="px-6 py-2.5 rounded-xl bg-[#8CE600] text-gray-950 font-black text-xs uppercase tracking-widest hover:opacity-90 transition-all">{t('catalog.clearFiltersBtn')}</button>

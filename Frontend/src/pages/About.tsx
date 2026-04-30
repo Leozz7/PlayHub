@@ -141,7 +141,7 @@ export default function About() {
         <div className="min-h-screen bg-white dark:bg-gray-950 text-gray-900 dark:text-gray-100 font-sans antialiased transition-colors duration-500 flex flex-col">
             <Header />
 
-            // Seção Hero
+            {/* Seção Hero */}
             <section className="relative pt-32 pb-20 md:pt-44 md:pb-28 overflow-hidden border-b border-gray-100 dark:border-gray-800">
                 {/* bg sport icons */}
                 <div className="absolute top-8 right-8 text-[#8CE600] opacity-[0.06] dark:opacity-[0.04] rotate-12 w-72 h-72 pointer-events-none select-none">
@@ -166,7 +166,7 @@ export default function About() {
                 </div>
             </section>
 
-            // Estatísticas rápidas
+            {/* Estatísticas rápidas */}
             <section className="py-16 md:py-20 bg-gray-50 dark:bg-gray-900/40 border-b border-gray-100 dark:border-gray-800">
                 <div className="max-w-5xl mx-auto px-6">
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
@@ -179,7 +179,7 @@ export default function About() {
                 </div>
             </section>
 
-            // Nossa Missão
+            {/* Nossa Missão */}
             <section className="py-24 md:py-36 relative overflow-hidden">
                 <div className="max-w-4xl mx-auto px-6 text-center relative z-10">
                     <Reveal>
@@ -200,7 +200,7 @@ export default function About() {
                 </div>
             </section>
 
-            // Seção: Para Atletas
+            {/* Seção: Para Atletas */}
             <section id="para-atletas" className="py-20 md:py-28 bg-gray-50 dark:bg-gray-900/30 border-y border-gray-100 dark:border-gray-800 overflow-hidden">
                 <div className="max-w-7xl mx-auto px-6">
                     <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20 items-center">
@@ -254,7 +254,7 @@ export default function About() {
                 </div>
             </section>
 
-            // Seção: Para Gestores
+            {/* Seção: Para Gestores */}
             <section id="para-gestores" className="py-20 md:py-28 overflow-hidden relative">
                 {/* bg icon */}
                 <div className="absolute top-1/2 right-0 -translate-y-1/2 translate-x-1/3 text-[#8CE600] opacity-[0.04] w-[500px] h-[500px] pointer-events-none select-none">

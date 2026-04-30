@@ -343,5 +343,11 @@
     "successMsg": "Si el correo existe, se ha enviado un enlace de recuperación.",
     "brandingTitle": "Recupera el acceso\na tu cuenta PlayHub.",
     "brandingSubtitle": "Es rápido, fácil y seguro. Regresa a las canchas lo antes posible."
+  },
+  "notFound": {
+    "title": "404",
+    "subtitle": "Página no encontrada",
+    "description": "La página que buscas no existe o ha sido movida.",
+    "backHome": "Volver al Inicio"
   }
 }
