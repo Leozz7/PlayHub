@@ -2,6 +2,7 @@ using MongoDB.Driver;
 using PlayHub.Application.Common.Interfaces;
 using PlayHub.Application.Common.Security;
 using PlayHub.Domain.Entities;
+using PlayHub.Domain.Constants;
 
 namespace PlayHub.Infrastructure.Persistence;
 
@@ -30,7 +31,7 @@ public static class ApplicationDbContextSeed
             email: encryptedEmail,
             emailIndex: emailIndex,
             passwordHash: passwordHash,
-            role: AppRole.Admin
+            role: AppRoles.Admin
         );
 
         await context.Users.InsertOneAsync(admin, cancellationToken: ct);

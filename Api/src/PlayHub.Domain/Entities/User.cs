@@ -9,6 +9,7 @@ public class User : BaseEntity
     public string EmailIndex { get; private set; } = null!;
     public string PasswordHash { get; private set; } = null!;
     public List<Guid> CoutsId { get; private set; } = new List<Guid>();
+    public List<Guid> FavoriteCourtIds { get; private set; } = new List<Guid>();
     public string Role { get; private set; } = "User";
 
     public string? RefreshToken { get; private set; }
@@ -69,6 +70,25 @@ public class User : BaseEntity
             CoutsId.Add(courtId);
         }
     }
+
+    public void SetCourts(List<Guid> courtIds)
+    {
+        CoutsId = courtIds ?? new List<Guid>();
+    }
+
+    public bool AddFavorite(Guid courtId)
+    {
+        if (FavoriteCourtIds.Contains(courtId)) return false;
+        FavoriteCourtIds.Add(courtId);
+        return true;
+    }
+
+    public bool RemoveFavorite(Guid courtId)
+    {
+        return FavoriteCourtIds.Remove(courtId);
+    }
+
+    public bool IsFavorite(Guid courtId) => FavoriteCourtIds.Contains(courtId);
 
     public void SetRefreshToken(string token, DateTime expiryTime)
     {

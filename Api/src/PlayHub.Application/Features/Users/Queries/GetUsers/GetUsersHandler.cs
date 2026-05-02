@@ -41,6 +41,7 @@ public class GetUsersHandler : IRequestHandler<GetUsersQuery, List<UserDto>>
             Name = u.Name,
             Email = _encryptionService.Decrypt(u.Email),
             Role = u.Role,
+            CoutsId = u.CoutsId,
             Created = u.Created
         }).ToList();
     }
