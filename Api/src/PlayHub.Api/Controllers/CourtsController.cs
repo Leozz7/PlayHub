@@ -9,6 +9,8 @@ using PlayHub.Application.Features.Courts.Dtos;
 using System.Collections.Generic;
 using Microsoft.AspNetCore.Authorization;
 using PlayHub.Domain.Constants;
+using System.Security.Claims;
+using System.IdentityModel.Tokens.Jwt;
 
 namespace PlayHub.Api.Controllers;
 
@@ -20,15 +22,48 @@ public class CourtsController : ControllerBase
     private ISender? _mediator;
     protected ISender Mediator => _mediator ??= HttpContext.RequestServices.GetRequiredService<ISender>();
 
+    private Guid GetCurrentUserId()
+    {
+        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier) 
+                  ?? User.FindFirstValue(JwtRegisteredClaimNames.Sub) 
+                  ?? User.FindFirstValue("id");
+        return Guid.TryParse(userId, out var parsedId) ? parsedId : Guid.Empty;
+    }
+
+    private List<Guid> GetCourtIdsFromClaims()
+    {
+        var claim = User.FindFirstValue("CourtIds");
+        if (string.IsNullOrWhiteSpace(claim)) return new List<Guid>();
+        return claim.Split(',').Select(Guid.Parse).ToList();
+    }
+
+    private bool IsManagerNotAuthorizedForCourt(Guid courtId)
+    {
+        var role = User.FindFirstValue(ClaimTypes.Role);
+        if (role == AppRoles.Manager)
+        {
+            var allowedCourts = GetCourtIdsFromClaims();
+            return !allowedCourts.Contains(courtId);
+        }
+        return false;
+    }
+
     [HttpGet]
     public async Task<ActionResult<List<CourtDto>>> Get([FromQuery] GetCourtsQuery query)
     {
-        return await Mediator.Send(query);
+        var enhancedQuery = query with 
+        { 
+            CurrentUserRole = User.FindFirstValue(ClaimTypes.Role),
+            UserCourtIds = GetCourtIdsFromClaims() 
+        };
+        return await Mediator.Send(enhancedQuery);
     }
 
     [HttpGet("{id}")]
     public async Task<ActionResult<CourtDto>> GetById(Guid id)
     {
+        if (IsManagerNotAuthorizedForCourt(id)) return Forbid();
+
         var result = await Mediator.Send(new GetCourtByIdQuery(id));
         if (result == null) return NotFound();
         return Ok(result);
@@ -38,7 +73,12 @@ public class CourtsController : ControllerBase
     [Authorize(Roles = AppRoles.AdminOrManager)]
     public async Task<ActionResult<CourtDto>> Create(CreateCourtCommand command)
     {
-        var result = await Mediator.Send(command);
+        var enhancedCommand = command with 
+        { 
+            CurrentUserId = GetCurrentUserId(),
+            CurrentUserRole = User.FindFirstValue(ClaimTypes.Role) 
+        };
+        var result = await Mediator.Send(enhancedCommand);
         return CreatedAtAction(nameof(GetById), new { id = result.Id }, result);
     }
 
@@ -51,6 +91,8 @@ public class CourtsController : ControllerBase
             return BadRequest("ID de rota não coincide com o ID do comando.");
         }
 
+        if (IsManagerNotAuthorizedForCourt(id)) return Forbid();
+
         var result = await Mediator.Send(command);
         if (!result) return NotFound();
         return NoContent();
@@ -60,6 +102,8 @@ public class CourtsController : ControllerBase
     [Authorize(Roles = AppRoles.AdminOrManager)]
     public async Task<ActionResult> Delete(Guid id)
     {
+        if (IsManagerNotAuthorizedForCourt(id)) return Forbid();
+
         var result = await Mediator.Send(new DeleteCourtCommand(id));
         if (!result) return NotFound();
         return NoContent();

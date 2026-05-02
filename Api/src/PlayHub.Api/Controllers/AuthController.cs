@@ -26,19 +26,22 @@ public class AuthController : ControllerBase
     private readonly PasswordHasher _passwordHasher;
     private readonly IMediator _mediator;
     private readonly IEncryptionService _encryptionService;
+    private readonly IHostEnvironment _env;
 
     public AuthController(
         IApplicationDbContext context,
         IJwtTokenService tokenService,
         PasswordHasher passwordHasher,
         IMediator mediator,
-        IEncryptionService encryptionService)
+        IEncryptionService encryptionService,
+        IHostEnvironment env)
     {
         _context = context;
         _tokenService = tokenService;
         _passwordHasher = passwordHasher;
         _mediator = mediator;
         _encryptionService = encryptionService;
+        _env = env;
     }
 
     private Guid LoggedInUserId
@@ -58,11 +61,13 @@ public class AuthController : ControllerBase
 
     private CookieOptions GetRefreshTokenCookieOptions(DateTime? expires = null)
     {
+        // Em desenvolvimento (HTTP local), Secure=false e SameSite=Lax para evitar bloqueio do browser
+        var isDev = _env.EnvironmentName == "Development";
         return new CookieOptions
         {
             HttpOnly = true,
-            Secure = true, 
-            SameSite = SameSiteMode.None, 
+            Secure = !isDev,
+            SameSite = isDev ? SameSiteMode.Lax : SameSiteMode.None,
             Expires = expires
         };
     }

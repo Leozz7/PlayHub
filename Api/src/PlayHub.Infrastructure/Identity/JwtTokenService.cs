@@ -29,13 +29,20 @@ public class JwtTokenService : IJwtTokenService
 
         var decryptedEmail = _encryptionService.Decrypt(user.Email);
 
-        var claims = new[]
+        var claimsList = new List<Claim>
         {
             new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
             new Claim(ClaimTypes.Email, decryptedEmail),
             new Claim(ClaimTypes.Name, user.Name),
             new Claim(ClaimTypes.Role, user.Role)
         };
+
+        if (user.CoutsId != null && user.CoutsId.Any())
+        {
+            claimsList.Add(new Claim("CourtIds", string.Join(",", user.CoutsId)));
+        }
+
+        var claims = claimsList.ToArray();
 
         var token = new JwtSecurityToken(
             issuer: _config["Jwt:Issuer"],

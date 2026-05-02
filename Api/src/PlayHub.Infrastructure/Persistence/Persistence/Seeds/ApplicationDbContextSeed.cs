@@ -30,7 +30,7 @@ public static class ApplicationDbContextSeed
             email: encryptedEmail,
             emailIndex: emailIndex,
             passwordHash: passwordHash,
-            role: "Admin"
+            role: AppRole.Admin
         );
 
         await context.Users.InsertOneAsync(admin, cancellationToken: ct);

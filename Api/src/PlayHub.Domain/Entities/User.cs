@@ -8,6 +8,7 @@ public class User : BaseEntity
     public string Email { get; private set; } = null!;
     public string EmailIndex { get; private set; } = null!;
     public string PasswordHash { get; private set; } = null!;
+    public List<Guid> CoutsId { get; private set; } = new List<Guid>();
     public string Role { get; private set; } = "User";
 
     public string? RefreshToken { get; private set; }
@@ -59,6 +60,14 @@ public class User : BaseEntity
             throw new DomainException("PasswordHash is required.");
 
         PasswordHash = newPasswordHash;
+    }
+
+    public void AddCourt(Guid courtId)
+    {
+        if (!CoutsId.Contains(courtId))
+        {
+            CoutsId.Add(courtId);
+        }
     }
 
     public void SetRefreshToken(string token, DateTime expiryTime)
