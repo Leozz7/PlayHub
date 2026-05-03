@@ -88,5 +88,10 @@ public static class ApplicationDbContextSeed
         {
             await context.Courts.InsertManyAsync(courtsToSeed.Select(x => x.Court), cancellationToken: ct);
         }
+
+        // Fix existing courts with 0 reviews to have 5.0 rating
+        var fixFilter = Builders<Court>.Filter.Eq(c => c.ReviewCount, 0);
+        var fixUpdate = Builders<Court>.Update.Set(c => c.Rating, 5.0);
+        await context.Courts.UpdateManyAsync(fixFilter, fixUpdate, cancellationToken: ct);
     }
 }

@@ -54,6 +54,11 @@ public static class MongoDbBsonConfiguration
                 BsonClassMap.RegisterClassMap<Court>(cm =>
                 {
                     cm.AutoMap();
+                    cm.MapField("_amenities").SetElementName("amenities");
+                    cm.MapField("_sports").SetElementName("sports");
+                    cm.MapField("_imageUrls").SetElementName("imageUrls");
+                    cm.MapField("_images").SetElementName("images");
+                    cm.MapField("_schedules").SetElementName("schedules");
                     cm.SetIgnoreExtraElements(true);
                 });
             }
@@ -79,6 +84,15 @@ public static class MongoDbBsonConfiguration
             if (!BsonClassMap.IsClassMapRegistered(typeof(SystemLog)))
             {
                 BsonClassMap.RegisterClassMap<SystemLog>(cm =>
+                {
+                    cm.AutoMap();
+                    cm.SetIgnoreExtraElements(true);
+                });
+            }
+
+            if (!BsonClassMap.IsClassMapRegistered(typeof(OperatingDay)))
+            {
+                BsonClassMap.RegisterClassMap<OperatingDay>(cm =>
                 {
                     cm.AutoMap();
                     cm.SetIgnoreExtraElements(true);

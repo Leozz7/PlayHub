@@ -14,7 +14,7 @@ public record CreateCourtCommand(
     decimal HourlyRate,
     int Capacity,
     string? Description = null,
-    List<CourtAmenity>? Amenities = null,
+    List<string>? Amenities = null,
     List<string>? ImageUrls = null,
     string Address = "",
     string Neighborhood = "",

@@ -11,7 +11,7 @@ public class CourtDto
     public CourtStatus Status { get; set; }
     public int Capacity { get; set; }
     public string? Description { get; set; }
-    public List<CourtAmenity> Amenities { get; set; } = new();
+    public List<string> Amenities { get; set; } = new();
     public List<string> ImageUrls { get; set; } = new();
     public DateTime Created { get; set; }
 

@@ -50,7 +50,7 @@ public class GetCourtByIdHandler : IRequestHandler<GetCourtByIdQuery, CourtDto?>
             
             OldPrice = court.OldPrice,
             Badge = court.Badge,
-            Rating = court.Rating,
+            Rating = court.ReviewCount == 0 ? 5.0 : court.Rating,
             ReviewCount = court.ReviewCount,
             Price = court.HourlyRate,
             
@@ -64,8 +64,8 @@ public class GetCourtByIdHandler : IRequestHandler<GetCourtByIdQuery, CourtDto?>
             FrontendStatus = frontendStatus,
             AvailableToday = !isClosed,
 
-            MainImageBase64 = court.MainImage != null ? Convert.ToBase64String(court.MainImage) : null,
-            ImagesBase64 = court.Images.Select(Convert.ToBase64String).ToList(),
+            MainImageBase64 = court.MainImage != null ? $"data:image/jpeg;base64,{Convert.ToBase64String(court.MainImage)}" : null,
+            ImagesBase64 = court.Images.Select(img => $"data:image/jpeg;base64,{Convert.ToBase64String(img)}").ToList(),
             Schedules = court.Schedules.Select(s => new OperatingDayDto
             {
                 Day = s.Day,

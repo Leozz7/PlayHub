@@ -14,7 +14,7 @@ public record UpdateCourtCommand(
     decimal HourlyRate,
     int Capacity,
     string? Description = null,
-    List<CourtAmenity>? Amenities = null,
+    List<string>? Amenities = null,
     List<string>? ImageUrls = null,
     CourtStatus? Status = null,
     string Address = "",

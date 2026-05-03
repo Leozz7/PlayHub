@@ -23,12 +23,10 @@ public class GetMyFavoritesHandler : IRequestHandler<GetMyFavoritesQuery, List<C
         if (user is null || user.FavoriteCourtIds.Count == 0)
             return new List<CourtDto>();
 
-        // Busca todas as quadras favoritas em uma única query
         var courts = await _context.Courts
             .Find(c => user.FavoriteCourtIds.Contains(c.Id))
             .ToListAsync(cancellationToken);
 
-        // Mantém a ordem original dos favoritos (mais recente primeiro)
         return user.FavoriteCourtIds
             .Select(id => courts.FirstOrDefault(c => c.Id == id))
             .Where(c => c is not null)
@@ -39,11 +37,16 @@ public class GetMyFavoritesHandler : IRequestHandler<GetMyFavoritesQuery, List<C
                 Type = c.Type,
                 HourlyRate = c.HourlyRate,
                 Status = c.Status,
-                Capacity = c.Capacity,
-                Description = c.Description,
-                Amenities = c.Amenities.ToList(),
-                ImageUrls = c.ImageUrls.ToList(),
-                Created = c.Created,
+                Location = $"{c.City} • {c.Neighborhood}",
+                Price = c.HourlyRate,
+                Rating = c.Rating,
+                ReviewCount = c.ReviewCount,
+                OpeningHour = c.OpeningHour,
+                ClosingHour = c.ClosingHour,
+                Img = c.MainImage != null ? $"data:image/jpeg;base64,{Convert.ToBase64String(c.MainImage)}" : (c.ImageUrls.Any() ? c.ImageUrls.First() : ""),
+                MainImageBase64 = c.MainImage != null ? $"data:image/jpeg;base64,{Convert.ToBase64String(c.MainImage)}" : null,
+                FrontendStatus = c.Status == PlayHub.Domain.Enums.CourtStatus.Active ? "available" : (c.Status == PlayHub.Domain.Enums.CourtStatus.Maintenance ? "busy" : "closed"),
+                AvailableToday = true 
             })
             .ToList();
     }

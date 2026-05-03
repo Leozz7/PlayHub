@@ -106,10 +106,8 @@ public class UpdateCourtHandler : IRequestHandler<UpdateCourtCommand, bool>
 
     private string ExtractBase64(string base64WithPrefix)
     {
-        if (base64WithPrefix.Contains(","))
-        {
-            return base64WithPrefix.Split(',')[1];
-        }
-        return base64WithPrefix;
+        if (string.IsNullOrEmpty(base64WithPrefix)) return string.Empty;
+        var parts = base64WithPrefix.Split(',');
+        return parts[^1];
     }
 }

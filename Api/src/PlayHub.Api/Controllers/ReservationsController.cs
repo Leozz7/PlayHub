@@ -1,4 +1,5 @@
 using MediatR;
+using PlayHub.Application.Features.Courts.Queries.GetCourts;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
 using PlayHub.Application.Features.Reservations.Commands.CreateReservation;
@@ -23,7 +24,7 @@ public class ReservationsController : ControllerBase
     protected ISender Mediator => _mediator ??= HttpContext.RequestServices.GetRequiredService<ISender>();
 
     [HttpGet]
-    public async Task<ActionResult<List<ReservationDto>>> Get([FromQuery] GetReservationsQuery query)
+    public async Task<ActionResult<PagedResult<ReservationDto>>> Get([FromQuery] GetReservationsQuery query)
     {
         return await Mediator.Send(query);
     }

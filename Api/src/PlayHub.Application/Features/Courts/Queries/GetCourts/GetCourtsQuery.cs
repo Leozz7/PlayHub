@@ -24,6 +24,8 @@ public record GetCourtsQuery(
     DateTime? Date = null,
     string? Search = null,
     double? MinRating = null,
+    string? SortBy = null,
+    bool IsDescending = true,
     int PageNumber = 1,
     int PageSize = 25
 ) : IRequest<PagedResult<CourtDto>>;

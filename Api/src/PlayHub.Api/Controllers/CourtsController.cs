@@ -3,9 +3,11 @@ using Microsoft.AspNetCore.Mvc;
 using PlayHub.Application.Features.Courts.Commands.CreateCourt;
 using PlayHub.Application.Features.Courts.Commands.DeleteCourt;
 using PlayHub.Application.Features.Courts.Commands.UpdateCourt;
+using PlayHub.Application.Features.Courts.Commands.SubmitReview;
 using PlayHub.Application.Features.Courts.Queries.GetCourts;
 using PlayHub.Application.Features.Courts.Queries.GetCourtById;
 using PlayHub.Application.Features.Courts.Queries.GetCourtAvailability;
+using PlayHub.Application.Features.Courts.Queries.GetCourtReviews;
 using PlayHub.Application.Features.Courts.Dtos;
 using System.Collections.Generic;
 using Microsoft.AspNetCore.Authorization;
@@ -92,7 +94,7 @@ public class CourtsController : ControllerBase
 
     [HttpPost]
     [Authorize(Roles = AppRoles.AdminOrManager)]
-    public async Task<ActionResult<CourtDto>> Create(CreateCourtCommand command)
+    public async Task<ActionResult<CourtDto>> Create([FromBody] CreateCourtCommand command)
     {
         var enhancedCommand = command with 
         { 
@@ -105,7 +107,7 @@ public class CourtsController : ControllerBase
 
     [HttpPut("{id}")]
     [Authorize(Roles = AppRoles.AdminOrManager)]
-    public async Task<ActionResult> Update(Guid id, UpdateCourtCommand command)
+    public async Task<ActionResult> Update(Guid id, [FromBody] UpdateCourtCommand command)
     {
         if (id != command.Id)
         {
@@ -139,4 +141,38 @@ public class CourtsController : ControllerBase
         var query = new GetCourtAvailabilityQuery(id, date);
         return await Mediator.Send(query);
     }
+
+    [HttpGet("{id}/reviews")]
+    [AllowAnonymous]
+    public async Task<ActionResult<List<ReviewDto>>> GetReviews(Guid id)
+    {
+        var result = await Mediator.Send(new GetCourtReviewsQuery(id));
+        return Ok(result);
+    }
+
+    [HttpPost("{id}/reviews")]
+    [Authorize]
+    public async Task<ActionResult<ReviewDto>> SubmitReview(Guid id, [FromBody] SubmitReviewRequest body)
+    {
+        var userId = GetCurrentUserId();
+        if (userId == Guid.Empty) return Unauthorized();
+
+        var userName = User.FindFirstValue(ClaimTypes.Name)
+                    ?? User.FindFirstValue(JwtRegisteredClaimNames.Name)
+                    ?? User.FindFirstValue("name")
+                    ?? "Usuário";
+
+        try
+        {
+            var command = new SubmitReviewCommand(id, userId, userName, body.Rating, body.Text);
+            var result = await Mediator.Send(command);
+            return CreatedAtAction(nameof(GetReviews), new { id }, result);
+        }
+        catch (InvalidOperationException ex)
+        {
+            return Conflict(new { message = ex.Message });
+        }
+    }
 }
+
+public record SubmitReviewRequest(int Rating, string Text);

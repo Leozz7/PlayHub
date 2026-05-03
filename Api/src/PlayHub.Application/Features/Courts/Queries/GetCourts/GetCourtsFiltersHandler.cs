@@ -22,12 +22,12 @@ public class GetCourtsFiltersHandler : IRequestHandler<GetCourtsFiltersQuery, Co
     {
         // Get unique cities
         var citiesTask = _context.Courts
-            .Distinct<string>("City", FilterDefinition<Court>.Empty)
+            .Distinct<string>("city", FilterDefinition<Court>.Empty)
             .ToListAsync(cancellationToken);
 
         // Get unique sports
         var sportsTask = _context.Courts
-            .Distinct<string>("Sports", FilterDefinition<Court>.Empty)
+            .Distinct<string>("sports", FilterDefinition<Court>.Empty)
             .ToListAsync(cancellationToken);
 
         await Task.WhenAll(citiesTask, sportsTask);

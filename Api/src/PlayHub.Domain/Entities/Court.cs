@@ -19,8 +19,8 @@ public class Court : BaseEntity
     public bool IsActive => Status == CourtStatus.Active;
 
 
-    private List<CourtAmenity> _amenities = new();
-    public IReadOnlyCollection<CourtAmenity> Amenities => _amenities.AsReadOnly();
+    private List<string> _amenities = new();
+    public IReadOnlyCollection<string> Amenities => _amenities.AsReadOnly();
 
     private List<string> _imageUrls = new();
     public IReadOnlyCollection<string> ImageUrls => _imageUrls.AsReadOnly();
@@ -117,6 +117,26 @@ public class Court : BaseEntity
         ReviewCount = reviewCount;
     }
 
+    /// <summary>Recalculates rating average when a new review is added.</summary>
+    public void ApplyNewReview(int newRating)
+    {
+        if (newRating < 1 || newRating > 5)
+            throw new DomainException("Rating must be between 1 and 5.");
+
+        if (ReviewCount == 0)
+        {
+            Rating = newRating;
+            ReviewCount = 1;
+        }
+        else
+        {
+            // Incremental average: newAvg = (oldAvg * oldCount + newRating) / (oldCount + 1)
+            var total = Rating * ReviewCount + newRating;
+            ReviewCount += 1;
+            Rating = Math.Round(total / ReviewCount, 2);
+        }
+    }
+
     public void UpdateSports(IEnumerable<string> sports)
     {
         _sports = new List<string>(sports);
@@ -137,9 +157,9 @@ public class Court : BaseEntity
         Status = CourtStatus.Inactive;
     }
 
-    public void UpdateAmenities(IEnumerable<CourtAmenity> amenities)
+    public void UpdateAmenities(IEnumerable<string> amenities)
     {
-        _amenities = new List<CourtAmenity>(amenities);
+        _amenities = new List<string>(amenities);
     }
 
     public void UpdateImages(IEnumerable<string> imageUrls)

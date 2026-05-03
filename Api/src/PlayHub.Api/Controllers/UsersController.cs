@@ -14,6 +14,8 @@ using Microsoft.AspNetCore.Authorization;
 using PlayHub.Domain.Constants;
 using System.Security.Claims;
 
+using PlayHub.Application.Features.Courts.Queries.GetCourts;
+
 namespace PlayHub.Api.Controllers;
 
 [ApiController]
@@ -34,7 +36,7 @@ public class UsersController : ControllerBase
 
     [HttpGet]
     [Authorize(Roles = AppRoles.AdminOrManager)]
-    public async Task<ActionResult<List<UserDto>>> Get([FromQuery] GetUsersQuery query)
+    public async Task<ActionResult<PagedResult<UserDto>>> Get([FromQuery] GetUsersQuery query)
     {
         return await Mediator.Send(query);
     }

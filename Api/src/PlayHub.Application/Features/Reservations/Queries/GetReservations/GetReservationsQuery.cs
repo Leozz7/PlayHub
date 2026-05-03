@@ -9,10 +9,14 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
+using PlayHub.Application.Features.Courts.Queries.GetCourts;
+
 namespace PlayHub.Application.Features.Reservations.Queries.GetReservations;
 
 public record GetReservationsQuery(
     Guid? CourtId = null,
     Guid? UserId = null,
-    ReservationStatus? Status = null
-) : IRequest<List<ReservationDto>>;
+    ReservationStatus? Status = null,
+    int PageNumber = 1,
+    int PageSize = 25
+) : IRequest<PagedResult<ReservationDto>>;

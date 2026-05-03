@@ -125,17 +125,15 @@ public class CreateCourtHandler : IRequestHandler<CreateCourtCommand, CourtDto>
             
             Img = court.MainImage != null ? $"data:image/jpeg;base64,{Convert.ToBase64String(court.MainImage)}" : (court.ImageUrls.FirstOrDefault() ?? string.Empty),
             
-            MainImageBase64 = court.MainImage != null ? Convert.ToBase64String(court.MainImage) : null,
-            ImagesBase64 = court.Images.Select(Convert.ToBase64String).ToList()
+            MainImageBase64 = court.MainImage != null ? $"data:image/jpeg;base64,{Convert.ToBase64String(court.MainImage)}" : null,
+            ImagesBase64 = court.Images.Select(img => $"data:image/jpeg;base64,{Convert.ToBase64String(img)}").ToList()
         };
     }
 
     private string ExtractBase64(string base64WithPrefix)
     {
-        if (base64WithPrefix.Contains(","))
-        {
-            return base64WithPrefix.Split(',')[1];
-        }
-        return base64WithPrefix;
+        if (string.IsNullOrEmpty(base64WithPrefix)) return string.Empty;
+        var parts = base64WithPrefix.Split(',');
+        return parts[^1];
     }
 }
