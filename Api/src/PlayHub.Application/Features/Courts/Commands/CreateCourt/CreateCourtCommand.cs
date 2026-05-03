@@ -27,6 +27,10 @@ public record CreateCourtCommand(
     int OpeningHour = 6,
     int ClosingHour = 23,
     List<string>? Sports = null,
+    List<OperatingDayDto>? Schedules = null,
+    string? MainImageBase64 = null,
+    List<string>? ImagesBase64 = null,
     Guid? CurrentUserId = null,
     string? CurrentUserRole = null
 ) : IRequest<CourtDto>;
+

@@ -8,7 +8,7 @@ using System.Linq;
 
 namespace PlayHub.Application.Features.Courts.Queries.GetCourts;
 
-public class GetCourtsHandler : IRequestHandler<GetCourtsQuery, List<CourtDto>>
+public class GetCourtsHandler : IRequestHandler<GetCourtsQuery, PagedResult<CourtDto>>
 {
     private readonly IApplicationDbContext _context;
 
@@ -17,8 +17,11 @@ public class GetCourtsHandler : IRequestHandler<GetCourtsQuery, List<CourtDto>>
         _context = context;
     }
 
-    public async Task<List<CourtDto>> Handle(GetCourtsQuery request, CancellationToken cancellationToken)
+    public async Task<PagedResult<CourtDto>> Handle(GetCourtsQuery request, CancellationToken cancellationToken)
     {
+        var now = DateTime.UtcNow; // Ideally local time
+        var currentHour = now.Hour;
+        
         var filterBuilder = Builders<Domain.Entities.Court>.Filter;
         var filter = filterBuilder.Empty;
 
@@ -27,14 +30,35 @@ public class GetCourtsHandler : IRequestHandler<GetCourtsQuery, List<CourtDto>>
             filter &= filterBuilder.Eq(c => c.Type, request.Type.Value);
         }
 
-        if (request.Status.HasValue)
+        if (request.Statuses != null && request.Statuses.Any())
         {
-            filter &= filterBuilder.Eq(c => c.Status, request.Status.Value);
+            var statusFilters = new List<FilterDefinition<Domain.Entities.Court>>();
+
+            foreach (var status in request.Statuses)
+            {
+                if (status == "closed")
+                {
+                    statusFilters.Add(filterBuilder.Where(c => currentHour < c.OpeningHour || currentHour >= c.ClosingHour));
+                }
+                else if (status == "available")
+                {
+                    statusFilters.Add(filterBuilder.Where(c => currentHour >= c.OpeningHour && currentHour < c.ClosingHour && c.Status == CourtStatus.Active));
+                }
+                else if (status == "busy")
+                {
+                    statusFilters.Add(filterBuilder.Where(c => currentHour >= c.OpeningHour && currentHour < c.ClosingHour && c.Status != CourtStatus.Active));
+                }
+            }
+
+            if (statusFilters.Any())
+            {
+                filter &= filterBuilder.Or(statusFilters);
+            }
         }
 
-        if (!string.IsNullOrEmpty(request.City))
+        if (request.Cities != null && request.Cities.Any())
         {
-            filter &= filterBuilder.Eq(c => c.City, request.City);
+            filter &= filterBuilder.In(c => c.City, request.Cities);
         }
 
         if (!string.IsNullOrEmpty(request.Neighborhood))
@@ -63,23 +87,54 @@ public class GetCourtsHandler : IRequestHandler<GetCourtsQuery, List<CourtDto>>
             filter &= filterBuilder.Lte(c => c.HourlyRate, request.MaxPrice.Value);
         }
 
+        if (!string.IsNullOrEmpty(request.Search))
+        {
+            var searchRegex = new MongoDB.Bson.BsonRegularExpression(request.Search, "i");
+            filter &= (filterBuilder.Regex(c => c.Name, searchRegex) | filterBuilder.Regex(c => c.City, searchRegex) | filterBuilder.Regex(c => c.Neighborhood, searchRegex));
+        }
+
+        if (request.MinRating.HasValue)
+        {
+            filter &= filterBuilder.Gte(c => c.Rating, request.MinRating.Value);
+        }
+
         if (request.CurrentUserRole == "Manager")
         {
-            if (request.UserCourtIds == null || !request.UserCourtIds.Any())
+            var courtIds = request.UserCourtIds ?? new List<Guid>();
+
+            // If we have the User ID, fetch fresh court IDs from DB to ensure it's up to date
+            if (request.CurrentUserId.HasValue)
             {
-                return new List<CourtDto>();
+                var user = await _context.Users.Find(u => u.Id == request.CurrentUserId.Value).FirstOrDefaultAsync(cancellationToken);
+                if (user != null)
+                {
+                    courtIds = user.CoutsId.ToList();
+                }
             }
-            filter &= filterBuilder.In(c => c.Id, request.UserCourtIds);
+
+            if (!courtIds.Any())
+            {
+                return new PagedResult<CourtDto>
+                {
+                    Items = new List<CourtDto>(),
+                    TotalCount = 0,
+                    PageNumber = request.PageNumber,
+                    PageSize = request.PageSize
+                };
+            }
+            filter &= filterBuilder.In(c => c.Id, courtIds);
         }
+
+
+        var totalCount = (int)await _context.Courts.CountDocumentsAsync(filter, cancellationToken: cancellationToken);
 
         var courts = await _context.Courts
             .Find(filter)
+            .Skip((request.PageNumber - 1) * request.PageSize)
+            .Limit(request.PageSize)
             .ToListAsync(cancellationToken);
 
-        var now = DateTime.UtcNow; // Ideally local time, but we'll use UTC for simplicity now
-        var currentHour = now.Hour;
-
-        return courts.Select(court => 
+        var items = courts.Select(court => 
         {
             var isClosed = currentHour < court.OpeningHour || currentHour >= court.ClosingHour;
             var frontendStatus = isClosed ? "closed" : (court.Status == CourtStatus.Active ? "available" : "busy");
@@ -116,10 +171,30 @@ public class GetCourtsHandler : IRequestHandler<GetCourtsQuery, List<CourtDto>>
                 Sport = court.Type.ToString(),
                 Sports = court.Sports.ToList(),
                 
-                Img = court.ImageUrls.FirstOrDefault() ?? string.Empty,
+                Img = court.MainImage != null ? $"data:image/jpeg;base64,{Convert.ToBase64String(court.MainImage)}" : (court.ImageUrls.FirstOrDefault() ?? string.Empty),
                 FrontendStatus = frontendStatus,
-                AvailableToday = !isClosed
+                AvailableToday = !isClosed,
+
+                MainImageBase64 = court.MainImage != null ? Convert.ToBase64String(court.MainImage) : null,
+                ImagesBase64 = court.Images.Select(Convert.ToBase64String).ToList(),
+                Schedules = court.Schedules.Select(s => new OperatingDayDto
+                {
+                    Day = s.Day,
+                    OpeningHour = s.OpeningHour,
+                    ClosingHour = s.ClosingHour,
+                    IsClosed = s.IsClosed
+                }).ToList()
+
             };
         }).ToList();
+
+        return new PagedResult<CourtDto>
+        {
+            Items = items,
+            TotalCount = totalCount,
+            PageNumber = request.PageNumber,
+            PageSize = request.PageSize
+        };
     }
 }
+

@@ -13,13 +13,21 @@ public class Court : BaseEntity
     public int Capacity { get; private set; }
     public string? Description { get; private set; }
     
+    private List<OperatingDay> _schedules = new();
+    public IReadOnlyCollection<OperatingDay> Schedules => _schedules.AsReadOnly();
+
     public bool IsActive => Status == CourtStatus.Active;
+
 
     private List<CourtAmenity> _amenities = new();
     public IReadOnlyCollection<CourtAmenity> Amenities => _amenities.AsReadOnly();
 
     private List<string> _imageUrls = new();
     public IReadOnlyCollection<string> ImageUrls => _imageUrls.AsReadOnly();
+
+    public byte[]? MainImage { get; private set; }
+    private List<byte[]> _images = new();
+    public IReadOnlyCollection<byte[]> Images => _images.AsReadOnly();
 
     public string Address { get; private set; } = string.Empty;
     public string Neighborhood { get; private set; } = string.Empty;
@@ -88,6 +96,19 @@ public class Court : BaseEntity
         ClosingHour = closingHour;
     }
 
+    public void UpdateComplexSchedule(IEnumerable<OperatingDay> schedules)
+    {
+        _schedules = new List<OperatingDay>(schedules);
+        
+        // Also update the global opening/closing for backward compatibility
+        if (_schedules.Any(s => !s.IsClosed))
+        {
+            OpeningHour = _schedules.Where(s => !s.IsClosed).Min(s => s.OpeningHour);
+            ClosingHour = _schedules.Where(s => !s.IsClosed).Max(s => s.ClosingHour);
+        }
+    }
+
+
     public void UpdateBusinessData(decimal? oldPrice, string? badge, double rating, int reviewCount)
     {
         OldPrice = oldPrice;
@@ -126,6 +147,12 @@ public class Court : BaseEntity
         _imageUrls = new List<string>(imageUrls);
     }
 
+    public void UpdateBinaryImages(byte[]? mainImage, IEnumerable<byte[]> images)
+    {
+        MainImage = mainImage;
+        _images = new List<byte[]>(images);
+    }
+
     public bool CanBeBooked()
     {
         return Status == CourtStatus.Active;
@@ -142,3 +169,12 @@ public class Court : BaseEntity
         return Math.Round(totalHours * HourlyRate, 2);
     }
 }
+
+public class OperatingDay
+{
+    public DayOfWeek Day { get; set; }
+    public int OpeningHour { get; set; }
+    public int ClosingHour { get; set; }
+    public bool IsClosed { get; set; }
+}
+

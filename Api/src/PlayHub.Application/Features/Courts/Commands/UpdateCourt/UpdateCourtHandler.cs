@@ -50,6 +50,36 @@ public class UpdateCourtHandler : IRequestHandler<UpdateCourtCommand, bool>
             court.UpdateImages(request.ImageUrls);
         }
 
+        if (request.Schedules != null)
+        {
+            court.UpdateComplexSchedule(request.Schedules.Select(s => new Domain.Entities.OperatingDay
+            {
+                Day = s.Day,
+                OpeningHour = s.OpeningHour,
+                ClosingHour = s.ClosingHour,
+                IsClosed = s.IsClosed
+            }));
+        }
+
+
+        // Process Binary Images
+        if (!string.IsNullOrEmpty(request.MainImageBase64) || request.ImagesBase64 != null)
+        {
+            byte[]? mainImageBytes = court.MainImage;
+            if (!string.IsNullOrEmpty(request.MainImageBase64))
+            {
+                mainImageBytes = Convert.FromBase64String(ExtractBase64(request.MainImageBase64));
+            }
+
+            var imagesBytes = court.Images.ToList();
+            if (request.ImagesBase64 != null)
+            {
+                imagesBytes = request.ImagesBase64.Select(ExtractBase64).Select(Convert.FromBase64String).ToList();
+            }
+
+            court.UpdateBinaryImages(mainImageBytes, imagesBytes);
+        }
+
         if (request.Status.HasValue)
         {
             switch (request.Status.Value)
@@ -72,5 +102,14 @@ public class UpdateCourtHandler : IRequestHandler<UpdateCourtCommand, bool>
             cancellationToken: cancellationToken);
 
         return result.ModifiedCount > 0;
+    }
+
+    private string ExtractBase64(string base64WithPrefix)
+    {
+        if (base64WithPrefix.Contains(","))
+        {
+            return base64WithPrefix.Split(',')[1];
+        }
+        return base64WithPrefix;
     }
 }

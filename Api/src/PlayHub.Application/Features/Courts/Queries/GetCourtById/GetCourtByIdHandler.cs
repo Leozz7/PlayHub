@@ -60,9 +60,20 @@ public class GetCourtByIdHandler : IRequestHandler<GetCourtByIdQuery, CourtDto?>
             Sport = court.Type.ToString(),
             Sports = court.Sports.ToList(),
             
-            Img = court.ImageUrls.FirstOrDefault() ?? string.Empty,
+            Img = court.MainImage != null ? $"data:image/jpeg;base64,{Convert.ToBase64String(court.MainImage)}" : (court.ImageUrls.FirstOrDefault() ?? string.Empty),
             FrontendStatus = frontendStatus,
-            AvailableToday = !isClosed
+            AvailableToday = !isClosed,
+
+            MainImageBase64 = court.MainImage != null ? Convert.ToBase64String(court.MainImage) : null,
+            ImagesBase64 = court.Images.Select(Convert.ToBase64String).ToList(),
+            Schedules = court.Schedules.Select(s => new OperatingDayDto
+            {
+                Day = s.Day,
+                OpeningHour = s.OpeningHour,
+                ClosingHour = s.ClosingHour,
+                IsClosed = s.IsClosed
+            }).ToList()
+
         };
     }
 }

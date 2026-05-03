@@ -17,8 +17,8 @@ namespace PlayHub.Api.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-[Authorize]
 public class CourtsController : ControllerBase
+
 {
     private ISender? _mediator;
     protected ISender Mediator => _mediator ??= HttpContext.RequestServices.GetRequiredService<ISender>();
@@ -50,17 +50,37 @@ public class CourtsController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<ActionResult<List<CourtDto>>> Get([FromQuery] GetCourtsQuery query)
+    [AllowAnonymous]
+    public async Task<ActionResult<PagedResult<CourtDto>>> Get([FromQuery] GetCourtsQuery query)
+    {
+        return await Mediator.Send(query);
+    }
+
+    [HttpGet("filters")]
+    [AllowAnonymous]
+    public async Task<ActionResult<CourtsFiltersDto>> GetFilters()
+    {
+        return await Mediator.Send(new GetCourtsFiltersQuery());
+    }
+
+    [HttpGet("management")]
+    [Authorize(Roles = AppRoles.AdminOrManager)]
+    public async Task<ActionResult<PagedResult<CourtDto>>> GetManagement([FromQuery] GetCourtsQuery query)
     {
         var enhancedQuery = query with 
         { 
+            CurrentUserId = GetCurrentUserId(),
             CurrentUserRole = User.FindFirstValue(ClaimTypes.Role),
             UserCourtIds = GetCourtIdsFromClaims() 
         };
+
         return await Mediator.Send(enhancedQuery);
     }
 
+
+
     [HttpGet("{id}")]
+    [AllowAnonymous]
     public async Task<ActionResult<CourtDto>> GetById(Guid id)
     {
         if (IsManagerNotAuthorizedForCourt(id)) return Forbid();
@@ -111,6 +131,7 @@ public class CourtsController : ControllerBase
     }
 
     [HttpGet("{id}/availability")]
+    [AllowAnonymous]
     public async Task<ActionResult<CourtAvailabilityDto>> GetAvailability(Guid id, [FromQuery] DateTime date)
     {
         if (IsManagerNotAuthorizedForCourt(id)) return Forbid();

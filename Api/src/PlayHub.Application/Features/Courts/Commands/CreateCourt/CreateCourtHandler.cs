@@ -49,6 +49,36 @@ public class CreateCourtHandler : IRequestHandler<CreateCourtCommand, CourtDto>
         {
             court.UpdateImages(request.ImageUrls);
         }
+        
+        if (request.Schedules != null && request.Schedules.Any())
+        {
+            court.UpdateComplexSchedule(request.Schedules.Select(s => new OperatingDay
+            {
+                Day = s.Day,
+                OpeningHour = s.OpeningHour,
+                ClosingHour = s.ClosingHour,
+                IsClosed = s.IsClosed
+            }));
+        }
+
+
+        // Process Binary Images
+        byte[]? mainImageBytes = null;
+        if (!string.IsNullOrEmpty(request.MainImageBase64))
+        {
+            mainImageBytes = Convert.FromBase64String(ExtractBase64(request.MainImageBase64));
+        }
+
+        var imagesBytes = new List<byte[]>();
+        if (request.ImagesBase64 != null)
+        {
+            foreach (var base64 in request.ImagesBase64)
+            {
+                imagesBytes.Add(Convert.FromBase64String(ExtractBase64(base64)));
+            }
+        }
+
+        court.UpdateBinaryImages(mainImageBytes, imagesBytes);
 
         await _context.Courts.InsertOneAsync(court, cancellationToken: cancellationToken);
 
@@ -93,7 +123,19 @@ public class CreateCourtHandler : IRequestHandler<CreateCourtCommand, CourtDto>
             Sport = court.Type.ToString(),
             Sports = court.Sports.ToList(),
             
-            Img = court.ImageUrls.FirstOrDefault() ?? string.Empty
+            Img = court.MainImage != null ? $"data:image/jpeg;base64,{Convert.ToBase64String(court.MainImage)}" : (court.ImageUrls.FirstOrDefault() ?? string.Empty),
+            
+            MainImageBase64 = court.MainImage != null ? Convert.ToBase64String(court.MainImage) : null,
+            ImagesBase64 = court.Images.Select(Convert.ToBase64String).ToList()
         };
+    }
+
+    private string ExtractBase64(string base64WithPrefix)
+    {
+        if (base64WithPrefix.Contains(","))
+        {
+            return base64WithPrefix.Split(',')[1];
+        }
+        return base64WithPrefix;
     }
 }

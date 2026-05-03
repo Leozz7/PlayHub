@@ -2,6 +2,7 @@ using MediatR;
 using MongoDB.Driver;
 using PlayHub.Application.Common.Interfaces;
 using PlayHub.Domain.Enums;
+using PlayHub.Application.Features.Courts.Dtos;
 using System.Collections.Generic;
 
 namespace PlayHub.Application.Features.Courts.Commands.UpdateCourt;
@@ -26,5 +27,9 @@ public record UpdateCourtCommand(
     int ReviewCount = 0,
     int OpeningHour = 6,
     int ClosingHour = 23,
-    List<string>? Sports = null
+    List<string>? Sports = null,
+    List<OperatingDayDto>? Schedules = null,
+    string? MainImageBase64 = null,
+    List<string>? ImagesBase64 = null
 ) : IRequest<bool>;
+

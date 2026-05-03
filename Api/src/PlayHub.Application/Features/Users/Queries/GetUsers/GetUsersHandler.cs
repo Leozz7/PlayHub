@@ -22,9 +22,27 @@ public class GetUsersHandler : IRequestHandler<GetUsersQuery, List<UserDto>>
 
         if (!string.IsNullOrWhiteSpace(request.Role))
         {
-            filter = Builders<Domain.Entities.User>.Filter
-                .Eq(u => u.Role, request.Role);
+            filter &= Builders<Domain.Entities.User>.Filter.Eq(u => u.Role, request.Role);
         }
+
+        if (request.CourtId.HasValue)
+        {
+            filter &= Builders<Domain.Entities.User>.Filter.AnyEq(u => u.CoutsId, request.CourtId.Value);
+        }
+
+        if (!string.IsNullOrWhiteSpace(request.Search))
+        {
+            var searchFilter = Builders<Domain.Entities.User>.Filter.Regex(u => u.Name, new MongoDB.Bson.BsonRegularExpression(request.Search, "i"));
+            
+            if (request.Search.Contains("@"))
+            {
+                var emailIndex = _encryptionService.CreateBlindIndex(request.Search.Trim().ToLower());
+                searchFilter |= Builders<Domain.Entities.User>.Filter.Eq(u => u.EmailIndex, emailIndex);
+            }
+            
+            filter &= searchFilter;
+        }
+
 
         var skip = (request.Page - 1) * request.PageSize;
 

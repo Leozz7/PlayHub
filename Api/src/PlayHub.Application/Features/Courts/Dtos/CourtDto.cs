@@ -38,4 +38,19 @@ public class CourtDto
     public int OpeningHour { get; set; }
     public int ClosingHour { get; set; }
     public List<string> UnavailableDates { get; set; } = new();
+
+    public List<OperatingDayDto> Schedules { get; set; } = new();
+
+    // Binary Images (Base64)
+    public string? MainImageBase64 { get; set; }
+    public List<string> ImagesBase64 { get; set; } = new();
 }
+
+public class OperatingDayDto
+{
+    public DayOfWeek Day { get; set; }
+    public int OpeningHour { get; set; }
+    public int ClosingHour { get; set; }
+    public bool IsClosed { get; set; }
+}
+
