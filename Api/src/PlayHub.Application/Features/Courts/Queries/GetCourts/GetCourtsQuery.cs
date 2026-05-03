@@ -12,5 +12,12 @@ public record GetCourtsQuery(
     CourtType? Type = null,
     CourtStatus? Status = null,
     string? CurrentUserRole = null,
-    List<Guid>? UserCourtIds = null
+    List<Guid>? UserCourtIds = null,
+    string? City = null,
+    string? Neighborhood = null,
+    List<string>? Sports = null,
+    int? Hour = null,
+    decimal? MinPrice = null,
+    decimal? MaxPrice = null,
+    DateTime? Date = null
 ) : IRequest<List<CourtDto>>;

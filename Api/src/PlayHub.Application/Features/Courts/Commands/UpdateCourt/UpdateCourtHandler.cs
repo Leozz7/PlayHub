@@ -31,6 +31,15 @@ public class UpdateCourtHandler : IRequestHandler<UpdateCourtCommand, bool>
             request.Description
         );
 
+        court.UpdateLocation(request.Address, request.Neighborhood, request.City, request.State);
+        court.UpdateBusinessData(request.OldPrice, request.Badge, request.Rating, request.ReviewCount);
+        court.UpdateSchedule(request.OpeningHour, request.ClosingHour);
+
+        if (request.Sports != null)
+        {
+            court.UpdateSports(request.Sports);
+        }
+
         if (request.Amenities != null)
         {
             court.UpdateAmenities(request.Amenities);

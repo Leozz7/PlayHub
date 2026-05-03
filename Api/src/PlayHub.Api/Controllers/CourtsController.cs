@@ -5,6 +5,7 @@ using PlayHub.Application.Features.Courts.Commands.DeleteCourt;
 using PlayHub.Application.Features.Courts.Commands.UpdateCourt;
 using PlayHub.Application.Features.Courts.Queries.GetCourts;
 using PlayHub.Application.Features.Courts.Queries.GetCourtById;
+using PlayHub.Application.Features.Courts.Queries.GetCourtAvailability;
 using PlayHub.Application.Features.Courts.Dtos;
 using System.Collections.Generic;
 using Microsoft.AspNetCore.Authorization;
@@ -107,5 +108,14 @@ public class CourtsController : ControllerBase
         var result = await Mediator.Send(new DeleteCourtCommand(id));
         if (!result) return NotFound();
         return NoContent();
+    }
+
+    [HttpGet("{id}/availability")]
+    public async Task<ActionResult<CourtAvailabilityDto>> GetAvailability(Guid id, [FromQuery] DateTime date)
+    {
+        if (IsManagerNotAuthorizedForCourt(id)) return Forbid();
+
+        var query = new GetCourtAvailabilityQuery(id, date);
+        return await Mediator.Send(query);
     }
 }

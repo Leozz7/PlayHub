@@ -14,4 +14,28 @@ public class CourtDto
     public List<CourtAmenity> Amenities { get; set; } = new();
     public List<string> ImageUrls { get; set; } = new();
     public DateTime Created { get; set; }
+
+    // New Fields
+    public string Location { get; set; } = string.Empty;
+    public string Address { get; set; } = string.Empty;
+    public string Neighborhood { get; set; } = string.Empty;
+    public string City { get; set; } = string.Empty;
+    public string State { get; set; } = string.Empty;
+
+    public string Sport { get; set; } = string.Empty;
+    public List<string> Sports { get; set; } = new();
+
+    public double Rating { get; set; }
+    public int ReviewCount { get; set; }
+    public decimal Price { get; set; }
+    public decimal? OldPrice { get; set; }
+    public string FrontendStatus { get; set; } = string.Empty; // 'available', 'busy', 'closed'
+    public string? Badge { get; set; }
+    
+    public string Img { get; set; } = string.Empty; // First image
+
+    public bool AvailableToday { get; set; }
+    public int OpeningHour { get; set; }
+    public int ClosingHour { get; set; }
+    public List<string> UnavailableDates { get; set; } = new();
 }

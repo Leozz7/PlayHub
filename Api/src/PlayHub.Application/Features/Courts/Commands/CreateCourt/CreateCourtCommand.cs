@@ -16,6 +16,17 @@ public record CreateCourtCommand(
     string? Description = null,
     List<CourtAmenity>? Amenities = null,
     List<string>? ImageUrls = null,
+    string Address = "",
+    string Neighborhood = "",
+    string City = "",
+    string State = "",
+    decimal? OldPrice = null,
+    string? Badge = null,
+    double Rating = 5.0,
+    int ReviewCount = 0,
+    int OpeningHour = 6,
+    int ClosingHour = 23,
+    List<string>? Sports = null,
     Guid? CurrentUserId = null,
     string? CurrentUserRole = null
 ) : IRequest<CourtDto>;

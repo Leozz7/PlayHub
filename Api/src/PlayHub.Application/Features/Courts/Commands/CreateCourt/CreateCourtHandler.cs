@@ -27,6 +27,19 @@ public class CreateCourtHandler : IRequestHandler<CreateCourtCommand, CourtDto>
             request.Description
         );
 
+        court.UpdateLocation(request.Address, request.Neighborhood, request.City, request.State);
+        court.UpdateBusinessData(request.OldPrice, request.Badge, request.Rating, request.ReviewCount);
+        court.UpdateSchedule(request.OpeningHour, request.ClosingHour);
+
+        if (request.Sports != null && request.Sports.Any())
+        {
+            court.UpdateSports(request.Sports);
+        }
+        else
+        {
+            court.UpdateSports(new List<string> { request.Type.ToString() });
+        }
+
         if (request.Amenities != null)
         {
             court.UpdateAmenities(request.Amenities);
@@ -60,7 +73,27 @@ public class CreateCourtHandler : IRequestHandler<CreateCourtCommand, CourtDto>
             Description = court.Description,
             Amenities = court.Amenities.ToList(),
             ImageUrls = court.ImageUrls.ToList(),
-            Created = court.Created
+            Created = court.Created,
+            
+            Address = court.Address,
+            Neighborhood = court.Neighborhood,
+            City = court.City,
+            State = court.State,
+            Location = string.IsNullOrWhiteSpace(court.City) ? "" : $"{court.City} • {court.Neighborhood}",
+            
+            OldPrice = court.OldPrice,
+            Badge = court.Badge,
+            Rating = court.Rating,
+            ReviewCount = court.ReviewCount,
+            Price = court.HourlyRate,
+            
+            OpeningHour = court.OpeningHour,
+            ClosingHour = court.ClosingHour,
+            
+            Sport = court.Type.ToString(),
+            Sports = court.Sports.ToList(),
+            
+            Img = court.ImageUrls.FirstOrDefault() ?? string.Empty
         };
     }
 }

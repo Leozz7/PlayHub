@@ -23,6 +23,11 @@ public class GetCourtByIdHandler : IRequestHandler<GetCourtByIdQuery, CourtDto?>
 
         if (court == null) return null;
 
+        var now = DateTime.UtcNow;
+        var currentHour = now.Hour;
+        var isClosed = currentHour < court.OpeningHour || currentHour >= court.ClosingHour;
+        var frontendStatus = isClosed ? "closed" : (court.Status == PlayHub.Domain.Enums.CourtStatus.Active ? "available" : "busy");
+
         return new CourtDto
         {
             Id = court.Id,
@@ -34,7 +39,30 @@ public class GetCourtByIdHandler : IRequestHandler<GetCourtByIdQuery, CourtDto?>
             Description = court.Description,
             Amenities = court.Amenities.ToList(),
             ImageUrls = court.ImageUrls.ToList(),
-            Created = court.Created
+            Created = court.Created,
+
+            // Rich Fields
+            Address = court.Address,
+            Neighborhood = court.Neighborhood,
+            City = court.City,
+            State = court.State,
+            Location = string.IsNullOrWhiteSpace(court.City) ? "" : $"{court.City} • {court.Neighborhood}",
+            
+            OldPrice = court.OldPrice,
+            Badge = court.Badge,
+            Rating = court.Rating,
+            ReviewCount = court.ReviewCount,
+            Price = court.HourlyRate,
+            
+            OpeningHour = court.OpeningHour,
+            ClosingHour = court.ClosingHour,
+            
+            Sport = court.Type.ToString(),
+            Sports = court.Sports.ToList(),
+            
+            Img = court.ImageUrls.FirstOrDefault() ?? string.Empty,
+            FrontendStatus = frontendStatus,
+            AvailableToday = !isClosed
         };
     }
 }

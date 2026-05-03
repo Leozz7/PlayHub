@@ -170,6 +170,7 @@ using (var scope = app.Services.CreateScope())
         var encryptionService = services.GetRequiredService<IEncryptionService>();
 
         await ApplicationDbContextSeed.SeedAdminAsync(dbContext, hasher, encryptionService);
+        await ApplicationDbContextSeed.SeedCourtsAsync(dbContext);
         logger.LogInformation("✅ Seed executado com sucesso.");
     }
     catch (Exception ex)

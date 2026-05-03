@@ -21,6 +21,22 @@ public class Court : BaseEntity
     private List<string> _imageUrls = new();
     public IReadOnlyCollection<string> ImageUrls => _imageUrls.AsReadOnly();
 
+    public string Address { get; private set; } = string.Empty;
+    public string Neighborhood { get; private set; } = string.Empty;
+    public string City { get; private set; } = string.Empty;
+    public string State { get; private set; } = string.Empty;
+
+    public decimal? OldPrice { get; private set; }
+    public string? Badge { get; private set; }
+    public double Rating { get; private set; } = 5.0;
+    public int ReviewCount { get; private set; } = 0;
+
+    public int OpeningHour { get; private set; } = 6;
+    public int ClosingHour { get; private set; } = 23;
+
+    private List<string> _sports = new();
+    public IReadOnlyCollection<string> Sports => _sports.AsReadOnly();
+
     private Court() { }
 
     public Court(string name, CourtType type, decimal hourlyRate, int capacity, string? description = null, CourtStatus status = CourtStatus.Active)
@@ -56,6 +72,33 @@ public class Court : BaseEntity
         HourlyRate = hourlyRate;
         Capacity = capacity;
         Description = description;
+    }
+
+    public void UpdateLocation(string address, string neighborhood, string city, string state)
+    {
+        Address = address;
+        Neighborhood = neighborhood;
+        City = city;
+        State = state;
+    }
+
+    public void UpdateSchedule(int openingHour, int closingHour)
+    {
+        OpeningHour = openingHour;
+        ClosingHour = closingHour;
+    }
+
+    public void UpdateBusinessData(decimal? oldPrice, string? badge, double rating, int reviewCount)
+    {
+        OldPrice = oldPrice;
+        Badge = badge;
+        Rating = rating;
+        ReviewCount = reviewCount;
+    }
+
+    public void UpdateSports(IEnumerable<string> sports)
+    {
+        _sports = new List<string>(sports);
     }
 
     public void MarkUnderMaintenance()
