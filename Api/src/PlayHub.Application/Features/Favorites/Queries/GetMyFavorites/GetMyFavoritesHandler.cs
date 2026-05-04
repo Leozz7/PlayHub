@@ -3,7 +3,7 @@ using MongoDB.Driver;
 using PlayHub.Application.Common.Interfaces;
 using PlayHub.Application.Features.Courts.Dtos;
 
-namespace PlayHub.Application.Features.Users.Queries.GetMyFavorites;
+namespace PlayHub.Application.Features.Favorites.Queries.GetMyFavorites;
 
 public class GetMyFavoritesHandler : IRequestHandler<GetMyFavoritesQuery, List<CourtDto>>
 {

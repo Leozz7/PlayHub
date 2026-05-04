@@ -2,7 +2,7 @@ using MediatR;
 using MongoDB.Driver;
 using PlayHub.Application.Common.Interfaces;
 
-namespace PlayHub.Application.Features.Users.Commands.RemoveFavorite;
+namespace PlayHub.Application.Features.Favorites.Commands.RemoveFavorite;
 
 public class RemoveFavoriteHandler : IRequestHandler<RemoveFavoriteCommand, bool>
 {
@@ -21,10 +21,9 @@ public class RemoveFavoriteHandler : IRequestHandler<RemoveFavoriteCommand, bool
 
         if (user is null) return false;
 
-        // O método de domínio retorna false se a quadra não estava na lista
-        var changed = user.RemoveFavorite(request.CourtId);
+        var removed = user.RemoveFavorite(request.CourtId);
 
-        if (!changed) return true; // Já não era favorito — idempotente
+        if (!removed) return true;
 
         var result = await _context.Users.ReplaceOneAsync(
             u => u.Id == request.UserId,

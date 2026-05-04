@@ -2,7 +2,7 @@ using MediatR;
 using MongoDB.Driver;
 using PlayHub.Application.Common.Interfaces;
 
-namespace PlayHub.Application.Features.Users.Commands.AddFavorite;
+namespace PlayHub.Application.Features.Favorites.Commands.AddFavorite;
 
 public class AddFavoriteHandler : IRequestHandler<AddFavoriteCommand, bool>
 {
