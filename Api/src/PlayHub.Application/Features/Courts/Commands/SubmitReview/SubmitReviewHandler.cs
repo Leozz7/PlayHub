@@ -25,7 +25,6 @@ public class SubmitReviewHandler : IRequestHandler<SubmitReviewCommand, ReviewDt
 
     public async Task<ReviewDto> Handle(SubmitReviewCommand request, CancellationToken cancellationToken)
     {
-        // Check if user already reviewed this court
         var existingFilter = Builders<Review>.Filter.And(
             Builders<Review>.Filter.Eq(r => r.CourtId, request.CourtId),
             Builders<Review>.Filter.Eq(r => r.UserId, request.UserId)
@@ -35,17 +34,14 @@ public class SubmitReviewHandler : IRequestHandler<SubmitReviewCommand, ReviewDt
         if (existing != null)
             throw new InvalidOperationException("Você já avaliou esta quadra.");
 
-        // Load the court to update its aggregate rating
         var courtFilter = Builders<Court>.Filter.Eq(c => c.Id, request.CourtId);
         var court = await _db.Courts.Find(courtFilter).FirstOrDefaultAsync(cancellationToken);
         if (court == null)
             throw new InvalidOperationException("Quadra não encontrada.");
 
-        // Create review
         var review = new Review(request.CourtId, request.UserId, request.UserName, request.Rating, request.Text);
         await _db.Reviews.InsertOneAsync(review, cancellationToken: cancellationToken);
 
-        // Update court's aggregated rating (incremental average)
         court.ApplyNewReview(request.Rating);
 
         var courtUpdate = Builders<Court>.Update

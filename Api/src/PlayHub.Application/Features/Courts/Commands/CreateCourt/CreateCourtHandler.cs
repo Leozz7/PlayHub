@@ -5,6 +5,7 @@ using PlayHub.Domain.Entities;
 using PlayHub.Domain.Enums;
 using MongoDB.Driver;
 using System.Linq;
+using PlayHub.Application.Common.Extensions;
 
 namespace PlayHub.Application.Features.Courts.Commands.CreateCourt;
 
@@ -37,7 +38,7 @@ public class CreateCourtHandler : IRequestHandler<CreateCourtCommand, CourtDto>
         }
         else
         {
-            court.UpdateSports(new List<string> { request.Type.ToString() });
+            court.UpdateSports(new List<string> { request.Type.ToFriendlyString() });
         }
 
         if (request.Amenities != null)
@@ -62,7 +63,6 @@ public class CreateCourtHandler : IRequestHandler<CreateCourtCommand, CourtDto>
         }
 
 
-        // Process Binary Images
         byte[]? mainImageBytes = null;
         if (!string.IsNullOrEmpty(request.MainImageBase64))
         {
@@ -82,7 +82,7 @@ public class CreateCourtHandler : IRequestHandler<CreateCourtCommand, CourtDto>
 
         await _context.Courts.InsertOneAsync(court, cancellationToken: cancellationToken);
 
-        if (request.CurrentUserId.HasValue && request.CurrentUserRole == "Manager")
+        if (request.CurrentUserId.HasValue && string.Equals(request.CurrentUserRole, AppRoles.Manager, StringComparison.OrdinalIgnoreCase))
         {
             var user = await _context.Users.Find(u => u.Id == request.CurrentUserId.Value).FirstOrDefaultAsync(cancellationToken);
             if (user != null)
@@ -120,7 +120,7 @@ public class CreateCourtHandler : IRequestHandler<CreateCourtCommand, CourtDto>
             OpeningHour = court.OpeningHour,
             ClosingHour = court.ClosingHour,
             
-            Sport = court.Type.ToString(),
+            Sport = court.Type.ToFriendlyString(),
             Sports = court.Sports.ToList(),
             
             Img = court.MainImage != null ? $"data:image/jpeg;base64,{Convert.ToBase64String(court.MainImage)}" : (court.ImageUrls.FirstOrDefault() ?? string.Empty),

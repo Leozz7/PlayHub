@@ -17,6 +17,7 @@ public record GetReservationsQuery(
     Guid? CourtId = null,
     Guid? UserId = null,
     ReservationStatus? Status = null,
+    DateTime? Date = null,
     int PageNumber = 1,
     int PageSize = 25
 ) : IRequest<PagedResult<ReservationDto>>;

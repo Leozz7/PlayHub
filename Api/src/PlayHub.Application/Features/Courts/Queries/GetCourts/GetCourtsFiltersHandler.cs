@@ -20,12 +20,10 @@ public class GetCourtsFiltersHandler : IRequestHandler<GetCourtsFiltersQuery, Co
 
     public async Task<CourtsFiltersDto> Handle(GetCourtsFiltersQuery request, CancellationToken cancellationToken)
     {
-        // Get unique cities
         var citiesTask = _context.Courts
             .Distinct<string>("city", FilterDefinition<Court>.Empty)
             .ToListAsync(cancellationToken);
 
-        // Get unique sports
         var sportsTask = _context.Courts
             .Distinct<string>("sports", FilterDefinition<Court>.Empty)
             .ToListAsync(cancellationToken);

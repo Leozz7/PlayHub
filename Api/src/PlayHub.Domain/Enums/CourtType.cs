@@ -8,5 +8,8 @@ public enum CourtType
     Volei = 4,
     Basquete = 5,
     Futsal = 6,
+    BeachTennis = 7,
+    Padel = 8,
+    Handebol = 9,
     Other = 99
 }

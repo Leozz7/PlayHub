@@ -15,7 +15,6 @@ public class CourtDto
     public List<string> ImageUrls { get; set; } = new();
     public DateTime Created { get; set; }
 
-    // New Fields
     public string Location { get; set; } = string.Empty;
     public string Address { get; set; } = string.Empty;
     public string Neighborhood { get; set; } = string.Empty;
@@ -32,7 +31,7 @@ public class CourtDto
     public string FrontendStatus { get; set; } = string.Empty; // 'available', 'busy', 'closed'
     public string? Badge { get; set; }
     
-    public string Img { get; set; } = string.Empty; // First image
+    public string Img { get; set; } = string.Empty;
 
     public bool AvailableToday { get; set; }
     public int OpeningHour { get; set; }
@@ -41,7 +40,6 @@ public class CourtDto
 
     public List<OperatingDayDto> Schedules { get; set; } = new();
 
-    // Binary Images (Base64)
     public string? MainImageBase64 { get; set; }
     public List<string> ImagesBase64 { get; set; } = new();
 }

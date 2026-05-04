@@ -9,6 +9,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using PlayHub.Application.Common.Extensions;
 
 namespace PlayHub.Application.Features.Reservations.Queries.GetReservations;
 
@@ -41,6 +42,13 @@ public class GetReservationsHandler : IRequestHandler<GetReservationsQuery, Page
             filter &= filterBuilder.Eq(r => r.Status, request.Status.Value);
         }
 
+        if (request.Date.HasValue)
+        {
+            var startDate = request.Date.Value.Date;
+            var endDate = startDate.AddDays(1);
+            filter &= filterBuilder.Gte(r => r.StartTime, startDate) & filterBuilder.Lt(r => r.StartTime, endDate);
+        }
+
         var totalCount = (int)await _context.Reservations.CountDocumentsAsync(filter, cancellationToken: cancellationToken);
 
         var reservations = await _context.Reservations
@@ -61,6 +69,7 @@ public class GetReservationsHandler : IRequestHandler<GetReservationsQuery, Page
             Id = reservation.Id,
             CourtId = reservation.CourtId,
             CourtName = courts.FirstOrDefault(c => c.Id == reservation.CourtId)?.Name,
+            CourtSport = courts.FirstOrDefault(c => c.Id == reservation.CourtId)?.Type.ToFriendlyString(),
             UserId = reservation.UserId,
             UserName = users.FirstOrDefault(u => u.Id == reservation.UserId)?.Name,
             StartTime = reservation.StartTime,

@@ -29,7 +29,9 @@ public class CourtsController : ControllerBase
     {
         var userId = User.FindFirstValue(ClaimTypes.NameIdentifier) 
                   ?? User.FindFirstValue(JwtRegisteredClaimNames.Sub) 
-                  ?? User.FindFirstValue("id");
+                  ?? User.FindFirst(ClaimTypes.NameIdentifier)?.Value
+                  ?? User.FindFirst("id")?.Value;
+                  
         return Guid.TryParse(userId, out var parsedId) ? parsedId : Guid.Empty;
     }
 
@@ -42,8 +44,8 @@ public class CourtsController : ControllerBase
 
     private bool IsManagerNotAuthorizedForCourt(Guid courtId)
     {
-        var role = User.FindFirstValue(ClaimTypes.Role);
-        if (role == AppRoles.Manager)
+        var role = User.FindFirstValue(ClaimTypes.Role) ?? User.FindFirst("role")?.Value;
+        if (string.Equals(role, AppRoles.Manager, StringComparison.OrdinalIgnoreCase))
         {
             var allowedCourts = GetCourtIdsFromClaims();
             return !allowedCourts.Contains(courtId);
@@ -69,10 +71,12 @@ public class CourtsController : ControllerBase
     [Authorize(Roles = AppRoles.AdminOrManager)]
     public async Task<ActionResult<PagedResult<CourtDto>>> GetManagement([FromQuery] GetCourtsQuery query)
     {
+        var role = User.FindFirstValue(ClaimTypes.Role) ?? User.FindFirst("role")?.Value;
+        
         var enhancedQuery = query with 
         { 
             CurrentUserId = GetCurrentUserId(),
-            CurrentUserRole = User.FindFirstValue(ClaimTypes.Role),
+            CurrentUserRole = role,
             UserCourtIds = GetCourtIdsFromClaims() 
         };
 

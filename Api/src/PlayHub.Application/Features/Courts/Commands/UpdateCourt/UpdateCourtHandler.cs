@@ -62,7 +62,6 @@ public class UpdateCourtHandler : IRequestHandler<UpdateCourtCommand, bool>
         }
 
 
-        // Process Binary Images
         if (!string.IsNullOrEmpty(request.MainImageBase64) || request.ImagesBase64 != null)
         {
             byte[]? mainImageBytes = court.MainImage;

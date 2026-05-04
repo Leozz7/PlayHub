@@ -28,7 +28,7 @@ public class GetCourtAvailabilityHandler : IRequestHandler<GetCourtAvailabilityQ
 
         if (court == null)
         {
-            throw new Exception("Court not found"); // Ideally a custom exception
+            throw new Exception("Court not found");
         }
 
         var startOfDay = request.Date.Date;

@@ -3,6 +3,7 @@ using MongoDB.Driver;
 using PlayHub.Application.Common.Interfaces;
 using PlayHub.Application.Features.Courts.Dtos;
 using System.Linq;
+using PlayHub.Application.Common.Extensions;
 
 namespace PlayHub.Application.Features.Courts.Queries.GetCourtById;
 
@@ -41,7 +42,6 @@ public class GetCourtByIdHandler : IRequestHandler<GetCourtByIdQuery, CourtDto?>
             ImageUrls = court.ImageUrls.ToList(),
             Created = court.Created,
 
-            // Rich Fields
             Address = court.Address,
             Neighborhood = court.Neighborhood,
             City = court.City,
@@ -57,7 +57,7 @@ public class GetCourtByIdHandler : IRequestHandler<GetCourtByIdQuery, CourtDto?>
             OpeningHour = court.OpeningHour,
             ClosingHour = court.ClosingHour,
             
-            Sport = court.Type.ToString(),
+            Sport = court.Type.ToFriendlyString(),
             Sports = court.Sports.ToList(),
             
             Img = court.MainImage != null ? $"data:image/jpeg;base64,{Convert.ToBase64String(court.MainImage)}" : (court.ImageUrls.FirstOrDefault() ?? string.Empty),

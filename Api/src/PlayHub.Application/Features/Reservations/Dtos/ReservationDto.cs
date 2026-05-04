@@ -8,6 +8,7 @@ public class ReservationDto
     public Guid Id { get; set; }
     public Guid CourtId { get; set; }
     public string? CourtName { get; set; }
+    public string? CourtSport { get; set; }
     public Guid UserId { get; set; }
     public string? UserName { get; set; }
     public DateTime StartTime { get; set; }

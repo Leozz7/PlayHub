@@ -21,7 +21,6 @@ public class AddFavoriteHandler : IRequestHandler<AddFavoriteCommand, bool>
 
         if (user is null) return false;
 
-        // Valida se a quadra existe
         var courtExists = await _context.Courts
             .Find(c => c.Id == request.CourtId)
             .AnyAsync(cancellationToken);

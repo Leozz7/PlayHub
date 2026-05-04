@@ -7,6 +7,7 @@ using PlayHub.Domain.Enums;
 using System.Collections.Generic;
 using System.Linq;
 using PlayHub.Domain.Entities;
+using PlayHub.Application.Common.Extensions;
 
 namespace PlayHub.Application.Features.Courts.Queries.GetCourts;
 
@@ -140,16 +141,17 @@ public class GetCourtsHandler : IRequestHandler<GetCourtsQuery, PagedResult<Cour
             filter &= filterBuilder.Gte(c => c.Rating, request.MinRating.Value);
         }
 
-        if (request.CurrentUserRole == "Manager")
+        // Se for Gestor, filtrar apenas pelas suas quadras
+        if (string.Equals(request.CurrentUserRole, AppRoles.Manager, StringComparison.OrdinalIgnoreCase))
         {
             var courtIds = request.UserCourtIds ?? new List<Guid>();
 
-            if (request.CurrentUserId.HasValue)
+            if (request.CurrentUserId.HasValue && request.CurrentUserId.Value != Guid.Empty)
             {
                 var user = await _context.Users.Find(u => u.Id == request.CurrentUserId.Value).FirstOrDefaultAsync(cancellationToken);
-                if (user != null)
+                if (user != null && user.CoutsId != null)
                 {
-                    courtIds = (user.CoutsId ?? new List<Guid>()).ToList();
+                    courtIds = user.CoutsId.ToList();
                 }
             }
 
@@ -215,7 +217,6 @@ public class GetCourtsHandler : IRequestHandler<GetCourtsQuery, PagedResult<Cour
                 ImageUrls = (court.ImageUrls ?? Array.Empty<string>()).ToList(),
                 Created = court.Created,
 
-                // Rich Fields
                 Address = court.Address,
                 Neighborhood = court.Neighborhood,
                 City = court.City,
@@ -231,7 +232,7 @@ public class GetCourtsHandler : IRequestHandler<GetCourtsQuery, PagedResult<Cour
                 OpeningHour = court.OpeningHour,
                 ClosingHour = court.ClosingHour,
                 
-                Sport = court.Type.ToString(),
+                Sport = court.Type.ToFriendlyString(),
                 Sports = (court.Sports ?? Array.Empty<string>()).ToList(),
                 
                 Img = court.MainImage != null ? $"data:image/jpeg;base64,{Convert.ToBase64String(court.MainImage)}" : ((court.ImageUrls ?? Array.Empty<string>()).FirstOrDefault() ?? string.Empty),
