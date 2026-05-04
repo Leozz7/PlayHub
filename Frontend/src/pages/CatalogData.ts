@@ -1,5 +1,5 @@
 export type Court = {
-    id: number;
+    id: string;
     name: string;
     location: string;
     address: string;
@@ -11,15 +11,31 @@ export type Court = {
     reviewCount: number;
     price: number;
     oldPrice?: number;
-    status: 'available' | 'busy' | 'closed';
+    status: 'available' | 'busy' | 'closed' | any;
+    frontendStatus?: 'available' | 'busy' | 'closed';
     badge?: string;
     amenities: string[];
     img: string;
     availableToday: boolean;
     openingHour: number;
     closingHour: number;
-    unavailableDates: string[];   // ISO yyyy-MM-dd
+    unavailableDates: string[];
+    capacity?: number;
+    description?: string;
+    type?: number;
+    imageUrls?: string[];
+    mainImageBase64?: string;
+    imagesBase64?: string[];
+    schedules?: OperatingDay[];
 };
+
+export type OperatingDay = {
+    day: number; // 0-6 (Sunday-Saturday)
+    openingHour: number;
+    closingHour: number;
+    isClosed: boolean;
+};
+
 
 export const SPORTS_LIST = [
     'Futebol Society',
@@ -36,7 +52,7 @@ export const CITIES = ['São Paulo', 'Rio de Janeiro', 'Belo Horizonte', 'Curiti
 
 export const CATALOG_COURTS: Court[] = [
     {
-        id: 1,
+        id: "1",
         name: 'Arena Central Paulista',
         location: 'São Paulo • Paulista',
         address: 'Avenida Paulista, 1578',
@@ -58,7 +74,7 @@ export const CATALOG_COURTS: Court[] = [
         unavailableDates: ['2025-05-03','2025-05-10','2025-05-17','2025-05-24'],
     },
     {
-        id: 2,
+        id: "2",
         name: 'Beach Club Sport',
         location: 'São Paulo • Morumbi',
         address: 'Avenida Giovanni Gronchi, 5930',
@@ -79,7 +95,7 @@ export const CATALOG_COURTS: Court[] = [
         unavailableDates: ['2025-05-05','2025-05-12','2025-05-19'],
     },
     {
-        id: 3,
+        id: "3",
         name: 'Sport Center Sul',
         location: 'São Paulo • Santo André',
         address: 'Rua das Figueiras, 400',
@@ -100,7 +116,7 @@ export const CATALOG_COURTS: Court[] = [
         unavailableDates: ['2025-05-01','2025-05-02','2025-05-08','2025-05-09','2025-05-15','2025-05-16'],
     },
     {
-        id: 4,
+        id: "4",
         name: 'Quadra Premium Vila',
         location: 'São Paulo • Vila Olímpia',
         address: 'Rua Funchal, 200',
@@ -120,7 +136,7 @@ export const CATALOG_COURTS: Court[] = [
         unavailableDates: ['2025-05-07','2025-05-14','2025-05-21'],
     },
     {
-        id: 5,
+        id: "5",
         name: 'Padel Experience',
         location: 'Rio de Janeiro • Barra',
         address: 'Avenida das Américas, 4666',
@@ -141,7 +157,7 @@ export const CATALOG_COURTS: Court[] = [
         unavailableDates: ['2025-05-04','2025-05-11','2025-05-18','2025-05-25'],
     },
     {
-        id: 6,
+        id: "6",
         name: 'Vôlei Sunset',
         location: 'Rio de Janeiro • Ipanema',
         address: 'Avenida Vieira Souto, Posto 9',
@@ -161,7 +177,7 @@ export const CATALOG_COURTS: Court[] = [
         unavailableDates: ['2025-05-01','2025-05-02','2025-05-03','2025-05-04','2025-05-05','2025-05-06','2025-05-07','2025-05-08','2025-05-09','2025-05-10'],
     },
     {
-        id: 7,
+        id: "7",
         name: 'Arena Futsal BH',
         location: 'Belo Horizonte • Centro',
         address: 'Avenida Afonso Pena, 1500',
@@ -181,7 +197,7 @@ export const CATALOG_COURTS: Court[] = [
         unavailableDates: ['2025-05-06','2025-05-13','2025-05-20'],
     },
     {
-        id: 8,
+        id: "8",
         name: 'Clube Esportivo Sul',
         location: 'Porto Alegre • Moinhos',
         address: 'Rua Padre Chagas, 300',
@@ -203,7 +219,7 @@ export const CATALOG_COURTS: Court[] = [
         unavailableDates: ['2025-05-02','2025-05-09','2025-05-16','2025-05-23'],
     },
     {
-        id: 9,
+        id: "9",
         name: 'Top Court Curitiba',
         location: 'Curitiba • Batel',
         address: 'Avenida do Batel, 1868',
@@ -223,7 +239,7 @@ export const CATALOG_COURTS: Court[] = [
         unavailableDates: ['2025-05-01','2025-05-02','2025-05-03','2025-05-04','2025-05-05'],
     },
     {
-        id: 10,
+        id: "10",
         name: 'Beach Park Arena',
         location: 'Rio de Janeiro • Leblon',
         address: 'Avenida Delfim Moreira, Posto 12',
@@ -244,7 +260,7 @@ export const CATALOG_COURTS: Court[] = [
         unavailableDates: ['2025-05-08','2025-05-15','2025-05-22'],
     },
     {
-        id: 11,
+        id: "11",
         name: 'Arena Handebol MG',
         location: 'Belo Horizonte • Savassi',
         address: 'Rua Pernambuco, 1000',
@@ -264,7 +280,7 @@ export const CATALOG_COURTS: Court[] = [
         unavailableDates: ['2025-05-05','2025-05-12','2025-05-19','2025-05-26'],
     },
     {
-        id: 12,
+        id: "12",
         name: 'Quadra Park Curitiba',
         location: 'Curitiba • Água Verde',
         address: 'Avenida República Argentina, 500',

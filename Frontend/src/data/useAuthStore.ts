@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { User } from '@/features/auth/types/auth.types';
+import { useFavoritesStore } from './useFavoritesStore';
 
 interface AuthState {
   user: User | null;
@@ -17,7 +18,10 @@ export const useAuthStore = create<AuthState>()(
       token: null,
       isAuthenticated: false,
       setAuth: (user, token) => set({ user, token, isAuthenticated: true }),
-      logout: () => set({ user: null, token: null, isAuthenticated: false }),
+      logout: () => {
+        set({ user: null, token: null, isAuthenticated: false });
+        useFavoritesStore.getState().clear();
+      },
     }),
     {
       name: 'playhub-auth',

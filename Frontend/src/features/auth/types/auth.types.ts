@@ -1,14 +1,8 @@
 export interface User {
   id: string;
+  name: string;
   email: string;
-  firstName: string;
-  lastName: string;
-  roles: string[];
-}
-
-export interface AuthTokens {
-  accessToken: string;
-  refreshToken: string;
+  role: string;
 }
 
 export interface LoginCredentials {
@@ -18,6 +12,6 @@ export interface LoginCredentials {
 }
 
 export interface AuthResponse {
+  accessToken: string;
   user: User;
-  tokens: AuthTokens;
 }

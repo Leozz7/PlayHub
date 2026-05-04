@@ -19,8 +19,43 @@
   "header": {
     "userMenu": {
       "managerPanel": "Painel do Gestor",
-      "generalAdmin": "Administração"
+      "generalAdmin": "Administração",
+      "myReservations": "Minhas Reservas",
+      "generalSettings": "Configurações Gerais",
+      "roles": {
+        "admin": "Admin",
+        "manager": "Gestor",
+        "athlete": "Atleta"
+      },
+      "favoriteCourts": "Quadras Favoritas"
+    },
+    "favorites": {
+      "title": "Favoritas",
+      "saved": "salvas",
+      "emptyTitle": "Nenhuma favorita",
+      "emptyDescription": "Salve suas quadras preferidas para acessá-las rapidamente.",
+      "viewAll": "Ver todas as favoritas"
     }
+  },
+  "configUser": {
+    "title": "Configurações Gerais",
+    "subtitle": "Gerencie suas preferências, aparência e acesse informações importantes.",
+    "appearance": "Aparência do Sistema",
+    "themeLight": "Modo Claro",
+    "themeDark": "Modo Escuro",
+    "language": "Idioma",
+    "session": "Sessão",
+    "logout": "Sair da Conta",
+    "logoutDesc": "Encerrar sessão de {{name}}",
+    "quickAccess": "Acesso Rápido",
+    "myReservations": "Minhas Reservas",
+    "managerPanel": "Painel do Gestor",
+    "adminPanel": "Painel Admin",
+    "legalSupport": "Legal & Suporte",
+    "privacy": "Privacidade",
+    "terms": "Termos de Uso",
+    "about": "Sobre nós",
+    "contact": "Contato"
   },
   "footer": {
     "description": "A plataforma definitiva para reservas de quadras esportivas. Encontre, reserve e jogue sem complicação. Crie sua conta gratuitamente.",
@@ -290,7 +325,15 @@
     },
     "noCourts": "Nenhuma quadra encontrada",
     "noCourtsDesc": "Tente ajustar os filtros ou limpar a busca.",
-    "clearFiltersBtn": "Limpar filtros"
+    "clearFiltersBtn": "Limpar filtros",
+    "searchCity": "Buscar cidade...",
+    "searchSport": "Buscar esporte...",
+    "errorLoading": "Erro ao carregar quadras",
+    "errorLoadingDesc": "Não foi possível carregar os dados do catálogo. Verifique sua conexão ou tente novamente mais tarde.",
+    "loading": "Carregando quadras...",
+    "selectHour": "Selecione o horário",
+    "noSportFound": "Nenhum esporte encontrado.",
+    "noCityFound": "Nenhuma cidade encontrada."
   },
   "details": {
     "backToCatalog": "Voltar ao catálogo",
@@ -333,6 +376,32 @@
     "goToHome": "Ir para o início",
     "viewCatalog": "Ver catálogo"
   },
+  "confirmation": {
+    "eyebrow": "Quase lá!",
+    "title": "Confirme sua reserva",
+    "subtitle": "Revise os detalhes abaixo antes de confirmar. Esta é sua última chance de verificar as informações.",
+    "back": "Voltar",
+    "scheduleLabel": "Data e Horário",
+    "dateLabel": "Data da reserva",
+    "hoursLabel": "hora(s) reservada(s)",
+    "priceBreakdown": "Resumo do Pagamento",
+    "serviceFee": "Taxa de serviço",
+    "free": "Grátis",
+    "paymentMethod": "Método de Pagamento",
+    "confirmBtn": "Confirmar e pagar",
+    "confirming": "Processando...",
+    "policy1": "Confirmação imediata por e-mail",
+    "policy2": "Pagamento criptografado (SSL)",
+    "policy3": "Cancelamento gratuito em até 24h",
+    "policy4": "Comprovante enviado automaticamente",
+    "cancelWarning": "Cancelamentos com menos de 24h de antecedência podem estar sujeitos a cobrança de taxa.",
+    "noData": "Nenhuma reserva encontrada. Selecione um horário na quadra desejada.",
+    "successTitle": "Reserva confirmada! 🎉",
+    "successDesc1": "Sua reserva em",
+    "successDesc2": "para",
+    "successDesc3": "foi realizada com sucesso. Você receberá um e-mail de confirmação em breve.",
+    "emailNotice": "Um comprovante foi enviado para o seu e-mail cadastrado."
+  },
   "forgotPassword": {
     "title": "Recuperar senha",
     "subtitle": "Informe seu e-mail para enviarmos o link de redefinição de senha.",
@@ -349,5 +418,126 @@
     "subtitle": "Página não encontrada",
     "description": "A página que você está procurando não existe ou foi movida.",
     "backHome": "Voltar ao Início"
+  },
+  "toasts": {
+    "loginSuccess": {
+      "title": "Acesso autorizado",
+      "titleNamed": "Bem-vindo, {{name}}",
+      "desc": "Sessão iniciada com sucesso. Aproveite o sistema."
+    },
+    "loginError": {
+      "title": "Falha na autenticação",
+      "desc": "E-mail ou senha incorretos. Verifique os dados inseridos e tente novamente."
+    },
+    "registerSuccess": {
+      "title": "Conta criada com sucesso",
+      "desc": "Seu cadastro foi finalizado. Efetue login para começar a realizar reservas."
+    },
+    "registerError": {
+      "title": "Erro ao criar conta",
+      "desc": "Não foi possível concluir o seu cadastro neste momento. Tente novamente."
+    },
+    "logoutSuccess": {
+      "title": "Sessão encerrada",
+      "desc": "Você foi desconectado com segurança do PlayHub."
+    },
+    "forgotPassword": {
+      "title": "E-mail de recuperação enviado",
+      "desc": "Verifique a sua caixa de entrada para as instruções de redefinição de senha."
+    },
+    "bookingConfirmed": {
+      "title": "Reserva confirmada",
+      "desc": "A sua reserva no espaço {{court}} foi confirmada com sucesso."
+    },
+    "bookingCancelled": {
+      "title": "Reserva cancelada",
+      "desc": "O cancelamento da sua reserva foi processado com sucesso."
+    },
+    "bookingError": {
+      "title": "Erro na reserva",
+      "desc": "Houve um problema ao processar a sua solicitação. Tente novamente mais tarde."
+    },
+    "slotAlreadyTaken": {
+      "title": "Horário indisponível",
+      "desc": "O horário selecionado já foi reservado. Por favor, escolha outro período."
+    },
+    "reviewSuccess": {
+      "title": "Avaliação enviada",
+      "desc": "Agradecemos pelo seu feedback. Ele é essencial para nossa comunidade."
+    },
+    "reviewError": {
+      "title": "Erro ao enviar avaliação",
+      "desc": "Sua avaliação não pôde ser publicada. Tente novamente."
+    },
+    "reviewLoginRequired": {
+      "title": "Autenticação necessária",
+      "desc": "É necessário estar logado em sua conta para publicar avaliações."
+    },
+    "contactSuccess": {
+      "title": "Mensagem recebida",
+      "desc": "Sua mensagem foi enviada. Nossa equipe retornará o contato em breve."
+    },
+    "contactError": {
+      "title": "Erro no envio",
+      "desc": "Não foi possível enviar a sua mensagem. Verifique a conexão e tente novamente."
+    },
+    "networkError": {
+      "title": "Problema de conexão",
+      "desc": "Não foi possível conectar ao servidor. Verifique sua internet."
+    }
+  },
+  "admin": {
+    "activities": {
+      "title": "Atividades",
+      "subtitle": "Histórico recente de ações e eventos na plataforma.",
+      "searchPlaceholder": "Filtrar por ação ou usuário...",
+      "type": "Tipo",
+      "allTypes": "Todas as Atividades",
+      "table": {
+        "date": "Data e Hora",
+        "action": "Ação",
+        "user": "Usuário",
+        "details": "Detalhes"
+      },
+      "types": {
+        "new_user": "Novo Usuário",
+        "new_booking": "Nova Reserva",
+        "booking_confirmed": "Reserva Confirmada",
+        "booking_cancelled": "Reserva Cancelada",
+        "payment_success": "Pagamento Sucesso",
+        "review_added": "Nova Avaliação"
+      },
+      "noActivities": "Nenhuma atividade encontrada.",
+      "viewDetails": "Ver detalhes"
+    },
+    "reports": {
+      "title": "Relatórios",
+      "subtitle": "Análise detalhada de desempenho e métricas.",
+      "exportPdf": "Exportar PDF",
+      "period": "Período",
+      "last7Days": "Últimos 7 dias",
+      "last30Days": "Últimos 30 dias",
+      "last90Days": "Últimos 90 dias",
+      "summary": {
+        "totalRevenue": "Receita Total",
+        "totalBookings": "Total de Reservas",
+        "averageTicket": "Ticket Médio",
+        "newUsers": "Novos Usuários"
+      },
+      "charts": {
+        "revenueGrowth": "Crescimento de Receita",
+        "bookingsBySport": "Reservas por Esporte"
+      },
+      "pdf": {
+        "reportTitle": "Relatório de Desempenho PlayHub",
+        "generatedAt": "Gerado em",
+        "summaryTitle": "Resumo Executivo",
+        "bookingsDetail": "Detalhes das Reservas",
+        "date": "Data",
+        "status": "Status",
+        "value": "Valor",
+        "court": "Quadra"
+      }
+    }
   }
 }

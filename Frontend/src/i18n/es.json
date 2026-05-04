@@ -19,8 +19,43 @@
   "header": {
     "userMenu": {
       "managerPanel": "Panel de Gestor",
-      "generalAdmin": "Administración"
+      "generalAdmin": "Administración",
+      "myReservations": "Mis Reservas",
+      "generalSettings": "Configuración General",
+      "roles": {
+        "admin": "Admin",
+        "manager": "Gestor",
+        "athlete": "Atleta"
+      },
+      "favoriteCourts": "Canchas Favoritas"
+    },
+    "favorites": {
+      "title": "Favoritas",
+      "saved": "guardadas",
+      "emptyTitle": "Sin favoritas",
+      "emptyDescription": "Guarda tus canchas preferidas para acceder rápidamente.",
+      "viewAll": "Ver todas las favoritas"
     }
+  },
+  "configUser": {
+    "title": "Configuración General",
+    "subtitle": "Administra tus preferencias, apariencia y accede a información importante.",
+    "appearance": "Apariencia del Sistema",
+    "themeLight": "Modo Claro",
+    "themeDark": "Modo Oscuro",
+    "language": "Idioma",
+    "session": "Sesión",
+    "logout": "Cerrar Sesión",
+    "logoutDesc": "Terminar sesión de {{name}}",
+    "quickAccess": "Acceso Rápido",
+    "myReservations": "Mis Reservas",
+    "managerPanel": "Panel de Gestor",
+    "adminPanel": "Panel de Admin",
+    "legalSupport": "Legal & Soporte",
+    "privacy": "Privacidad",
+    "terms": "Términos de Uso",
+    "about": "Sobre Nosotros",
+    "contact": "Contacto"
   },
   "footer": {
     "description": "La plataforma definitiva para reservas de canchas deportivas. Encuentra, reserva y juega sin complicaciones. Crea tu cuenta gratis.",
@@ -290,7 +325,15 @@
     },
     "noCourts": "Ninguna cancha encontrada",
     "noCourtsDesc": "Intenta ajustar los filtros o limpiar la búsqueda.",
-    "clearFiltersBtn": "Limpiar filtros"
+    "clearFiltersBtn": "Limpiar filtros",
+    "searchCity": "Buscar ciudad...",
+    "searchSport": "Buscar deporte...",
+    "errorLoading": "Error al cargar canchas",
+    "errorLoadingDesc": "No se pudieron cargar los datos del catálogo. Comprueba tu conexión o inténtalo más tarde.",
+    "loading": "Cargando canchas...",
+    "selectHour": "Seleccionar hora",
+    "noSportFound": "No se encontraron deportes.",
+    "noCityFound": "No se encontraron ciudades."
   },
   "details": {
     "backToCatalog": "Volver al catálogo",
@@ -333,6 +376,32 @@
     "goToHome": "Ir al inicio",
     "viewCatalog": "Ver catálogo"
   },
+  "confirmation": {
+    "eyebrow": "¡Casi listo!",
+    "title": "Confirma tu reserva",
+    "subtitle": "Revisa los detalles a continuación antes de confirmar. Esta es tu última oportunidad de verificar la información.",
+    "back": "Volver",
+    "scheduleLabel": "Fecha y Hora",
+    "dateLabel": "Fecha de la reserva",
+    "hoursLabel": "hora(s) reservada(s)",
+    "priceBreakdown": "Resumen de Pago",
+    "serviceFee": "Tarifa de servicio",
+    "free": "Gratis",
+    "paymentMethod": "Método de Pago",
+    "confirmBtn": "Confirmar y pagar",
+    "confirming": "Procesando...",
+    "policy1": "Confirmación inmediata por correo",
+    "policy2": "Pago encriptado (SSL)",
+    "policy3": "Cancelación gratuita hasta 24h",
+    "policy4": "Comprobante enviado automáticamente",
+    "cancelWarning": "Las cancelaciones realizadas con menos de 24 horas de anticipación pueden estar sujetas a un cargo.",
+    "noData": "No se encontró ninguna reserva. Selecciona un horario en la cancha deseada.",
+    "successTitle": "¡Reserva confirmada! 🎉",
+    "successDesc1": "Tu reserva en",
+    "successDesc2": "para el",
+    "successDesc3": "se realizó con éxito. Recibirás un correo de confirmación en breve.",
+    "emailNotice": "Se envió un comprobante a tu dirección de correo registrada."
+  },
   "forgotPassword": {
     "title": "Recuperar contraseña",
     "subtitle": "Ingresa tu correo electrónico para recibir un enlace de recuperación.",
@@ -349,5 +418,126 @@
     "subtitle": "Página no encontrada",
     "description": "La página que buscas no existe o ha sido movida.",
     "backHome": "Volver al Inicio"
+  },
+  "toasts": {
+    "loginSuccess": {
+      "title": "Acceso autorizado",
+      "titleNamed": "Bienvenido, {{name}}",
+      "desc": "Sesión iniciada con éxito. Disfruta de la plataforma."
+    },
+    "loginError": {
+      "title": "Error de autenticación",
+      "desc": "Correo o contraseña incorrectos. Verifica tus credenciales."
+    },
+    "registerSuccess": {
+      "title": "Cuenta creada con éxito",
+      "desc": "Tu registro se ha completado. Inicia sesión para empezar a reservar."
+    },
+    "registerError": {
+      "title": "Error al crear la cuenta",
+      "desc": "No pudimos completar tu registro en este momento. Inténtalo de nuevo."
+    },
+    "logoutSuccess": {
+      "title": "Sesión cerrada",
+      "desc": "Has cerrado sesión de forma segura en PlayHub."
+    },
+    "forgotPassword": {
+      "title": "Correo de recuperación enviado",
+      "desc": "Revisa tu bandeja de entrada para ver las instrucciones de recuperación."
+    },
+    "bookingConfirmed": {
+      "title": "Reserva confirmada",
+      "desc": "Tu reserva en {{court}} ha sido confirmada con éxito."
+    },
+    "bookingCancelled": {
+      "title": "Reserva cancelada",
+      "desc": "La cancelación de tu reserva ha sido procesada con éxito."
+    },
+    "bookingError": {
+      "title": "Error en la reserva",
+      "desc": "Hubo un problema al procesar tu solicitud. Inténtalo más tarde."
+    },
+    "slotAlreadyTaken": {
+      "title": "Horario no disponible",
+      "desc": "El horario seleccionado ya está reservado. Por favor, elige otro."
+    },
+    "reviewSuccess": {
+      "title": "Reseña enviada",
+      "desc": "Gracias por tus comentarios. Son esenciales para nuestra comunidad."
+    },
+    "reviewError": {
+      "title": "Error al enviar la reseña",
+      "desc": "No se pudo publicar tu reseña. Inténtalo de nuevo."
+    },
+    "reviewLoginRequired": {
+      "title": "Autenticación requerida",
+      "desc": "Debes iniciar sesión en tu cuenta para publicar reseñas."
+    },
+    "contactSuccess": {
+      "title": "Mensaje recibido",
+      "desc": "Tu mensaje ha sido enviado. Nuestro equipo te contactará en breve."
+    },
+    "contactError": {
+      "title": "Error de envío",
+      "desc": "No se pudo enviar tu mensaje. Verifica tu conexión e inténtalo de nuevo."
+    },
+    "networkError": {
+      "title": "Problema de conexión",
+      "desc": "No se puede conectar al servidor. Comprueba tu conexión a internet."
+    }
+  },
+  "admin": {
+    "activities": {
+      "title": "Actividades",
+      "subtitle": "Historial reciente de acciones y eventos en la plataforma.",
+      "searchPlaceholder": "Filtrar por acción o usuario...",
+      "type": "Tipo",
+      "allTypes": "Todas las Actividades",
+      "table": {
+        "date": "Fecha y Hora",
+        "action": "Acción",
+        "user": "Usuario",
+        "details": "Detalles"
+      },
+      "types": {
+        "new_user": "Nuevo Usuario",
+        "new_booking": "Nueva Reserva",
+        "booking_confirmed": "Reserva Confirmada",
+        "booking_cancelled": "Reserva Cancelada",
+        "payment_success": "Pago Exitoso",
+        "review_added": "Nueva Reseña"
+      },
+      "noActivities": "No se encontraron actividades.",
+      "viewDetails": "Ver detalles"
+    },
+    "reports": {
+      "title": "Informes",
+      "subtitle": "Análisis detallado de rendimiento y métricas.",
+      "exportPdf": "Exportar PDF",
+      "period": "Período",
+      "last7Days": "Últimos 7 días",
+      "last30Days": "Últimos 30 días",
+      "last90Days": "Últimos 90 dias",
+      "summary": {
+        "totalRevenue": "Ingresos Totales",
+        "totalBookings": "Total de Reservas",
+        "averageTicket": "Ticket Promedio",
+        "newUsers": "Nuevos Usuarios"
+      },
+      "charts": {
+        "revenueGrowth": "Crecimiento de Ingresos",
+        "bookingsBySport": "Reservas por Deporte"
+      },
+      "pdf": {
+        "reportTitle": "Informe de Rendimiento PlayHub",
+        "generatedAt": "Generado en",
+        "summaryTitle": "Resumen Ejecutivo",
+        "bookingsDetail": "Detalles de las Reservas",
+        "date": "Fecha",
+        "status": "Estado",
+        "value": "Valor",
+        "court": "Cancha"
+      }
+    }
   }
 }

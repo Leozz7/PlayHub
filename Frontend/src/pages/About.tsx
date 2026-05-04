@@ -19,7 +19,7 @@ function GreenBadge({ children }: { children: React.ReactNode }) {
 
 function StatCard({ value, label, icon }: { value: string; label: string; icon: React.ReactNode }) {
     return (
-        <div className="flex flex-col items-center gap-2 p-6 rounded-3xl bg-white dark:bg-gray-900 border border-gray-100 dark:border-gray-800 shadow-lg shadow-gray-100/60 dark:shadow-black/20 hover:-translate-y-1 transition-transform duration-300">
+        <div className="flex flex-col items-center gap-2 p-6 rounded-3xl bg-white dark:bg-background border border-gray-100 dark:border-white/10 shadow-lg shadow-gray-100/60 dark:shadow-black/20 hover:-translate-y-1 transition-transform duration-300">
             <div className="w-10 h-10 rounded-2xl bg-[#8CE600]/10 text-[#8CE600] flex items-center justify-center mb-1">
                 {icon}
             </div>
@@ -45,52 +45,52 @@ function FeatureRow({ icon, title, desc }: { icon: React.ReactNode; title: strin
 
 
 const SearchIcon = () => (
-    <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+    <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24">
         <circle cx="11" cy="11" r="8" /><path d="M21 21l-4.35-4.35" />
     </svg>
 );
 const ClockIcon = () => (
-    <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+    <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24">
         <circle cx="12" cy="12" r="10" /><path d="M12 6v6l4 2" />
     </svg>
 );
 const CardIcon = () => (
-    <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+    <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24">
         <rect x="1" y="4" width="22" height="16" rx="2" ry="2" /><line x1="1" y1="10" x2="23" y2="10" />
     </svg>
 );
 const UsersIcon = () => (
-    <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+    <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24">
         <path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2" /><circle cx="9" cy="7" r="4" /><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75" />
     </svg>
 );
 const ChartIcon = () => (
-    <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+    <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24">
         <polyline points="22 12 18 12 15 21 9 3 6 12 2 12" />
     </svg>
 );
 const BellIcon = () => (
-    <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+    <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24">
         <path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9M13.73 21a2 2 0 01-3.46 0" />
     </svg>
 );
 const ShieldIcon = () => (
-    <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+    <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24">
         <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
     </svg>
 );
 const StarIcon = () => (
-    <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+    <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24">
         <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
     </svg>
 );
 const BuildingIcon = () => (
-    <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+    <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24">
         <path d="M8 14v3m4-3v3m4-3v3M3 21h18M3 10h18M3 7l9-4 9 4M4 10h16v11H4V10z" />
     </svg>
 );
 const PixIcon = () => (
-    <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+    <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24">
         <path d="M7 7l5 5-5 5M17 7l-5 5 5 5" />
     </svg>
 );
@@ -138,11 +138,11 @@ export default function About() {
     ];
 
     return (
-        <div className="min-h-screen bg-white dark:bg-gray-950 text-gray-900 dark:text-gray-100 font-sans antialiased transition-colors duration-500 flex flex-col">
+        <div className="min-h-screen bg-white dark:bg-background text-gray-900 dark:text-gray-100 font-sans antialiased transition-colors duration-500 flex flex-col">
             <Header />
 
             {/* Seção Hero */}
-            <section className="relative pt-32 pb-20 md:pt-44 md:pb-28 overflow-hidden border-b border-gray-100 dark:border-gray-800">
+            <section className="relative pt-32 pb-20 md:pt-44 md:pb-28 overflow-hidden border-b border-gray-100 dark:border-white/10">
                 {/* bg sport icons */}
                 <div className="absolute top-8 right-8 text-[#8CE600] opacity-[0.06] dark:opacity-[0.04] rotate-12 w-72 h-72 pointer-events-none select-none">
                     <Icon1 className="w-full h-full" />
@@ -167,7 +167,7 @@ export default function About() {
             </section>
 
             {/* Estatísticas rápidas */}
-            <section className="py-16 md:py-20 bg-gray-50 dark:bg-gray-900/40 border-b border-gray-100 dark:border-gray-800">
+            <section className="py-16 md:py-20 bg-gray-50 dark:bg-background/40 border-b border-gray-100 dark:border-white/10">
                 <div className="max-w-5xl mx-auto px-6">
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                         {stats.map((s, i) => (
@@ -201,7 +201,7 @@ export default function About() {
             </section>
 
             {/* Seção: Para Atletas */}
-            <section id="para-atletas" className="py-20 md:py-28 bg-gray-50 dark:bg-gray-900/30 border-y border-gray-100 dark:border-gray-800 overflow-hidden">
+            <section id="para-atletas" className="py-20 md:py-28 bg-gray-50 dark:bg-background/30 border-y border-gray-100 dark:border-white/10 overflow-hidden">
                 <div className="max-w-7xl mx-auto px-6">
                     <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20 items-center">
 
@@ -228,7 +228,7 @@ export default function About() {
                                     className="inline-flex items-center gap-2 px-7 py-3.5 rounded-2xl bg-[#8CE600] text-gray-950 font-black uppercase tracking-widest text-xs hover:opacity-90 active:scale-[0.98] transition-all shadow-lg shadow-[#8CE600]/20"
                                 >
                                     {t('about.userCta')}
-                                    <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7" /></svg>
+                                    <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7" /></svg>
                                 </Link>
                             </div>
                         </Reveal>
@@ -239,7 +239,7 @@ export default function About() {
                                 {userFeatures.map((f, i) => (
                                     <div
                                         key={i}
-                                        className="bg-white dark:bg-gray-900 rounded-3xl p-6 border border-gray-100 dark:border-gray-800 shadow-md shadow-gray-100/60 dark:shadow-black/20 hover:-translate-y-1 transition-transform duration-300"
+                                        className="bg-white dark:bg-background rounded-3xl p-6 border border-gray-100 dark:border-white/10 shadow-md shadow-gray-100/60 dark:shadow-black/20 hover:-translate-y-1 transition-transform duration-300"
                                     >
                                         <div className="w-10 h-10 rounded-2xl bg-[#8CE600]/10 text-[#8CE600] flex items-center justify-center mb-4">
                                             {f.icon}
@@ -266,7 +266,7 @@ export default function About() {
 
                         {/* Feature cards – left on desktop */}
                         <Reveal width="w-full">
-                            <div className="bg-gray-950 dark:bg-gray-900 rounded-[2.5rem] p-8 md:p-10 border border-gray-900 dark:border-gray-800 shadow-2xl shadow-black/30 relative overflow-hidden">
+                            <div className="bg-gray-950 dark:bg-background rounded-[2.5rem] p-8 md:p-10 border border-gray-900 dark:border-white/10 shadow-2xl shadow-black/30 relative overflow-hidden">
                                 {/* Glow */}
                                 <div className="absolute -top-20 -right-20 w-72 h-72 bg-[#8CE600] opacity-5 rounded-full blur-3xl pointer-events-none" />
 
@@ -319,7 +319,7 @@ export default function About() {
                                         className="inline-flex items-center gap-2 px-7 py-3.5 rounded-2xl bg-gray-900 dark:bg-white text-white dark:text-gray-900 font-black uppercase tracking-widest text-xs hover:opacity-90 active:scale-[0.98] transition-all border border-gray-800 dark:border-transparent shadow-lg"
                                     >
                                         {t('about.managerCta')}
-                                        <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7" /></svg>
+                                        <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7" /></svg>
                                     </Link>
                                 </div>
                             </div>
@@ -328,7 +328,7 @@ export default function About() {
                 </div>
             </section>
 
-            <section className="py-20 md:py-28 bg-gray-50 dark:bg-gray-900/30 border-y border-gray-100 dark:border-gray-800">
+            <section className="py-20 md:py-28 bg-gray-50 dark:bg-background/30 border-y border-gray-100 dark:border-white/10">
                 <div className="max-w-5xl mx-auto px-6">
                     <Reveal>
                         <div className="text-center mb-14">
@@ -344,7 +344,7 @@ export default function About() {
                             { icon: <UsersIcon />, title: t('about.diff3Title'), desc: t('about.diff3Desc') },
                         ].map((item, i) => (
                             <Reveal key={i} delay={i * 100} width="w-full">
-                                <div className="group bg-white dark:bg-gray-900 rounded-3xl p-8 border border-gray-100 dark:border-gray-800 shadow-md shadow-gray-100/60 dark:shadow-black/20 hover:-translate-y-2 transition-transform duration-400 h-full text-center flex flex-col items-center">
+                                <div className="group bg-white dark:bg-background rounded-3xl p-8 border border-gray-100 dark:border-white/10 shadow-md shadow-gray-100/60 dark:shadow-black/20 hover:-translate-y-2 transition-transform duration-400 h-full text-center flex flex-col items-center">
                                     <div className="w-14 h-14 rounded-3xl bg-[#8CE600]/10 text-[#8CE600] flex items-center justify-center mb-6 group-hover:bg-[#8CE600] group-hover:text-gray-950 transition-colors duration-300">
                                         {item.icon}
                                     </div>
@@ -385,7 +385,7 @@ export default function About() {
                             <Link
                                 to="/contact"
                                 id="about-join-manager-cta"
-                                className="w-full sm:w-auto px-8 py-4 rounded-2xl bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 text-gray-900 dark:text-white font-bold uppercase tracking-widest text-sm hover:border-[#8CE600] dark:hover:border-[#8CE600] hover:text-[#8CE600] dark:hover:text-[#8CE600] active:scale-[0.98] transition-all"
+                                className="w-full sm:w-auto px-8 py-4 rounded-2xl bg-white dark:bg-background border border-gray-200 dark:border-white/10 text-gray-900 dark:text-white font-bold uppercase tracking-widest text-sm hover:border-[#8CE600] dark:hover:border-[#8CE600] hover:text-[#8CE600] dark:hover:text-[#8CE600] active:scale-[0.98] transition-all"
                             >
                                 {t('about.ctaManager')}
                             </Link>
@@ -398,3 +398,6 @@ export default function About() {
         </div>
     );
 }
+
+
+

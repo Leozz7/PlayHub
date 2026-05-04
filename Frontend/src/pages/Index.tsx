@@ -42,7 +42,7 @@ function StatCard({ value, suffix, label }: { value: number; suffix: string; lab
                     return () => obs.disconnect();
                 }
             }} 
-            className="text-left border-l border-gray-100 dark:border-gray-800 pl-6 transition-all duration-500"
+            className="text-left border-l border-gray-100 dark:border-white/10 pl-6 transition-all duration-500"
         >
             <p className="text-3xl font-medium tracking-tight text-gray-900 dark:text-white tabular-nums">
                 {count}{suffix}
@@ -100,7 +100,7 @@ export function Index() {
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
     return (
-        <div className="min-h-screen bg-white dark:bg-gray-950 text-gray-900 dark:text-gray-100 font-sans antialiased transition-colors duration-500">
+        <div className="min-h-screen bg-white dark:bg-background text-gray-900 dark:text-gray-100 font-sans antialiased transition-colors duration-500">
             <Header />
 
             <section className="relative h-[95vh] min-h-[700px] flex items-center justify-center z-50">
@@ -129,11 +129,11 @@ export function Index() {
                         </div>
                     </Reveal>
 
-                    <Reveal delay={400} width="w-full max-w-4xl relative z-50">
+                    <Reveal delay={400} width="w-full max-w-5xl xl:max-w-6xl relative z-50">
                         <HomeSearchWidget onOpenChange={setIsDropdownOpen} />
                     </Reveal>
 
-                    <div className="flex flex-wrap items-center justify-center gap-x-16 gap-y-6 mt-10 pt-6 border-t border-gray-100/50 dark:border-gray-800/50 w-full max-w-3xl opacity-80">
+                    <div className="flex flex-wrap items-center justify-center gap-x-16 gap-y-6 mt-10 pt-6 border-t border-gray-100/50 dark:border-white/10/50 w-full max-w-3xl opacity-80">
                         {[[ '50+', t('index.hero.stats.courts')], ['12k+', t('index.hero.stats.bookings')], ['98%', t('index.hero.stats.satisfaction')]].map(([v, l], i) => (
                             <Reveal key={l} delay={600 + (i * 100)} width="w-auto">
                                 <div className="flex flex-col items-center gap-1 group">
@@ -159,7 +159,7 @@ export function Index() {
 
             <FeaturedCourts />
 
-            <section className="relative py-24 bg-white dark:bg-gray-950 transition-colors duration-500 overflow-hidden">
+            <section className="relative py-24 bg-white dark:bg-background transition-colors duration-500 overflow-hidden">
                 {(() => {
                     const Icon = SPORT_ICONS[6];
                     return (
@@ -182,7 +182,7 @@ export function Index() {
 
             <SportCards />
 
-            <section id="how-it-works" className="relative py-24 bg-white dark:bg-gray-950 transition-colors duration-500 overflow-hidden">
+            <section id="how-it-works" className="relative py-24 bg-white dark:bg-background transition-colors duration-500 overflow-hidden">
                 {(() => {
                     const Icon = SPORT_ICONS[4];
                     return (
@@ -221,7 +221,7 @@ export function Index() {
 
             <PaymentMethods />
 
-            <section className="relative py-24 bg-white dark:bg-gray-950 transition-colors duration-500 overflow-hidden">
+            <section className="relative py-24 bg-white dark:bg-background transition-colors duration-500 overflow-hidden">
                 {(() => {
                     const Icon = SPORT_ICONS[5];
                     return (
@@ -241,7 +241,7 @@ export function Index() {
                         {TESTIMONIALS.map((t_item) => (
                             <div
                                 key={t_item.name}
-                                className="group relative flex flex-col p-8 bg-gray-50 dark:bg-gray-900/50 rounded-[2rem] border border-gray-100 dark:border-gray-800 transition-all duration-300 hover:bg-white dark:hover:bg-gray-900 hover:shadow-xl hover:shadow-gray-200/30 dark:hover:shadow-black/30 overflow-hidden isolation-isolate transform-gpu"
+                                className="group relative flex flex-col p-8 bg-gray-50 dark:bg-background/50 rounded-[2rem] border border-gray-100 dark:border-white/10 transition-all duration-300 hover:bg-white dark:hover:bg-gray-900 hover:shadow-xl hover:shadow-gray-200/30 dark:hover:shadow-black/30 overflow-hidden isolation-isolate transform-gpu"
                             >
                                 <div className="flex items-center gap-1 mb-6 text-[#8CE600]">
                                     {[...Array(5)].map((_, i) => (
@@ -255,7 +255,7 @@ export function Index() {
                                     "{t(t_item.text)}"
                                 </p>
 
-                                <div className="mt-auto flex items-center gap-4 pt-6 border-t border-gray-100 dark:border-gray-800">
+                                <div className="mt-auto flex items-center gap-4 pt-6 border-t border-gray-100 dark:border-white/10">
                                     <div className="w-10 h-10 rounded-2xl bg-[#8CE600] text-gray-950 flex items-center justify-center text-xs font-black shadow-lg shadow-[#8CE600]/20 shrink-0">
                                         {t_item.avatar}
                                     </div>
@@ -270,7 +270,7 @@ export function Index() {
                 </div>
             </section>
 
-            <section className="relative py-24 bg-white dark:bg-gray-950 transition-colors duration-500 overflow-hidden">
+            <section className="relative py-24 bg-white dark:bg-background transition-colors duration-500 overflow-hidden">
                 {(() => {
                     const Icon = SPORT_ICONS[0];
                     return (
@@ -312,3 +312,6 @@ export function Index() {
         </div>
     );
 }
+
+
+

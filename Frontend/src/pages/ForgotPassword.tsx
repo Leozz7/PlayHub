@@ -7,7 +7,7 @@ import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { toast } from 'sonner';
+import { usePlayHubToast } from '@/hooks/usePlayHubToast';
 import { ArrowLeft, Mail } from 'lucide-react';
 import { HeroBackground } from '@/components/ui/HeroBackground';
 import logo from '/assets/logo.png';
@@ -21,6 +21,7 @@ type ForgotPasswordFormValues = z.infer<typeof forgotPasswordSchema>;
 export default function ForgotPassword() {
   const { t } = useTranslation();
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const phToast = usePlayHubToast();
 
   const {
     register,
@@ -34,14 +35,14 @@ export default function ForgotPassword() {
     setIsSubmitting(true);
     setTimeout(() => {
       setIsSubmitting(false);
-      toast.success(t('forgotPassword.successMsg'));
+      phToast.forgotPasswordSuccess();
     }, 1500);
   };
 
   return (
-    <div className="min-h-screen w-full flex bg-white dark:bg-gray-950 transition-colors duration-500">
+    <div className="min-h-screen w-full flex bg-white dark:bg-background transition-colors duration-500">
 
-      <div className="hidden lg:flex w-1/2 relative bg-gray-50 dark:bg-gray-900 items-center justify-center overflow-hidden border-r border-gray-100 dark:border-gray-800">
+      <div className="hidden lg:flex w-1/2 relative bg-gray-50 dark:bg-background items-center justify-center overflow-hidden border-r border-gray-100 dark:border-white/10">
         <HeroBackground />
         <div className="relative z-10 p-12 max-w-xl text-center">
           <img src={logo} alt="PlayHub" className="h-16 w-auto object-contain mx-auto mb-8" />
@@ -63,11 +64,11 @@ export default function ForgotPassword() {
         </div>
       </div>
 
-      <div className="w-full lg:w-1/2 flex flex-col relative bg-white dark:bg-gray-950">
+      <div className="w-full lg:w-1/2 flex flex-col relative bg-white dark:bg-background">
 
         <div className="absolute top-4 left-6 z-20">
           <Link to="/login" className="flex items-center gap-3 text-sm font-bold text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white transition-colors group">
-            <div className="w-10 h-10 rounded-full bg-gray-50 dark:bg-gray-900 flex items-center justify-center group-hover:bg-[#8CE600] group-hover:text-gray-950 transition-all border border-gray-100 dark:border-gray-800 group-hover:border-transparent">
+            <div className="w-10 h-10 rounded-full bg-gray-50 dark:bg-background flex items-center justify-center group-hover:bg-[#8CE600] group-hover:text-gray-950 transition-all border border-gray-100 dark:border-white/10 group-hover:border-transparent">
               <ArrowLeft className="w-4 h-4" />
             </div>
             <span className="hidden sm:block">{t('forgotPassword.backToLogin')}</span>
@@ -98,7 +99,7 @@ export default function ForgotPassword() {
                     id="email"
                     type="email"
                     placeholder="seu@email.com"
-                    className="pl-11 bg-gray-50/50 dark:bg-gray-900/50 border-gray-200 dark:border-gray-800 h-13 rounded-2xl font-medium transition-all focus:bg-white dark:focus:bg-gray-900 focus-visible:ring-2 focus-visible:ring-[#8CE600] focus-visible:ring-offset-2 dark:focus-visible:ring-offset-gray-950"
+                    className="pl-11 bg-gray-50/50 dark:bg-background/50 border-gray-200 dark:border-white/10 h-13 rounded-2xl font-medium transition-all focus:bg-white dark:focus:bg-gray-900 focus-visible:ring-2 focus-visible:ring-[#8CE600] focus-visible:ring-offset-2 dark:focus-visible:ring-offset-gray-950"
                     {...register('email')}
                   />
                 </div>
@@ -136,3 +137,6 @@ export default function ForgotPassword() {
     </div>
   );
 }
+
+
+

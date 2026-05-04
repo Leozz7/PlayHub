@@ -1,81 +1,124 @@
 /* eslint-disable react-refresh/only-export-components */
 import { useTheme } from "next-themes";
 import { Toaster as Sonner, toast } from "sonner";
-import { useIsMobile } from "@/hooks/use-mobile";
-import { Capacitor } from "@capacitor/core";
+import { useState, useEffect } from "react";
+
+function useIsMobile() {
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const handleResize = () => setIsMobile(window.innerWidth < 768);
+    handleResize();
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
+  return isMobile;
+}
 
 type ToasterProps = React.ComponentProps<typeof Sonner>;
 
 const Toaster = ({ ...props }: ToasterProps) => {
   const { theme = "system" } = useTheme();
   const isMobile = useIsMobile();
-  const isNative = Capacitor.isNativePlatform();
 
   return (
     <Sonner
       theme={theme as ToasterProps["theme"]}
       className="toaster group"
       position={isMobile ? "top-center" : "bottom-right"}
-      offset={isMobile || isNative ? 96 : 16}
-      duration={2000}
+      offset={isMobile ? 96 : 20}
+      duration={3000}
       closeButton
+      gap={8}
       toastOptions={{
         unstyled: true,
         classNames: {
           toast: [
-            "flex items-start gap-3 w-full",
+            // Layout base
+            "flex items-center gap-3 w-full",
             isMobile ? "mt-12" : "",
-            "bg-white/80 dark:bg-zinc-800/80 backdrop-blur-md supports-[backdrop-filter]:bg-white/60 dark:supports-[backdrop-filter]:bg-zinc-800/60",
-            "border border-orange-500/30",
-            "rounded-xl",
-            "shadow-md",
-            "pl-4 pr-8 py-3.5",
-            "data-[visible=true]:animate-in data-[visible=true]:slide-in-from-top-4 data-[visible=true]:fade-in-0",
+            // Fundo glassmorphism adaptado ao PlayHub
+            "bg-white/95 dark:bg-background/95",
+            "backdrop-blur-xl",
+            "supports-[backdrop-filter]:bg-white/80 dark:supports-[backdrop-filter]:bg-gray-900/80",
+            // Borda sutil
+            "border border-gray-200/80 dark:border-gray-700/60",
+            // Forma premium
+            "rounded-2xl",
+            // Sombra acolchoada
+            "shadow-[0_8px_32px_-4px_rgba(0,0,0,0.12),0_2px_8px_-2px_rgba(0,0,0,0.08)]",
+            "dark:shadow-[0_8px_32px_-4px_rgba(0,0,0,0.4),0_2px_8px_-2px_rgba(0,0,0,0.25)]",
+            // Espaçamento
+            "pl-4 pr-10 py-3.5",
+            // Animação de entrada
+            "data-[visible=true]:animate-in",
+            "data-[visible=true]:slide-in-from-bottom-3",
+            "data-[visible=true]:fade-in-0",
+            "data-[visible=true]:duration-300",
           ].join(" "),
+
           title: [
-            "text-[14px] font-semibold text-zinc-900 dark:text-white/95",
+            "!text-[13.5px] !font-bold !text-gray-900 dark:!text-white",
             "leading-snug tracking-[-0.01em]",
           ].join(" "),
+
           description: [
-            "text-[12.5px] font-normal text-zinc-600 dark:text-white/55",
-            "leading-[1.45] mt-0.5",
+            "!text-[12px] !font-normal !text-gray-600 dark:!text-gray-400",
+            "leading-[1.5] mt-0.5",
           ].join(" "),
-          icon: "shrink-0 mt-[1px]",
+
+          icon: "shrink-0",
+
           actionButton: [
-            "h-7 px-3 rounded-lg text-[12px] font-semibold",
-            "bg-zinc-100 dark:bg-white/10 text-zinc-900 dark:text-white/90",
-            "hover:bg-zinc-200 dark:hover:bg-white/20 transition-colors",
-            "border border-zinc-200 dark:border-white/[0.12]",
+            "h-7 px-3 rounded-lg text-[11px] font-bold uppercase tracking-wider",
+            "bg-[#8CE600] text-gray-950",
+            "hover:bg-[#7bc900] transition-colors",
+            "shadow-sm shadow-[#8CE600]/20",
           ].join(" "),
+
           cancelButton: [
-            "h-7 px-3 rounded-lg text-[12px] font-medium",
-            "bg-transparent text-zinc-500 dark:text-white/40",
-            "hover:text-zinc-800 dark:hover:text-white/60 transition-colors",
+            "h-7 px-3 rounded-lg text-[11px] font-medium",
+            "bg-transparent text-gray-400 dark:text-gray-500",
+            "hover:text-gray-700 dark:hover:text-gray-300 transition-colors",
           ].join(" "),
+
           closeButton: [
-            "absolute !left-auto !right-3 !top-3",
-            "h-4 w-4",
-            "text-zinc-400 hover:text-zinc-700 dark:text-white/40 dark:hover:text-white/80",
+            "absolute !left-auto !right-2.5 !top-1/2 !-translate-y-1/2",
+            "h-5 w-5",
+            "text-gray-400 hover:text-gray-700 dark:text-gray-500 dark:hover:text-gray-300",
             "!bg-transparent border-none shadow-none",
             "transition-colors",
           ].join(" "),
+
+          // Variantes por tipo — borda colorida esquerda via box-shadow
           success: [
-            "bg-white/80 dark:bg-zinc-800/80 backdrop-blur-md border-orange-500/40",
-            "shadow-md",
+            "border-l-[3px] border-l-[#8CE600]",
+            "shadow-[0_8px_32px_-4px_rgba(140,230,0,0.08),0_2px_8px_-2px_rgba(0,0,0,0.06)]",
+            "dark:shadow-[0_8px_32px_-4px_rgba(140,230,0,0.12),0_2px_8px_-2px_rgba(0,0,0,0.3)]",
           ].join(" "),
+
           error: [
-            "bg-white/80 dark:bg-zinc-800/80 backdrop-blur-md border-red-500/30",
-            "shadow-md",
+            "border-l-[3px] border-l-red-500",
+            "shadow-[0_8px_32px_-4px_rgba(239,68,68,0.10),0_2px_8px_-2px_rgba(0,0,0,0.06)]",
+            "dark:shadow-[0_8px_32px_-4px_rgba(239,68,68,0.14),0_2px_8px_-2px_rgba(0,0,0,0.3)]",
           ].join(" "),
+
           warning: [
-            "bg-white/80 dark:bg-zinc-800/80 backdrop-blur-md border-amber-500/30",
-            "shadow-md",
+            "border-l-[3px] border-l-amber-500",
+            "shadow-[0_8px_32px_-4px_rgba(245,158,11,0.10),0_2px_8px_-2px_rgba(0,0,0,0.06)]",
+            "dark:shadow-[0_8px_32px_-4px_rgba(245,158,11,0.14),0_2px_8px_-2px_rgba(0,0,0,0.3)]",
           ].join(" "),
+
           info: [
-            "bg-white/80 dark:bg-zinc-800/80 backdrop-blur-md border-blue-500/30",
-            "shadow-md",
+            "border-l-[3px] border-l-blue-500",
+            "shadow-[0_8px_32px_-4px_rgba(59,130,246,0.10),0_2px_8px_-2px_rgba(0,0,0,0.06)]",
+            "dark:shadow-[0_8px_32px_-4px_rgba(59,130,246,0.14),0_2px_8px_-2px_rgba(0,0,0,0.3)]",
           ].join(" "),
-          loading: "bg-white/80 dark:bg-zinc-800/80 backdrop-blur-md border-orange-500/30 shadow-md",
+
+          loading: [
+            "border-l-[3px] border-l-gray-400 dark:border-l-gray-500",
+          ].join(" "),
         },
       }}
       style={
@@ -90,3 +133,6 @@ const Toaster = ({ ...props }: ToasterProps) => {
 };
 
 export { Toaster, toast };
+
+
+

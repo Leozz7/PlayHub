@@ -8,3 +8,6 @@ export function Stars({ rating }: { rating: number }) {
         </div>
     );
 }
+
+
+

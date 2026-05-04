@@ -16,3 +16,6 @@ export function AnimatedNumber({ value }: { value: number }) {
 
   return <motion.span>{display}</motion.span>;
 }
+
+
+
