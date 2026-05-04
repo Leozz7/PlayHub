@@ -5,7 +5,7 @@ export function PaymentMethods() {
     const { t } = useTranslation();
 
     return (
-        <section className="relative py-12 bg-gray-50 dark:bg-gray-900/30 border-y border-gray-100 dark:border-gray-800 transition-colors duration-500 overflow-hidden">
+        <section className="relative py-12 bg-gray-50 dark:bg-background/30 border-y border-gray-100 dark:border-white/10 transition-colors duration-500 overflow-hidden">
             <div className="max-w-7xl mx-auto px-6 relative z-10 flex flex-col items-center text-center">
                 <Reveal>
                     <p className="text-[10px] font-bold uppercase tracking-[0.4em] text-gray-400 dark:text-gray-500 mb-8">
@@ -52,3 +52,6 @@ export function PaymentMethods() {
         </section>
     );
 }
+
+
+

@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
@@ -7,8 +8,8 @@ import { useLogin } from '@/features/auth/hooks/useLogin';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { toast } from 'sonner';
-import { ArrowLeft, Mail, Lock } from 'lucide-react';
+import { usePlayHubToast } from '@/hooks/usePlayHubToast';
+import { ArrowLeft, Mail, Lock, Eye, EyeOff } from 'lucide-react';
 import { HeroBackground } from '@/components/ui/HeroBackground';
 import logo from '/assets/logo.png';
 
@@ -23,6 +24,8 @@ export default function Login() {
   const loginMutation = useLogin();
   const navigate = useNavigate();
   const { t } = useTranslation();
+  const phToast = usePlayHubToast();
+  const [showPassword, setShowPassword] = useState(false);
 
   const {
     register,
@@ -37,11 +40,11 @@ export default function Login() {
       { email: data.email, password: data.password, provider: 'email' },
       {
         onSuccess: () => {
-          toast.success(t('login.loginSuccess'));
+          phToast.loginSuccess();
           navigate('/');
         },
         onError: (err: any) => {
-          toast.error(err?.response?.data?.message || t('login.loginError'));
+          phToast.loginError(err?.response?.data?.message);
         },
       }
     );
@@ -50,9 +53,9 @@ export default function Login() {
   const isLoading = isSubmitting || loginMutation.isPending;
 
   return (
-    <div className="min-h-screen w-full flex bg-white dark:bg-gray-950 transition-colors duration-500">
+    <div className="min-h-screen w-full flex bg-white dark:bg-background transition-colors duration-500">
       {/* Painel Esquerdo: Branding */}
-      <div className="hidden lg:flex w-1/2 relative bg-gray-50 dark:bg-gray-900 items-center justify-center overflow-hidden border-r border-gray-100 dark:border-gray-800">
+      <div className="hidden lg:flex w-1/2 relative bg-gray-50 dark:bg-background items-center justify-center overflow-hidden border-r border-gray-100 dark:border-white/10">
         <HeroBackground />
         <div className="relative z-10 p-12 max-w-xl text-center">
           <img src={logo} alt="PlayHub" className="h-16 w-auto object-contain mx-auto mb-8" />
@@ -75,11 +78,11 @@ export default function Login() {
       </div>
 
       {/* Painel Direito: Formulário */}
-      <div className="w-full lg:w-1/2 flex flex-col relative bg-white dark:bg-gray-950">
+      <div className="w-full lg:w-1/2 flex flex-col relative bg-white dark:bg-background">
 
         <div className="absolute top-4 left-6 z-20">
           <Link to="/" className="flex items-center gap-3 text-sm font-bold text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white transition-colors group">
-            <div className="w-10 h-10 rounded-full bg-gray-50 dark:bg-gray-900 flex items-center justify-center group-hover:bg-[#8CE600] group-hover:text-gray-950 transition-all border border-gray-100 dark:border-gray-800 group-hover:border-transparent">
+            <div className="w-10 h-10 rounded-full bg-gray-50 dark:bg-background flex items-center justify-center group-hover:bg-[#8CE600] group-hover:text-gray-950 transition-all border border-gray-100 dark:border-white/10 group-hover:border-transparent">
               <ArrowLeft className="w-4 h-4" />
             </div>
             <span className="hidden sm:block">{t('login.backToHome')}</span>
@@ -110,7 +113,7 @@ export default function Login() {
                     id="email"
                     type="email"
                     placeholder="seu@email.com"
-                    className="pl-11 bg-gray-50/50 dark:bg-gray-900/50 border-gray-200 dark:border-gray-800 h-13 rounded-2xl font-medium transition-all focus:bg-white dark:focus:bg-gray-900 focus-visible:ring-2 focus-visible:ring-[#8CE600] focus-visible:ring-offset-2 dark:focus-visible:ring-offset-gray-950"
+                    className="pl-11 bg-gray-50/50 dark:bg-background/50 border-gray-200 dark:border-white/10 h-13 rounded-2xl font-medium transition-all focus:bg-white dark:focus:bg-gray-900 focus-visible:ring-2 focus-visible:ring-[#8CE600] focus-visible:ring-offset-2 dark:focus-visible:ring-offset-gray-950"
                     {...register('email')}
                   />
                 </div>
@@ -130,11 +133,18 @@ export default function Login() {
                   <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
                   <Input
                     id="password"
-                    type="password"
+                    type={showPassword ? 'text' : 'password'}
                     placeholder="••••••••"
-                    className="pl-11 bg-gray-50/50 dark:bg-gray-900/50 border-gray-200 dark:border-gray-800 h-13 rounded-2xl font-medium transition-all focus:bg-white dark:focus:bg-gray-900 focus-visible:ring-2 focus-visible:ring-[#8CE600] focus-visible:ring-offset-2 dark:focus-visible:ring-offset-gray-950"
+                    className="pl-11 pr-11 bg-gray-50/50 dark:bg-background/50 border-gray-200 dark:border-white/10 h-13 rounded-2xl font-medium transition-all focus:bg-white dark:focus:bg-gray-900 focus-visible:ring-2 focus-visible:ring-[#8CE600] focus-visible:ring-offset-2 dark:focus-visible:ring-offset-gray-950"
                     {...register('password')}
                   />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors focus:outline-none"
+                  >
+                    {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                  </button>
                 </div>
                 {errors.password && <p className="text-xs text-red-500 font-medium">{errors.password.message}</p>}
               </div>
@@ -184,3 +194,6 @@ export default function Login() {
     </div>
   );
 }
+
+
+

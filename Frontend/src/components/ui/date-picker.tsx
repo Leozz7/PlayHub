@@ -159,7 +159,7 @@ export function DatePicker({
         
         <div className={cn(
           "absolute left-2 top-1/2 -translate-y-1/2 w-8 h-8 rounded-xl flex items-center justify-center transition-all pointer-events-none",
-          selectedDate ? "bg-primary text-primary-foreground shadow-lg shadow-primary/20" : "bg-muted/10 text-muted-foreground"
+          selectedDate ? "bg-[#8CE600] text-gray-950 shadow-lg shadow-[#8CE600]/20" : "bg-muted/10 text-muted-foreground"
         )}>
           <CalendarIcon size={16} />
         </div>
@@ -176,7 +176,7 @@ export function DatePicker({
           <PopoverTrigger asChild>
             <button 
                 disabled={disabled}
-                className="p-1.5 rounded-lg hover:bg-primary/10 text-muted-foreground hover:text-primary transition-all"
+                className="p-1.5 rounded-lg hover:bg-[#8CE600]/10 text-muted-foreground hover:text-[#8CE600] transition-all"
             >
                 <ChevronRight size={14} className={cn("transition-transform", isOpen && "rotate-90")} />
             </button>
@@ -184,15 +184,15 @@ export function DatePicker({
         </div>
       </div>
 
-      <PopoverContent className="w-[300px] p-0 rounded-[2rem] border-border shadow-2xl bg-card overflow-hidden" align="start">
-        <div className="relative bg-gradient-to-br from-card to-secondary/20 h-[380px] flex flex-col">
+      <PopoverContent className="w-[300px] p-0 rounded-[2.5rem] border-border shadow-2xl bg-card overflow-hidden" align="start">
+        <div className="relative bg-gradient-to-br from-card to-[#8CE600]/5 h-[380px] flex flex-col">
           
           {/* Custom Header */}
           <div className="p-4 flex items-center justify-between border-b border-border bg-card/50 backdrop-blur-sm z-20">
             <div className="flex flex-col">
               <button 
                 onClick={() => setViewMode(viewMode === "months" ? "days" : "months")}
-                className="text-xs font-black uppercase tracking-widest text-primary flex items-center gap-1 hover:bg-primary/10 px-2 py-1 rounded-lg transition-colors"
+                className="text-xs font-black uppercase tracking-widest text-[#8CE600] flex items-center gap-1 hover:bg-[#8CE600]/10 px-2 py-1 rounded-lg transition-colors"
               >
                 {format(viewDate, "MMMM", { locale: ptBR })}
                 <ChevronRight size={10} className={cn("transition-transform", viewMode === "months" ? "rotate-90" : "")} />
@@ -207,10 +207,10 @@ export function DatePicker({
             </div>
 
             <div className="flex gap-1">
-              <Button variant="ghost" size="icon" className="h-8 w-8 rounded-xl" onClick={prevMonth}>
+              <Button variant="ghost" size="icon" className="h-8 w-8 rounded-xl hover:bg-[#8CE600]/10 hover:text-[#8CE600]" onClick={prevMonth}>
                 <ChevronLeft size={16} />
               </Button>
-              <Button variant="ghost" size="icon" className="h-8 w-8 rounded-xl" onClick={nextMonth}>
+              <Button variant="ghost" size="icon" className="h-8 w-8 rounded-xl hover:bg-[#8CE600]/10 hover:text-[#8CE600]" onClick={nextMonth}>
                 <ChevronRight size={16} />
               </Button>
             </div>
@@ -230,7 +230,7 @@ export function DatePicker({
                     className="p-4 grid grid-cols-7 gap-1 absolute inset-0"
                 >
                     {["D", "S", "T", "Q", "Q", "S", "S"].map(d => (
-                        <div key={d} className="text-center text-[9px] font-black text-primary/40 uppercase py-2 tracking-tighter">
+                        <div key={d} className="text-center text-[9px] font-black text-[#8CE600]/40 uppercase py-2 tracking-tighter">
                             {d}
                         </div>
                     ))}
@@ -246,13 +246,13 @@ export function DatePicker({
                                     "h-8 w-8 rounded-lg text-[11px] font-bold transition-all relative flex items-center justify-center",
                                     !currentMonth && "opacity-20",
                                     isSelected 
-                                        ? "bg-primary text-primary-foreground shadow-lg shadow-primary/30 scale-110 z-10" 
-                                        : "hover:bg-primary/10 hover:text-primary",
-                                    isToday && !isSelected && "text-primary ring-1 ring-primary/30"
+                                        ? "bg-[#8CE600] text-gray-950 shadow-lg shadow-[#8CE600]/30 scale-110 z-10 font-black" 
+                                        : "hover:bg-[#8CE600]/10 hover:text-[#8CE600]",
+                                    isToday && !isSelected && "text-[#8CE600] ring-1 ring-[#8CE600]/30"
                                 )}
                             >
                                 {date.getDate()}
-                                {isToday && !isSelected && <div className="absolute bottom-1 w-1 h-1 rounded-full bg-primary" />}
+                                {isToday && !isSelected && <div className="absolute bottom-1 w-1 h-1 rounded-full bg-[#8CE600]" />}
                             </button>
                         )
                     })}
@@ -278,8 +278,8 @@ export function DatePicker({
                                   className={cn(
                                       "p-3 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all",
                                       isCurrent 
-                                          ? "bg-primary text-primary-foreground shadow-lg shadow-primary/20" 
-                                          : "bg-secondary/20 hover:bg-primary/10 hover:text-primary text-muted-foreground"
+                                          ? "bg-[#8CE600] text-gray-950 shadow-lg shadow-[#8CE600]/20" 
+                                          : "bg-secondary/20 hover:bg-[#8CE600]/10 hover:text-[#8CE600] text-muted-foreground"
                                   )}
                               >
                                   {m}
@@ -309,8 +309,8 @@ export function DatePicker({
                                   className={cn(
                                       "p-3 rounded-xl text-[10px] font-black transition-all",
                                       isCurrent 
-                                          ? "bg-primary text-primary-foreground shadow-lg shadow-primary/20" 
-                                          : "bg-secondary/20 hover:bg-primary/10 hover:text-primary text-muted-foreground"
+                                          ? "bg-[#8CE600] text-gray-950 shadow-lg shadow-[#8CE600]/20" 
+                                          : "bg-secondary/20 hover:bg-[#8CE600]/10 hover:text-[#8CE600] text-muted-foreground"
                                   )}
                               >
                                   {y}
@@ -328,7 +328,7 @@ export function DatePicker({
              <Button 
                 variant="ghost" 
                 size="sm" 
-                className="text-[9px] font-black uppercase text-primary tracking-widest gap-2"
+                className="text-[9px] font-black uppercase text-[#8CE600] tracking-widest gap-2 hover:bg-[#8CE600]/10"
                 onClick={() => handleDateSelect(new Date())}
              >
                 <Zap size={10} /> Hoje
@@ -338,7 +338,7 @@ export function DatePicker({
                 <Button 
                     variant="ghost" 
                     size="sm" 
-                    className="text-[9px] font-black uppercase tracking-widest text-muted-foreground"
+                    className="text-[9px] font-black uppercase tracking-widest text-muted-foreground hover:bg-muted/10"
                     onClick={() => setIsOpen(false)}
                 >
                     Fechar
@@ -350,3 +350,6 @@ export function DatePicker({
     </Popover>
   )
 }
+
+
+

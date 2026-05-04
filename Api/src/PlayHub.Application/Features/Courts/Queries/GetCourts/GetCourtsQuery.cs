@@ -10,49 +10,34 @@ namespace PlayHub.Application.Features.Courts.Queries.GetCourts;
 
 public record GetCourtsQuery(
     CourtType? Type = null,
-    CourtStatus? Status = null
-) : IRequest<List<CourtDto>>;
+    List<string>? Statuses = null,
+    string? CurrentUserRole = null,
+    Guid? CurrentUserId = null,
+    List<Guid>? UserCourtIds = null,
 
-public class GetCourtsHandler : IRequestHandler<GetCourtsQuery, List<CourtDto>>
+    List<string>? Cities = null,
+    string? Neighborhood = null,
+    List<string>? Sports = null,
+    int? Hour = null,
+    decimal? MinPrice = null,
+    decimal? MaxPrice = null,
+    DateTime? Date = null,
+    string? Search = null,
+    double? MinRating = null,
+    string? SortBy = null,
+    bool IsDescending = true,
+    int PageNumber = 1,
+    int PageSize = 25
+) : IRequest<PagedResult<CourtDto>>;
+
+public class PagedResult<T>
 {
-    private readonly IApplicationDbContext _context;
-
-    public GetCourtsHandler(IApplicationDbContext context)
-    {
-        _context = context;
-    }
-
-    public async Task<List<CourtDto>> Handle(GetCourtsQuery request, CancellationToken cancellationToken)
-    {
-        var filterBuilder = Builders<Domain.Entities.Court>.Filter;
-        var filter = filterBuilder.Empty;
-
-        if (request.Type.HasValue)
-        {
-            filter &= filterBuilder.Eq(c => c.Type, request.Type.Value);
-        }
-
-        if (request.Status.HasValue)
-        {
-            filter &= filterBuilder.Eq(c => c.Status, request.Status.Value);
-        }
-
-        var courts = await _context.Courts
-            .Find(filter)
-            .ToListAsync(cancellationToken);
-
-        return courts.Select(court => new CourtDto
-        {
-            Id = court.Id,
-            Name = court.Name,
-            Type = court.Type,
-            HourlyRate = court.HourlyRate,
-            Status = court.Status,
-            Capacity = court.Capacity,
-            Description = court.Description,
-            Amenities = court.Amenities.ToList(),
-            ImageUrls = court.ImageUrls.ToList(),
-            Created = court.Created
-        }).ToList();
-    }
+    public List<T> Items { get; set; } = new();
+    public int TotalCount { get; set; }
+    public int PageNumber { get; set; }
+    public int PageSize { get; set; }
+    public int TotalPages => (int)Math.Ceiling(TotalCount / (double)PageSize);
+    public bool HasPreviousPage => PageNumber > 1;
+    public bool HasNextPage => PageNumber < TotalPages;
 }
+

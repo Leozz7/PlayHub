@@ -7,10 +7,12 @@ import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { toast } from 'sonner';
+import { usePlayHubToast } from '@/hooks/usePlayHubToast';
 import { ArrowLeft, User, Mail, Lock, ShieldCheck } from 'lucide-react';
 import { HeroBackground } from '@/components/ui/HeroBackground';
 import logo from '/assets/logo.png';
+import { api } from '@/lib/api';
+import { useAuthStore } from '@/data/useAuthStore';
 
 const registerSchema = z.object({
   firstName: z.string().min(2, 'O nome deve ter pelo menos 2 caracteres'),
@@ -29,6 +31,8 @@ export default function Register() {
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
   const { t } = useTranslation();
+  const phToast = usePlayHubToast();
+  const setAuth = useAuthStore((state) => state.setAuth);
 
   const {
     register,
@@ -38,23 +42,41 @@ export default function Register() {
     resolver: zodResolver(registerSchema),
   });
 
-  const onSubmit = async (_data: RegisterFormValues) => {
+  const onSubmit = async (data: RegisterFormValues) => {
     setIsLoading(true);
     try {
-      await new Promise(resolve => setTimeout(resolve, 1500));
-      toast.success(t('register.registerSuccess'));
-      navigate('/login');
+      const payload = {
+        name: `${data.firstName} ${data.lastName}`.trim(),
+        email: data.email,
+        password: data.password
+      };
+      
+      const response = await api.post('/auth/register', payload);
+      
+      if (response.data?.accessToken && response.data?.user) {
+        setAuth(response.data.user, response.data.accessToken);
+        phToast.registerSuccess();
+        
+        if (response.data.user.role === 'Admin' || response.data.user.role === 'Manager') {
+          navigate('/admin');
+        } else {
+          navigate('/');
+        }
+      } else {
+        phToast.registerSuccess();
+        navigate('/login');
+      }
     } catch (err: any) {
-      toast.error(err?.response?.data?.message || t('register.registerError'));
+      phToast.registerError(err?.response?.data?.message || 'Ocorreu um erro ao criar a conta.');
     } finally {
       setIsLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen w-full flex bg-white dark:bg-gray-950 transition-colors duration-500">
+    <div className="min-h-screen w-full flex bg-white dark:bg-background transition-colors duration-500">
       {/* Painel Esquerdo: Branding */}
-      <div className="hidden lg:flex w-1/2 relative bg-gray-50 dark:bg-gray-900 items-center justify-center overflow-hidden border-r border-gray-100 dark:border-gray-800">
+      <div className="hidden lg:flex w-1/2 relative bg-gray-50 dark:bg-background items-center justify-center overflow-hidden border-r border-gray-100 dark:border-white/10">
         <HeroBackground />
         <div className="relative z-10 p-12 max-w-xl text-center">
           <img src={logo} alt="PlayHub" className="h-16 w-auto object-contain mx-auto mb-8" />
@@ -77,11 +99,11 @@ export default function Register() {
       </div>
 
       {/* Painel Direito: Formulário */}
-      <div className="w-full lg:w-1/2 flex flex-col relative bg-white dark:bg-gray-950 overflow-y-auto">
+      <div className="w-full lg:w-1/2 flex flex-col relative bg-white dark:bg-background overflow-y-auto">
 
         <div className="absolute top-4 left-6 z-20">
           <Link to="/" className="flex items-center gap-3 text-sm font-bold text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white transition-colors group">
-            <div className="w-10 h-10 rounded-full bg-gray-50 dark:bg-gray-900 flex items-center justify-center group-hover:bg-[#8CE600] group-hover:text-gray-950 transition-all border border-gray-100 dark:border-gray-800 group-hover:border-transparent">
+            <div className="w-10 h-10 rounded-full bg-gray-50 dark:bg-background flex items-center justify-center group-hover:bg-[#8CE600] group-hover:text-gray-950 transition-all border border-gray-100 dark:border-white/10 group-hover:border-transparent">
               <ArrowLeft className="w-4 h-4" />
             </div>
             <span className="hidden sm:block">{t('login.backToHome')}</span>
@@ -112,7 +134,7 @@ export default function Register() {
                     <Input
                       id="firstName"
                       placeholder="João"
-                      className="pl-11 bg-gray-50/50 dark:bg-gray-900/50 border-gray-200 dark:border-gray-800 h-13 rounded-2xl font-medium transition-all focus:bg-white dark:focus:bg-gray-900 focus-visible:ring-2 focus-visible:ring-[#8CE600] focus-visible:ring-offset-2 dark:focus-visible:ring-offset-gray-950"
+                      className="pl-11 bg-gray-50/50 dark:bg-background/50 border-gray-200 dark:border-white/10 h-13 rounded-2xl font-medium transition-all focus:bg-white dark:focus:bg-gray-900 focus-visible:ring-2 focus-visible:ring-[#8CE600] focus-visible:ring-offset-2 dark:focus-visible:ring-offset-gray-950"
                       {...register('firstName')}
                     />
                   </div>
@@ -128,7 +150,7 @@ export default function Register() {
                     <Input
                       id="lastName"
                       placeholder="Silva"
-                      className="pl-11 bg-gray-50/50 dark:bg-gray-900/50 border-gray-200 dark:border-gray-800 h-13 rounded-2xl font-medium transition-all focus:bg-white dark:focus:bg-gray-900 focus-visible:ring-2 focus-visible:ring-[#8CE600] focus-visible:ring-offset-2 dark:focus-visible:ring-offset-gray-950"
+                      className="pl-11 bg-gray-50/50 dark:bg-background/50 border-gray-200 dark:border-white/10 h-13 rounded-2xl font-medium transition-all focus:bg-white dark:focus:bg-gray-900 focus-visible:ring-2 focus-visible:ring-[#8CE600] focus-visible:ring-offset-2 dark:focus-visible:ring-offset-gray-950"
                       {...register('lastName')}
                     />
                   </div>
@@ -146,7 +168,7 @@ export default function Register() {
                     id="email"
                     type="email"
                     placeholder="seu@email.com"
-                    className="pl-11 bg-gray-50/50 dark:bg-gray-900/50 border-gray-200 dark:border-gray-800 h-13 rounded-2xl font-medium transition-all focus:bg-white dark:focus:bg-gray-900 focus-visible:ring-2 focus-visible:ring-[#8CE600] focus-visible:ring-offset-2 dark:focus-visible:ring-offset-gray-950"
+                    className="pl-11 bg-gray-50/50 dark:bg-background/50 border-gray-200 dark:border-white/10 h-13 rounded-2xl font-medium transition-all focus:bg-white dark:focus:bg-gray-900 focus-visible:ring-2 focus-visible:ring-[#8CE600] focus-visible:ring-offset-2 dark:focus-visible:ring-offset-gray-950"
                     {...register('email')}
                   />
                 </div>
@@ -170,7 +192,7 @@ export default function Register() {
                       id="password"
                       type="password"
                       placeholder="••••••••"
-                      className="pl-11 bg-gray-50/50 dark:bg-gray-900/50 border-gray-200 dark:border-gray-800 h-13 rounded-2xl font-medium transition-all focus:bg-white dark:focus:bg-gray-900 focus-visible:ring-2 focus-visible:ring-[#8CE600] focus-visible:ring-offset-2 dark:focus-visible:ring-offset-gray-950"
+                      className="pl-11 bg-gray-50/50 dark:bg-background/50 border-gray-200 dark:border-white/10 h-13 rounded-2xl font-medium transition-all focus:bg-white dark:focus:bg-gray-900 focus-visible:ring-2 focus-visible:ring-[#8CE600] focus-visible:ring-offset-2 dark:focus-visible:ring-offset-gray-950"
                       {...register('password')}
                     />
                   </div>
@@ -187,7 +209,7 @@ export default function Register() {
                       id="confirmPassword"
                       type="password"
                       placeholder="••••••••"
-                      className="pl-11 bg-gray-50/50 dark:bg-gray-900/50 border-gray-200 dark:border-gray-800 h-13 rounded-2xl font-medium transition-all focus:bg-white dark:focus:bg-gray-900 focus-visible:ring-2 focus-visible:ring-[#8CE600] focus-visible:ring-offset-2 dark:focus-visible:ring-offset-gray-950"
+                      className="pl-11 bg-gray-50/50 dark:bg-background/50 border-gray-200 dark:border-white/10 h-13 rounded-2xl font-medium transition-all focus:bg-white dark:focus:bg-gray-900 focus-visible:ring-2 focus-visible:ring-[#8CE600] focus-visible:ring-offset-2 dark:focus-visible:ring-offset-gray-950"
                       {...register('confirmPassword')}
                     />
                   </div>
@@ -240,3 +262,6 @@ export default function Register() {
     </div>
   );
 }
+
+
+

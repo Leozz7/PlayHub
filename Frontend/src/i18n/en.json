@@ -19,8 +19,43 @@
   "header": {
     "userMenu": {
       "managerPanel": "Manager Panel",
-      "generalAdmin": "Administration"
+      "generalAdmin": "Administration",
+      "myReservations": "My Bookings",
+      "generalSettings": "General Settings",
+      "roles": {
+        "admin": "Admin",
+        "manager": "Manager",
+        "athlete": "Athlete"
+      },
+      "favoriteCourts": "Favorite Courts"
+    },
+    "favorites": {
+      "title": "Favorites",
+      "saved": "saved",
+      "emptyTitle": "No favorites yet",
+      "emptyDescription": "Save your preferred courts to access them quickly.",
+      "viewAll": "View all favorites"
     }
+  },
+  "configUser": {
+    "title": "General Settings",
+    "subtitle": "Manage your preferences, appearance and access important information.",
+    "appearance": "System Appearance",
+    "themeLight": "Light Mode",
+    "themeDark": "Dark Mode",
+    "language": "Language",
+    "session": "Session",
+    "logout": "Sign Out",
+    "logoutDesc": "End session for {{name}}",
+    "quickAccess": "Quick Access",
+    "myReservations": "My Bookings",
+    "managerPanel": "Manager Panel",
+    "adminPanel": "Admin Panel",
+    "legalSupport": "Legal & Support",
+    "privacy": "Privacy Policy",
+    "terms": "Terms of Use",
+    "about": "About Us",
+    "contact": "Contact"
   },
   "footer": {
     "description": "The definitive platform for booking sports courts. Find, book, and play without complications. Create your account for free.",
@@ -290,7 +325,15 @@
     },
     "noCourts": "No courts found",
     "noCourtsDesc": "Try adjusting your filters or clearing your search.",
-    "clearFiltersBtn": "Clear filters"
+    "clearFiltersBtn": "Clear filters",
+    "searchCity": "Search city...",
+    "searchSport": "Search sport...",
+    "errorLoading": "Error loading courts",
+    "errorLoadingDesc": "Could not load catalog data. Please check your connection or try again later.",
+    "loading": "Loading courts...",
+    "selectHour": "Select hour",
+    "noSportFound": "No sport found.",
+    "noCityFound": "No city found."
   },
   "details": {
     "backToCatalog": "Back to catalog",
@@ -333,6 +376,32 @@
     "goToHome": "Go to home",
     "viewCatalog": "View catalog"
   },
+  "confirmation": {
+    "eyebrow": "Almost there!",
+    "title": "Confirm your booking",
+    "subtitle": "Review the details below before confirming. This is your last chance to check the information.",
+    "back": "Go back",
+    "scheduleLabel": "Date & Time",
+    "dateLabel": "Booking date",
+    "hoursLabel": "hour(s) booked",
+    "priceBreakdown": "Payment Summary",
+    "serviceFee": "Service fee",
+    "free": "Free",
+    "paymentMethod": "Payment Method",
+    "confirmBtn": "Confirm & pay",
+    "confirming": "Processing...",
+    "policy1": "Immediate email confirmation",
+    "policy2": "Encrypted payment (SSL)",
+    "policy3": "Free cancellation within 24h",
+    "policy4": "Receipt sent automatically",
+    "cancelWarning": "Cancellations made less than 24 hours in advance may be subject to a fee.",
+    "noData": "No booking found. Select a time slot on the court page.",
+    "successTitle": "Booking confirmed! 🎉",
+    "successDesc1": "Your booking at",
+    "successDesc2": "for",
+    "successDesc3": "was successfully placed. You will receive a confirmation email shortly.",
+    "emailNotice": "A receipt has been sent to your registered email address."
+  },
   "forgotPassword": {
     "title": "Recover password",
     "subtitle": "Enter your email to receive a password reset link.",
@@ -343,5 +412,132 @@
     "successMsg": "If the email exists, a reset link has been sent!",
     "brandingTitle": "Regain access\nto your PlayHub account.",
     "brandingSubtitle": "It's fast, easy, and secure. Get back to the courts as soon as possible."
+  },
+  "notFound": {
+    "title": "404",
+    "subtitle": "Page not found",
+    "description": "The page you are looking for does not exist or has been moved.",
+    "backHome": "Back to Home"
+  },
+  "toasts": {
+    "loginSuccess": {
+      "title": "Access granted",
+      "titleNamed": "Welcome, {{name}}",
+      "desc": "Successfully logged in. Enjoy the platform."
+    },
+    "loginError": {
+      "title": "Authentication failed",
+      "desc": "Incorrect email or password. Please verify your credentials."
+    },
+    "registerSuccess": {
+      "title": "Account created successfully",
+      "desc": "Your registration is complete. Please log in to start booking."
+    },
+    "registerError": {
+      "title": "Registration error",
+      "desc": "We could not complete your registration at this time. Please try again."
+    },
+    "logoutSuccess": {
+      "title": "Session ended",
+      "desc": "You have been securely logged out of PlayHub."
+    },
+    "forgotPassword": {
+      "title": "Recovery email sent",
+      "desc": "Check your inbox for password reset instructions."
+    },
+    "bookingConfirmed": {
+      "title": "Booking confirmed",
+      "desc": "Your reservation at {{court}} has been successfully confirmed."
+    },
+    "bookingCancelled": {
+      "title": "Booking cancelled",
+      "desc": "Your reservation cancellation has been processed successfully."
+    },
+    "bookingError": {
+      "title": "Booking error",
+      "desc": "There was a problem processing your request. Please try again later."
+    },
+    "slotAlreadyTaken": {
+      "title": "Slot unavailable",
+      "desc": "The selected time slot has already been booked. Please choose another."
+    },
+    "reviewSuccess": {
+      "title": "Review submitted",
+      "desc": "Thank you for your feedback. It is essential to our community."
+    },
+    "reviewError": {
+      "title": "Error submitting review",
+      "desc": "Your review could not be published. Please try again."
+    },
+    "reviewLoginRequired": {
+      "title": "Authentication required",
+      "desc": "You must be logged in to your account to post reviews."
+    },
+    "contactSuccess": {
+      "title": "Message received",
+      "desc": "Your message has been sent. Our team will contact you shortly."
+    },
+    "contactError": {
+      "title": "Sending error",
+      "desc": "Could not send your message. Please check your connection and try again."
+    },
+    "networkError": {
+      "title": "Connection issue",
+      "desc": "Unable to connect to the server. Please check your internet."
+    }
+  },
+  "admin": {
+    "activities": {
+      "title": "Activities",
+      "subtitle": "Recent history of actions and events on the platform.",
+      "searchPlaceholder": "Filter by action or user...",
+      "type": "Type",
+      "allTypes": "All Activities",
+      "table": {
+        "date": "Date and Time",
+        "action": "Action",
+        "user": "User",
+        "details": "Details"
+      },
+      "types": {
+        "new_user": "New User",
+        "new_booking": "New Booking",
+        "booking_confirmed": "Booking Confirmed",
+        "booking_cancelled": "Booking Cancelled",
+        "payment_success": "Payment Success",
+        "review_added": "New Review"
+      },
+      "noActivities": "No activities found.",
+      "viewDetails": "View details"
+    },
+    "reports": {
+      "title": "Reports",
+      "subtitle": "Detailed performance analysis and metrics.",
+      "exportPdf": "Export PDF",
+      "period": "Period",
+      "last7Days": "Last 7 days",
+      "last30Days": "Last 30 days",
+      "last90Days": "Last 90 days",
+      "summary": {
+        "totalRevenue": "Total Revenue",
+        "totalBookings": "Total Bookings",
+        "averageTicket": "Average Ticket",
+        "newUsers": "New Users"
+      },
+      "charts": {
+        "revenueGrowth": "Revenue Growth",
+        "bookingsBySport": "Bookings by Sport"
+      },
+      "pdf": {
+        "reportTitle": "PlayHub Performance Report",
+        "generatedAt": "Generated at",
+        "summaryTitle": "Executive Summary",
+        "bookingsDetail": "Booking Details",
+        "date": "Date",
+        "status": "Status",
+        "value": "Value",
+        "court": "Court"
+      }
+    }
   }
 }

@@ -13,13 +13,37 @@ public class Court : BaseEntity
     public int Capacity { get; private set; }
     public string? Description { get; private set; }
     
+    private List<OperatingDay> _schedules = new();
+    public IReadOnlyCollection<OperatingDay> Schedules => _schedules.AsReadOnly();
+
     public bool IsActive => Status == CourtStatus.Active;
 
-    private List<CourtAmenity> _amenities = new();
-    public IReadOnlyCollection<CourtAmenity> Amenities => _amenities.AsReadOnly();
+
+    private List<string> _amenities = new();
+    public IReadOnlyCollection<string> Amenities => _amenities.AsReadOnly();
 
     private List<string> _imageUrls = new();
     public IReadOnlyCollection<string> ImageUrls => _imageUrls.AsReadOnly();
+
+    public byte[]? MainImage { get; private set; }
+    private List<byte[]> _images = new();
+    public IReadOnlyCollection<byte[]> Images => _images.AsReadOnly();
+
+    public string Address { get; private set; } = string.Empty;
+    public string Neighborhood { get; private set; } = string.Empty;
+    public string City { get; private set; } = string.Empty;
+    public string State { get; private set; } = string.Empty;
+
+    public decimal? OldPrice { get; private set; }
+    public string? Badge { get; private set; }
+    public double Rating { get; private set; } = 5.0;
+    public int ReviewCount { get; private set; } = 0;
+
+    public int OpeningHour { get; private set; } = 6;
+    public int ClosingHour { get; private set; } = 23;
+
+    private List<string> _sports = new();
+    public IReadOnlyCollection<string> Sports => _sports.AsReadOnly();
 
     private Court() { }
 
@@ -58,6 +82,66 @@ public class Court : BaseEntity
         Description = description;
     }
 
+    public void UpdateLocation(string address, string neighborhood, string city, string state)
+    {
+        Address = address;
+        Neighborhood = neighborhood;
+        City = city;
+        State = state;
+    }
+
+    public void UpdateSchedule(int openingHour, int closingHour)
+    {
+        OpeningHour = openingHour;
+        ClosingHour = closingHour;
+    }
+
+    public void UpdateComplexSchedule(IEnumerable<OperatingDay> schedules)
+    {
+        _schedules = new List<OperatingDay>(schedules);
+        
+        // Also update the global opening/closing for backward compatibility
+        if (_schedules.Any(s => !s.IsClosed))
+        {
+            OpeningHour = _schedules.Where(s => !s.IsClosed).Min(s => s.OpeningHour);
+            ClosingHour = _schedules.Where(s => !s.IsClosed).Max(s => s.ClosingHour);
+        }
+    }
+
+
+    public void UpdateBusinessData(decimal? oldPrice, string? badge, double rating, int reviewCount)
+    {
+        OldPrice = oldPrice;
+        Badge = badge;
+        Rating = rating;
+        ReviewCount = reviewCount;
+    }
+
+    /// <summary>Recalculates rating average when a new review is added.</summary>
+    public void ApplyNewReview(int newRating)
+    {
+        if (newRating < 1 || newRating > 5)
+            throw new DomainException("Rating must be between 1 and 5.");
+
+        if (ReviewCount == 0)
+        {
+            Rating = newRating;
+            ReviewCount = 1;
+        }
+        else
+        {
+            // Incremental average: newAvg = (oldAvg * oldCount + newRating) / (oldCount + 1)
+            var total = Rating * ReviewCount + newRating;
+            ReviewCount += 1;
+            Rating = Math.Round(total / ReviewCount, 2);
+        }
+    }
+
+    public void UpdateSports(IEnumerable<string> sports)
+    {
+        _sports = new List<string>(sports);
+    }
+
     public void MarkUnderMaintenance()
     {
         Status = CourtStatus.Maintenance;
@@ -73,14 +157,20 @@ public class Court : BaseEntity
         Status = CourtStatus.Inactive;
     }
 
-    public void UpdateAmenities(IEnumerable<CourtAmenity> amenities)
+    public void UpdateAmenities(IEnumerable<string> amenities)
     {
-        _amenities = new List<CourtAmenity>(amenities);
+        _amenities = new List<string>(amenities);
     }
 
     public void UpdateImages(IEnumerable<string> imageUrls)
     {
         _imageUrls = new List<string>(imageUrls);
+    }
+
+    public void UpdateBinaryImages(byte[]? mainImage, IEnumerable<byte[]> images)
+    {
+        MainImage = mainImage;
+        _images = new List<byte[]>(images);
     }
 
     public bool CanBeBooked()
@@ -99,3 +189,12 @@ public class Court : BaseEntity
         return Math.Round(totalHours * HourlyRate, 2);
     }
 }
+
+public class OperatingDay
+{
+    public DayOfWeek Day { get; set; }
+    public int OpeningHour { get; set; }
+    public int ClosingHour { get; set; }
+    public bool IsClosed { get; set; }
+}
+

@@ -17,6 +17,9 @@ public sealed class MongoDbContext : IApplicationDbContext
     public IMongoCollection<Court> Courts =>
         _database.GetCollection<Court>("courts");
 
+    public IMongoCollection<Review> Reviews =>
+        _database.GetCollection<Review>("reviews");
+
     public IMongoCollection<Reservation> Reservations =>
         _database.GetCollection<Reservation>("reservations");
 
@@ -63,5 +66,19 @@ public sealed class MongoDbContext : IApplicationDbContext
             new CreateIndexOptions { Name = "level_idx" });
 
         SystemLogs.Indexes.CreateOne(logLevelIndex);
+
+        // Reviews indexes
+        var reviewCourtIndex = new CreateIndexModel<Review>(
+            Builders<Review>.IndexKeys.Ascending(r => r.CourtId),
+            new CreateIndexOptions { Name = "review_court_idx" });
+
+        Reviews.Indexes.CreateOne(reviewCourtIndex);
+
+        // Enforce one review per user per court
+        var reviewUniqueIndex = new CreateIndexModel<Review>(
+            Builders<Review>.IndexKeys.Ascending(r => r.CourtId).Ascending(r => r.UserId),
+            new CreateIndexOptions { Unique = true, Name = "review_unique_user_court" });
+
+        Reviews.Indexes.CreateOne(reviewUniqueIndex);
     }
 }

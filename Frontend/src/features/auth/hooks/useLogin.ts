@@ -9,8 +9,7 @@ export function useLogin() {
   return useMutation<AuthResponse, Error, LoginCredentials>({
     mutationFn: (credentials) => authService.login(credentials),
     onSuccess: (data) => {
-      // Manage global state after domain specific logic
-      setAuth(data.user, data.tokens.accessToken);
+      setAuth(data.user, data.accessToken);
     },
   });
 }

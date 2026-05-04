@@ -47,6 +47,11 @@ public class UpdateUserHandler : IRequestHandler<UpdateUserCommand, bool>
             user.SetNewPasswordHash(newHash);
         }
 
+        if (request.CoutsId != null)
+        {
+            user.SetCourts(request.CoutsId);
+        }
+
         var result = await _context.Users.ReplaceOneAsync(
             u => u.Id == request.Id,
             user,

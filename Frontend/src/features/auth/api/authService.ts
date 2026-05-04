@@ -4,12 +4,15 @@ import { AuthResponse, LoginCredentials } from '../types/auth.types';
 export interface IAuthService {
   login(credentials: LoginCredentials): Promise<AuthResponse>;
   logout(): Promise<void>;
-  refreshToken(token: string): Promise<AuthResponse>;
+  refreshToken(): Promise<{ accessToken: string }>;
 }
 
 export const authService: IAuthService = {
   login: async (credentials: LoginCredentials): Promise<AuthResponse> => {
-    const { data } = await api.post<AuthResponse>('/auth/login', credentials);
+    const { data } = await api.post<AuthResponse>('/auth/login', {
+      email: credentials.email,
+      password: credentials.password,
+    });
     return data;
   },
 
@@ -17,8 +20,8 @@ export const authService: IAuthService = {
     await api.post('/auth/logout');
   },
 
-  refreshToken: async (token: string): Promise<AuthResponse> => {
-    const { data } = await api.post<AuthResponse>('/auth/refresh', { token });
+  refreshToken: async (): Promise<{ accessToken: string }> => {
+    const { data } = await api.post<{ accessToken: string }>('/auth/refresh');
     return data;
-  }
+  },
 };

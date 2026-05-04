@@ -13,4 +13,4 @@ COPY . .
 
 EXPOSE 5000
 
-CMD ["dotnet", "watch", "--project", "./src/PlayHub.Api/PlayHub.Api.csproj", "run", "--urls", "http://0.0.0.0:5000"]
+CMD ["dotnet", "watch", "--non-interactive", "--project", "./src/PlayHub.Api/PlayHub.Api.csproj", "run", "--urls", "http://0.0.0.0:5000"]

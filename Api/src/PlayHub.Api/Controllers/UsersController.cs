@@ -5,9 +5,11 @@ using PlayHub.Application.Features.Users.Commands.DeleteUser;
 using PlayHub.Application.Features.Users.Commands.UpdateUser;
 using PlayHub.Application.Features.Users.Commands.UpdateMyProfile;
 using PlayHub.Application.Features.Users.Queries.GetUsers;
+using PlayHub.Application.Features.Courts.Queries.GetCourts;
 using PlayHub.Application.Features.Users.Dtos;
 using Microsoft.AspNetCore.Authorization;
 using PlayHub.Domain.Constants;
+using System.Security.Claims;
 
 namespace PlayHub.Api.Controllers;
 
@@ -18,10 +20,18 @@ public class UsersController : ControllerBase
 {
     private ISender? _mediator;
     protected ISender Mediator => _mediator ??= HttpContext.RequestServices.GetRequiredService<ISender>();
-    
+
+    // Extrai o UserId do JWT (claim "sub" ou "nameid")
+    private Guid CurrentUserId =>
+        Guid.TryParse(
+            User.FindFirstValue(ClaimTypes.NameIdentifier) ?? User.FindFirstValue("sub"),
+            out var id)
+        ? id
+        : throw new UnauthorizedAccessException("Token inválido: UserId não encontrado.");
+
     [HttpGet]
     [Authorize(Roles = AppRoles.AdminOrManager)]
-    public async Task<ActionResult<List<UserDto>>> Get([FromQuery] GetUsersQuery query)
+    public async Task<ActionResult<PagedResult<UserDto>>> Get([FromQuery] GetUsersQuery query)
     {
         return await Mediator.Send(query);
     }

@@ -19,7 +19,7 @@ export function HeroBackground() {
     ];
 
     return (
-        <div className="absolute inset-0 z-0 overflow-hidden bg-gray-50 dark:bg-gray-950 pointer-events-none transition-colors duration-500">
+        <div className="absolute inset-0 z-0 overflow-hidden bg-gray-50 dark:bg-background pointer-events-none transition-colors duration-500">
             <div className="absolute inset-0 bg-[radial-gradient(ellipse_60%_70%_at_50%_50%,transparent_0%,#f9fafb_100%)] dark:bg-[radial-gradient(ellipse_60%_70%_at_50%_50%,transparent_0%,rgba(3,7,18,1)_100%)]" />
 
             <style>{`
@@ -55,3 +55,6 @@ export function HeroBackground() {
         </div>
     );
 }
+
+
+

@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { Moon, Sun, User as UserIcon, LayoutDashboard, Settings, LogOut, ChevronDown } from 'lucide-react';
+import { Moon, Sun, User as UserIcon, LayoutDashboard, Settings, LogOut, ChevronDown, CalendarDays, Heart, ArrowUpRight, Loader2 } from 'lucide-react';
 import { useTheme } from '@/components/ui/theme-provider';
 import logoUrl from '../../assets/logo.png';
 import { useAuthStore } from '@/data/useAuthStore';
@@ -14,69 +14,198 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { useTranslation } from 'react-i18next';
+import { usePlayHubToast } from '@/hooks/usePlayHubToast';
+import { useFavoritesStore } from '@/data/useFavoritesStore';
+import { useMyFavorites } from '@/features/favorites/hooks/useFavorites';
 
-// NAV_LINKS moved inside component to support translations
+// ─── Favorites Popover
 
-function getInitials(firstName?: string, lastName?: string) {
-  if (!firstName) return 'U';
-  return `${firstName.charAt(0)}${lastName ? lastName.charAt(0) : ''}`.toUpperCase();
+function FavoritesPopover() {
+  const navigate = useNavigate();
+  const { t } = useTranslation();
+  const count = useFavoritesStore(s => s.count);
+  const { data: courts = [], isLoading } = useMyFavorites();
+  const [open, setOpen] = useState(false);
+
+  return (
+    <DropdownMenu open={open} onOpenChange={setOpen} modal={false}>
+      <DropdownMenuTrigger className="relative p-2 text-gray-500 dark:text-gray-400 hover:text-red-500 dark:hover:text-red-400 transition-all rounded-full hover:bg-red-50 dark:hover:bg-red-500/10 focus:outline-none group">
+        <Heart className="h-[1.15rem] w-[1.15rem] group-hover:scale-110 transition-transform duration-300" strokeWidth={1.5} />
+        {count > 0 && (
+          <span className="absolute -top-0.5 -right-0.5 min-w-[18px] h-[18px] flex items-center justify-center text-[10px] font-bold bg-red-500 text-white rounded-full px-1 shadow-sm ring-2 ring-white dark:ring-black">
+            {count > 99 ? '99+' : count}
+          </span>
+        )}
+      </DropdownMenuTrigger>
+
+      <DropdownMenuContent 
+        align="end" 
+        sideOffset={12}
+        className="z-[200] w-[340px] rounded-[1.5rem] p-0 bg-white/90 dark:bg-background/90 backdrop-blur-2xl border border-white/40 dark:border-white/10 shadow-[0_16px_40px_-12px_rgba(0,0,0,0.1)] dark:shadow-[0_16px_40px_-12px_rgba(0,0,0,0.5)] overflow-hidden ring-1 ring-black/5 dark:ring-white/5"
+      >
+        {/* Header do popover */}
+        <div className="flex items-center justify-between px-5 py-4 border-b border-gray-100 dark:border-white/5 bg-white/50 dark:bg-white/[0.02]">
+          <div className="flex items-center gap-3">
+            <div className="p-2 bg-red-50 dark:bg-red-500/10 rounded-xl">
+              <Heart className="w-4 h-4 text-red-500" fill="currentColor" />
+            </div>
+            <span className="text-sm font-bold text-gray-900 dark:text-white">{t('header.favorites.title', 'Favoritas')}</span>
+          </div>
+          {count > 0 && (
+            <span className="text-[11px] font-bold text-gray-500 dark:text-gray-400 bg-gray-100 dark:bg-white/5 px-2.5 py-1 rounded-full">
+              {count} {t('header.favorites.saved', 'salvas')}
+            </span>
+          )}
+        </div>
+
+        {/* Conteúdo */}
+        <div className="max-h-[320px] overflow-y-auto" style={{ scrollbarWidth: 'none' }}>
+          {isLoading ? (
+            <div className="flex items-center justify-center py-12">
+              <Loader2 className="w-6 h-6 animate-spin text-[#8CE600]" />
+            </div>
+          ) : courts.length === 0 ? (
+            <div className="flex flex-col items-center justify-center py-12 px-6 text-center">
+              <div className="w-16 h-16 bg-gray-50 dark:bg-white/[0.02] rounded-full flex items-center justify-center mb-4 ring-1 ring-gray-100 dark:ring-white/5">
+                <Heart className="w-6 h-6 text-gray-300 dark:text-gray-600" />
+              </div>
+              <p className="text-sm font-bold text-gray-900 dark:text-white">{t('header.favorites.emptyTitle', 'Nenhuma favorita')}</p>
+              <p className="text-xs text-gray-500 dark:text-gray-400 mt-1.5 max-w-[200px]">{t('header.favorites.emptyDescription', 'Salve suas quadras preferidas para acessá-las rapidamente.')}</p>
+            </div>
+          ) : (
+            <div className="flex flex-col py-1">
+              {courts.map(court => (
+                <DropdownMenuItem
+                  key={court.id}
+                  onClick={() => { navigate(`/courts/${court.id}`); setOpen(false); }}
+                  className="w-full flex items-center gap-4 px-5 py-3 hover:bg-gray-50/80 dark:hover:bg-white/[0.03] cursor-pointer transition-all duration-300 text-left group rounded-none outline-none"
+                >
+                  {/* Thumb */}
+                  <div className="w-14 h-14 rounded-2xl overflow-hidden shrink-0 bg-gray-100 dark:bg-gray-900 relative shadow-inner">
+                    {court.img ? (
+                      <img src={court.img} alt={court.name} className="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-700 ease-out" loading="lazy" />
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center"><Heart className="w-5 h-5 text-gray-300 dark:text-gray-700" /></div>
+                    )}
+                    <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors duration-300" />
+                  </div>
+                  {/* Info */}
+                  <div className="flex-1 min-w-0 flex flex-col justify-center">
+                    <p className="text-sm font-bold text-gray-900 dark:text-gray-100 truncate group-hover:text-[#8CE600] transition-colors">{court.name}</p>
+                    <p className="text-[11px] font-medium text-gray-500 dark:text-gray-400 mt-1">
+                      R$ {court.hourlyRate.toLocaleString('pt-BR', { minimumFractionDigits: 0 })}/h
+                    </p>
+                  </div>
+                  <div className="w-8 h-8 rounded-full bg-white dark:bg-gray-800 border border-gray-100 dark:border-white/5 flex items-center justify-center shadow-sm opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-300 shrink-0">
+                    <ArrowUpRight className="w-4 h-4 text-gray-900 dark:text-white" />
+                  </div>
+                </DropdownMenuItem>
+              ))}
+            </div>
+          )}
+        </div>
+
+        {/* Footer */}
+        <div className="p-4 border-t border-gray-100 dark:border-white/5 bg-white/50 dark:bg-white/[0.01] backdrop-blur-md">
+          <DropdownMenuItem
+            onClick={() => { navigate('/lz_user/favorites'); setOpen(false); }}
+            className="w-full flex items-center justify-center gap-2 py-3 bg-[#8CE600] text-gray-950 rounded-2xl text-sm font-bold hover:bg-[#7bc400] focus:bg-[#7bc400] transition-all shadow-lg shadow-[#8CE600]/20 cursor-pointer outline-none ring-1 ring-black/5"
+          >
+            {t('header.favorites.viewAll', 'Ver todas as favoritas')}
+          </DropdownMenuItem>
+        </div>
+      </DropdownMenuContent>
+    </DropdownMenu>
+  );
+}
+
+
+function getInitials(name?: string) {
+  if (!name) return 'U';
+  const parts = name.trim().split(' ');
+  return `${parts[0].charAt(0)}${parts.length > 1 ? parts[parts.length - 1].charAt(0) : ''}`.toUpperCase();
 }
 
 function DesktopUserMenu({ user, logout }: { user: any, logout: () => void }) {
   const navigate = useNavigate();
   const { t } = useTranslation();
-  const initials = getInitials(user?.firstName, user?.lastName);
+  const phToast = usePlayHubToast();
+  const initials = getInitials(user?.name);
+  const favCount = useFavoritesStore(s => s.count);
+  // Sincroniza favoritos com a API ao montar o menu
+  useMyFavorites();
   
   const handleLogout = () => {
     logout();
+    phToast.logoutSuccess();
     navigate('/login');
   };
 
-  const isAdmin = user?.roles?.map((r: string) => r.toLowerCase()).includes('admin');
-  const isManager = user?.roles?.map((r: string) => r.toLowerCase()).includes('manager');
+  const isAdmin = user?.role?.toLowerCase() === 'admin';
+  const isManager = user?.role?.toLowerCase() === 'manager';
 
   return (
-    <DropdownMenu>
+    <DropdownMenu modal={false}>
       <DropdownMenuTrigger className="flex items-center gap-2 focus:outline-none group">
         <Avatar className="h-10 w-10 border-2 border-transparent transition-all group-hover:border-[#8CE600] shadow-sm">
           <AvatarFallback className="bg-[#8CE600] text-gray-950 font-black text-sm tracking-widest">{initials}</AvatarFallback>
         </Avatar>
         <div className="hidden lg:flex flex-col items-start text-left ml-1">
-           <span className="text-sm font-bold text-gray-900 dark:text-white leading-none">{user?.firstName}</span>
+           <span className="text-sm font-bold text-gray-900 dark:text-white leading-none">{user?.name?.split(' ')[0]}</span>
            <span className="text-[10px] text-gray-500 uppercase tracking-widest font-bold mt-1">
-             {isAdmin ? 'Admin' : isManager ? 'Gestor' : 'Atleta'}
+             {isAdmin ? t('header.userMenu.roles.admin', 'Admin') : isManager ? t('header.userMenu.roles.manager', 'Gestor') : t('header.userMenu.roles.athlete', 'Atleta')}
            </span>
         </div>
-        <ChevronDown className="w-4 h-4 text-gray-400 group-hover:text-[#8CE600] transition-transform group-data-[state=open]:rotate-180 ml-1" />
+        <ChevronDown className="w-4 h-4 text-gray-400 group-hover:text-[#8CE600] transition-transform group-data-[state=open]:rotate-180 ml-1" strokeWidth={1.5} />
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" className="w-56 rounded-2xl p-2 bg-white/95 dark:bg-gray-950/95 backdrop-blur-xl border border-gray-100 dark:border-gray-800 shadow-2xl shadow-gray-200/20 dark:shadow-black/40">
+      <DropdownMenuContent align="end" className="z-[200] w-56 rounded-2xl p-2 bg-white/95 dark:bg-background/95 backdrop-blur-xl border border-gray-100 dark:border-white/10 shadow-2xl shadow-gray-200/20 dark:shadow-none">
         <DropdownMenuLabel className="font-normal p-3">
           <div className="flex flex-col space-y-1">
-            <p className="text-sm font-black leading-none text-gray-900 dark:text-white">{user?.firstName} {user?.lastName}</p>
+            <p className="text-sm font-black leading-none text-gray-900 dark:text-white">{user?.name}</p>
             <p className="text-xs leading-none text-gray-500 truncate mt-1">{user?.email}</p>
           </div>
         </DropdownMenuLabel>
         <DropdownMenuSeparator className="bg-gray-100 dark:bg-gray-800/50" />
         
         <div className="p-1 space-y-1">
-            <DropdownMenuItem onClick={() => navigate('/user/dashboard')} className="cursor-pointer rounded-xl hover:bg-gray-50 dark:hover:bg-gray-900 p-3 text-sm font-medium transition-colors">
+            <DropdownMenuItem onClick={() => navigate('/lz_user/profile')} className="cursor-pointer rounded-xl hover:bg-gray-50 dark:hover:bg-gray-900 p-3 text-sm font-medium transition-colors">
             <UserIcon className="mr-3 h-4 w-4 text-gray-500" />
             <span>{t('menu.profile.btnProfile')}</span>
             </DropdownMenuItem>
 
+            <DropdownMenuItem onClick={() => navigate('/my-bookings')} className="cursor-pointer rounded-xl hover:bg-gray-50 dark:hover:bg-gray-900 p-3 text-sm font-medium transition-colors">
+            <CalendarDays className="mr-3 h-4 w-4 text-gray-500" />
+            <span>{t('header.userMenu.myReservations', 'Minhas Reservas')}</span>
+            </DropdownMenuItem>
+
+            <DropdownMenuItem onClick={() => navigate('/lz_user/favorites')} className="cursor-pointer rounded-xl hover:bg-gray-50 dark:hover:bg-gray-900 p-3 text-sm font-medium transition-colors">
+            <Heart className="mr-3 h-4 w-4 text-red-400" />
+            <span className="flex-1">{t('header.userMenu.favoriteCourts', 'Quadras Favoritas')}</span>
+            {favCount > 0 && (
+              <span className="ml-2 min-w-[18px] h-[18px] flex items-center justify-center text-[10px] font-black bg-red-500 text-white rounded-full px-1">
+                {favCount}
+              </span>
+            )}
+            </DropdownMenuItem>
+
             {isManager && (
-            <DropdownMenuItem onClick={() => navigate('/gestor/dashboard')} className="cursor-pointer rounded-xl hover:bg-gray-50 dark:hover:bg-gray-900 p-3 text-sm font-medium transition-colors">
+            <DropdownMenuItem onClick={() => navigate('/lz_gestor/dashboard')} className="cursor-pointer rounded-xl hover:bg-gray-50 dark:hover:bg-gray-900 p-3 text-sm font-medium transition-colors">
                 <LayoutDashboard className="mr-3 h-4 w-4 text-[#8CE600]" />
                 <span>{t('header.userMenu.managerPanel')}</span>
             </DropdownMenuItem>
             )}
 
             {isAdmin && (
-            <DropdownMenuItem onClick={() => navigate('/admin/dashboard')} className="cursor-pointer rounded-xl hover:bg-gray-50 dark:hover:bg-gray-900 p-3 text-sm font-medium transition-colors">
-                <Settings className="mr-3 h-4 w-4 text-[#8CE600]" />
+            <DropdownMenuItem onClick={() => navigate('/lz_admin/dashboard')} className="cursor-pointer rounded-xl hover:bg-gray-50 dark:hover:bg-gray-900 p-3 text-sm font-medium transition-colors">
+                <LayoutDashboard className="mr-3 h-4 w-4 text-[#8CE600]" />
                 <span>{t('header.userMenu.generalAdmin')}</span>
             </DropdownMenuItem>
             )}
+
+            <DropdownMenuItem onClick={() => navigate('/config')} className="cursor-pointer rounded-xl hover:bg-gray-50 dark:hover:bg-gray-900 p-3 text-sm font-medium transition-colors">
+            <Settings className="mr-3 h-4 w-4 text-gray-500" />
+            <span>{t('header.userMenu.generalSettings', 'Configurações Gerais')}</span>
+            </DropdownMenuItem>
         </div>
 
         <DropdownMenuSeparator className="bg-gray-100 dark:bg-gray-800/50" />
@@ -98,13 +227,13 @@ export function Header() {
   const navigate = useNavigate();
   const { theme, setTheme } = useTheme();
   const { t } = useTranslation();
+  const phToast = usePlayHubToast();
   
   const { isAuthenticated, user, logout } = useAuthStore();
 
   const NAV_LINKS = [
     { label: t('footer.navigation.championships'), href: '/catalog' },
     { label: t('footer.institutional.about'), href: '/about' },
-    { label: t('common.navigation.leagues'), href: '#sports' },
     { label: t('footer.bottom.contactUs'), href: '/contact' },
   ];
 
@@ -123,10 +252,10 @@ export function Header() {
   return (
     <div className="fixed top-0 left-0 right-0 z-[100] flex justify-center w-full pointer-events-none pt-4 md:pt-6 px-4 transition-all duration-500">
       <header
-        className={`w-full max-w-6xl pointer-events-auto transition-all duration-700 ease-in-out overflow-hidden ${
+        className={`w-full max-w-6xl pointer-events-auto transition-all duration-700 ease-in-out ${
           scrolled || mobileOpen
-            ? 'bg-white/80 dark:bg-gray-950/80 backdrop-blur-2xl shadow-2xl shadow-gray-200/40 dark:shadow-black/60 border border-gray-100 dark:border-gray-800 rounded-3xl'
-            : 'bg-white/40 dark:bg-gray-950/20 backdrop-blur-md shadow-xl shadow-gray-100/10 dark:shadow-black/5 border border-white/40 dark:border-white/5 rounded-[2rem]'
+            ? 'bg-white/80 dark:bg-background/80 backdrop-blur-2xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-none border border-gray-100 dark:border-white/10 rounded-3xl'
+            : 'bg-white/40 dark:bg-background/20 backdrop-blur-md shadow-xl shadow-gray-100/10 dark:shadow-black/5 border border-white/40 dark:border-white/5 rounded-[2rem]'
         }`}
       >
         <div className="px-4 sm:px-6 lg:px-8">
@@ -154,7 +283,6 @@ export function Header() {
                   className="relative text-sm font-bold text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors group"
                 >
                   {link.label}
-                  {/* Animating underline */}
                   <span className="absolute -bottom-1.5 left-0 w-0 h-0.5 bg-[#8CE600] transition-all duration-300 group-hover:w-full rounded-full"></span>
                 </a>
               ))}
@@ -164,11 +292,14 @@ export function Header() {
             <div className="hidden md:flex items-center gap-5">
               <button
                 onClick={toggleTheme}
-                className="p-2 text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors rounded-full hover:bg-gray-100 dark:hover:bg-gray-800/50"
+                className="p-2 text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-all rounded-full hover:bg-gray-100 dark:hover:bg-white/5"
                 aria-label="Alternar tema"
               >
-                {theme === 'dark' ? <Sun className="h-[1.15rem] w-[1.15rem]" /> : <Moon className="h-[1.15rem] w-[1.15rem]" />}
+                {theme === 'dark' ? <Sun className="h-[1.15rem] w-[1.15rem]" strokeWidth={1.5} /> : <Moon className="h-[1.15rem] w-[1.15rem]" strokeWidth={1.5} />}
               </button>
+
+              {/* Favoritos — popover estilo carrinho */}
+              {isAuthenticated && <FavoritesPopover />}
               
               <div className="w-[1px] h-6 bg-gray-200 dark:bg-gray-800 mx-1"></div>
 
@@ -198,15 +329,15 @@ export function Header() {
             <div className="flex items-center gap-3 md:hidden">
               <button
                 onClick={toggleTheme}
-                className="p-2 text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors rounded-full hover:bg-gray-100 dark:hover:bg-gray-800/50"
+                className="p-2 text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-all rounded-full hover:bg-gray-100 dark:hover:bg-white/5"
                 aria-label="Alternar tema"
               >
-                {theme === 'dark' ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
+                {theme === 'dark' ? <Sun className="h-5 w-5" strokeWidth={1.5} /> : <Moon className="h-5 w-5" strokeWidth={1.5} />}
               </button>
               
               {isAuthenticated && (
                  <div className="w-8 h-8 rounded-full bg-[#8CE600] text-gray-950 flex items-center justify-center font-black text-xs shadow-sm">
-                   {getInitials(user?.firstName, user?.lastName)}
+                   {getInitials(user?.name)}
                  </div>
               )}
 
@@ -227,10 +358,10 @@ export function Header() {
           </div>
         </div>
 
-        {/* MOBILE NAV (Inside the island) */}
+        {/* MOBILE NAV */}
         <div
-          className={`md:hidden transition-all duration-500 ease-in-out bg-white/40 dark:bg-gray-950/40 backdrop-blur-md ${
-            mobileOpen ? 'max-h-[500px] opacity-100 border-t border-gray-200/50 dark:border-gray-800/50' : 'max-h-0 opacity-0'
+          className={`md:hidden overflow-hidden transition-all duration-500 ease-in-out bg-white/40 dark:bg-background/40 backdrop-blur-md ${
+            mobileOpen ? 'max-h-[500px] opacity-100 border-t border-gray-200/50 dark:border-white/10/50' : 'max-h-0 opacity-0'
           }`}
         >
           <div className="px-6 pb-6 pt-4 flex flex-col gap-2">
@@ -243,17 +374,30 @@ export function Header() {
                 {link.label}
               </a>
             ))}
-            <div className="flex flex-col gap-3 mt-4 pt-4 border-t border-gray-200/50 dark:border-gray-800/50">
+            <div className="flex flex-col gap-3 mt-4 pt-4 border-t border-gray-200/50 dark:border-white/10/50">
               {isAuthenticated ? (
                 <>
                   <Link
-                    to="/user/dashboard"
+                    to="/lz_user/profile"
                     className="px-4 py-3 text-center text-sm font-bold text-gray-900 bg-[#8CE600] rounded-xl hover:bg-[#7bc400] transition-all shadow-md shadow-[#8CE600]/20 ring-1 ring-black/5"
                   >
-                    {t('common.navigation.dashboard')}
+                    {t('menu.profile.btnProfile')}
+                  </Link>
+                  <Link
+                    to="/lz_user/dashboard"
+                    className="px-4 py-3 text-center text-sm font-bold text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-800 rounded-xl hover:bg-gray-200 dark:hover:bg-gray-700 transition-all"
+                  >
+                    {t('header.userMenu.myReservations', 'Minhas Reservas')}
+                  </Link>
+                  <Link
+                    to="/config"
+                    onClick={() => setMobileOpen(false)}
+                    className="px-4 py-3 text-center text-sm font-bold text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-800 rounded-xl hover:bg-gray-200 dark:hover:bg-gray-700 transition-all"
+                  >
+                    {t('header.userMenu.generalSettings', 'Configurações Gerais')}
                   </Link>
                   <button
-                    onClick={() => { logout(); navigate('/login'); }}
+                    onClick={() => { logout(); phToast.logoutSuccess(); navigate('/login'); }}
                     className="px-4 py-3 text-center text-sm font-bold text-red-600 hover:bg-red-50 dark:hover:bg-red-950/30 rounded-xl transition-all"
                   >
                     {t('common.actions.logout')}
@@ -282,3 +426,6 @@ export function Header() {
     </div>
   );
 }
+
+
+

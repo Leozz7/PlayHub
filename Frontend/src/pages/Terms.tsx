@@ -4,7 +4,7 @@ import { Footer } from '@/components/Footer';
 export default function Terms() {
 
   return (
-    <div className="min-h-screen bg-white dark:bg-gray-950 text-gray-900 dark:text-gray-100 font-sans flex flex-col">
+    <div className="min-h-screen bg-white dark:bg-background text-gray-900 dark:text-gray-100 font-sans flex flex-col">
       <Header />
       <main className="flex-1 max-w-4xl mx-auto px-6 py-24 md:py-32 w-full">
         <h1 className="text-4xl md:text-5xl font-black tracking-tighter mb-8">Termos de Uso</h1>
@@ -32,3 +32,6 @@ export default function Terms() {
     </div>
   );
 }
+
+
+

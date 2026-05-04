@@ -2,6 +2,7 @@ using MediatR;
 using MongoDB.Driver;
 using PlayHub.Application.Common.Interfaces;
 using PlayHub.Domain.Enums;
+using PlayHub.Application.Features.Courts.Dtos;
 using System.Collections.Generic;
 
 namespace PlayHub.Application.Features.Courts.Commands.UpdateCourt;
@@ -13,67 +14,22 @@ public record UpdateCourtCommand(
     decimal HourlyRate,
     int Capacity,
     string? Description = null,
-    List<CourtAmenity>? Amenities = null,
+    List<string>? Amenities = null,
     List<string>? ImageUrls = null,
-    CourtStatus? Status = null
+    CourtStatus? Status = null,
+    string Address = "",
+    string Neighborhood = "",
+    string City = "",
+    string State = "",
+    decimal? OldPrice = null,
+    string? Badge = null,
+    double Rating = 5.0,
+    int ReviewCount = 0,
+    int OpeningHour = 6,
+    int ClosingHour = 23,
+    List<string>? Sports = null,
+    List<OperatingDayDto>? Schedules = null,
+    string? MainImageBase64 = null,
+    List<string>? ImagesBase64 = null
 ) : IRequest<bool>;
 
-public class UpdateCourtHandler : IRequestHandler<UpdateCourtCommand, bool>
-{
-    private readonly IApplicationDbContext _context;
-
-    public UpdateCourtHandler(IApplicationDbContext context)
-    {
-        _context = context;
-    }
-
-    public async Task<bool> Handle(UpdateCourtCommand request, CancellationToken cancellationToken)
-    {
-        var court = await _context.Courts
-            .Find(c => c.Id == request.Id)
-            .FirstOrDefaultAsync(cancellationToken);
-
-        if (court == null) return false;
-
-        court.UpdateDetails(
-            request.Name,
-            request.Type,
-            request.HourlyRate,
-            request.Capacity,
-            request.Description
-        );
-
-        if (request.Amenities != null)
-        {
-            court.UpdateAmenities(request.Amenities);
-        }
-
-        if (request.ImageUrls != null)
-        {
-            court.UpdateImages(request.ImageUrls);
-        }
-
-        if (request.Status.HasValue)
-        {
-            switch (request.Status.Value)
-            {
-                case CourtStatus.Active:
-                    court.RestoreToService();
-                    break;
-                case CourtStatus.Maintenance:
-                    court.MarkUnderMaintenance();
-                    break;
-                case CourtStatus.Inactive:
-                    court.Deactivate();
-                    break;
-            }
-        }
-
-        var result = await _context.Courts.ReplaceOneAsync(
-            c => c.Id == court.Id, 
-            court, 
-            cancellationToken: cancellationToken);
-
-        return result.ModifiedCount > 0;
-    }
-}

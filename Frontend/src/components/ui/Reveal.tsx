@@ -29,3 +29,6 @@ export function Reveal({ children, delay = 0, width = "w-full" }: { children: Re
         </div>
     );
 }
+
+
+
