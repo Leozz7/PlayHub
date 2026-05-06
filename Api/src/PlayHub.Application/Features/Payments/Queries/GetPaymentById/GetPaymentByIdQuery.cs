@@ -9,4 +9,4 @@ using System.Threading.Tasks;
 
 namespace PlayHub.Application.Features.Payments.Queries.GetPaymentById;
 
-public record GetPaymentByIdQuery(Guid Id) : IRequest<PaymentDto>;
+public record GetPaymentByIdQuery(Guid Id) : IRequest<PaymentDto?>;
