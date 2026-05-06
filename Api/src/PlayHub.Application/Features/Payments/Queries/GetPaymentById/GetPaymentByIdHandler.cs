@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace PlayHub.Application.Features.Payments.Queries.GetPaymentById;
 
-public class GetPaymentByIdHandler : IRequestHandler<GetPaymentByIdQuery, PaymentDto>
+public class GetPaymentByIdHandler : IRequestHandler<GetPaymentByIdQuery, PaymentDto?>
 {
     private readonly IApplicationDbContext _context;
 
@@ -18,7 +18,7 @@ public class GetPaymentByIdHandler : IRequestHandler<GetPaymentByIdQuery, Paymen
         _context = context;
     }
 
-    public async Task<PaymentDto> Handle(GetPaymentByIdQuery request, CancellationToken cancellationToken)
+    public async Task<PaymentDto?> Handle(GetPaymentByIdQuery request, CancellationToken cancellationToken)
     {
         var filter = Builders<Payment>.Filter.Eq(p => p.Id, request.Id);
         var payment = await _context.Payments.Find(filter).FirstOrDefaultAsync(cancellationToken);
