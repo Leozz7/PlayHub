@@ -37,6 +37,8 @@ public class UpdateMyProfileHandler : IRequestHandler<UpdateMyProfileCommand, bo
 
         var encryptedEmail = _encryptionService.Encrypt(request.Email);
         user.UpdateDetails(request.Name, encryptedEmail, newEmailIndex, user.Role);
+        user.UpdatePhone(!string.IsNullOrWhiteSpace(request.Phone) ? _encryptionService.Encrypt(request.Phone) : null);
+        user.UpdateCpf(!string.IsNullOrWhiteSpace(request.Cpf) ? _encryptionService.Encrypt(request.Cpf) : null);
 
         var result = await _context.Users.ReplaceOneAsync(
             u => u.Id == request.UserId,

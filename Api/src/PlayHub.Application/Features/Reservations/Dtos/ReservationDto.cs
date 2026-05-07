@@ -11,6 +11,9 @@ public class ReservationDto
     public string? CourtSport { get; set; }
     public Guid UserId { get; set; }
     public string? UserName { get; set; }
+    public string? UserEmail { get; set; }
+    public string? UserPhone { get; set; }
+    public string? UserCpf { get; set; }
     public DateTime StartTime { get; set; }
     public DateTime EndTime { get; set; }
     public ReservationStatus Status { get; set; }

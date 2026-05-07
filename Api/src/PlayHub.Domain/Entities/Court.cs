@@ -100,7 +100,6 @@ public class Court : BaseEntity
     {
         _schedules = new List<OperatingDay>(schedules);
         
-        // Also update the global opening/closing for backward compatibility
         if (_schedules.Any(s => !s.IsClosed))
         {
             OpeningHour = _schedules.Where(s => !s.IsClosed).Min(s => s.OpeningHour);
@@ -117,7 +116,6 @@ public class Court : BaseEntity
         ReviewCount = reviewCount;
     }
 
-    /// <summary>Recalculates rating average when a new review is added.</summary>
     public void ApplyNewReview(int newRating)
     {
         if (newRating < 1 || newRating > 5)
@@ -130,7 +128,6 @@ public class Court : BaseEntity
         }
         else
         {
-            // Incremental average: newAvg = (oldAvg * oldCount + newRating) / (oldCount + 1)
             var total = Rating * ReviewCount + newRating;
             ReviewCount += 1;
             Rating = Math.Round(total / ReviewCount, 2);

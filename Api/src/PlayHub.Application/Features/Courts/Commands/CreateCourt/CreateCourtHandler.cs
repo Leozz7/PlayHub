@@ -121,7 +121,7 @@ public class CreateCourtHandler : IRequestHandler<CreateCourtCommand, CourtDto>
             OpeningHour = court.OpeningHour,
             ClosingHour = court.ClosingHour,
             
-            Sport = court.Type.ToFriendlyString(),
+            Sport = court.ToFriendlySportString(),
             Sports = court.Sports.ToList(),
             
             Img = court.MainImage != null ? $"data:image/jpeg;base64,{Convert.ToBase64String(court.MainImage)}" : (court.ImageUrls.FirstOrDefault() ?? string.Empty),

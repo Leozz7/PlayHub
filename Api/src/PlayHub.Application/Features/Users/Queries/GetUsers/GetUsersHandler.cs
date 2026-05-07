@@ -59,6 +59,8 @@ public class GetUsersHandler : IRequestHandler<GetUsersQuery, PagedResult<UserDt
             Id = u.Id,
             Name = u.Name,
             Email = _encryptionService.Decrypt(u.Email),
+            Phone = !string.IsNullOrWhiteSpace(u.Phone) ? _encryptionService.Decrypt(u.Phone) : null,
+            Cpf = !string.IsNullOrWhiteSpace(u.Cpf) ? _encryptionService.Decrypt(u.Cpf) : null,
             Role = u.Role,
             CoutsId = u.CoutsId,
             Created = u.Created

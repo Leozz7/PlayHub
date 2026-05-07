@@ -40,6 +40,9 @@ public class UpdateUserHandler : IRequestHandler<UpdateUserCommand, bool>
 
         var encryptedEmail = _encryptionService.Encrypt(request.Email);
         user.UpdateDetails(request.Name, encryptedEmail, newEmailIndex, request.Role);
+        
+        user.UpdatePhone(!string.IsNullOrWhiteSpace(request.Phone) ? _encryptionService.Encrypt(request.Phone) : null);
+        user.UpdateCpf(!string.IsNullOrWhiteSpace(request.Cpf) ? _encryptionService.Encrypt(request.Cpf) : null);
 
         if (!string.IsNullOrWhiteSpace(request.Password))
         {

@@ -11,6 +11,8 @@ using PlayHub.Infrastructure.Persistence;
 using System.Globalization;
 using System.Text;
 using System.Threading.RateLimiting;
+using PlayHub.Infrastructure.Hubs;
+
 
 var culture = new CultureInfo("pt-BR");
 CultureInfo.DefaultThreadCurrentCulture = culture;
@@ -24,6 +26,8 @@ builder.Configuration
     .AddEnvironmentVariables();
 
 builder.Services.AddControllers();
+builder.Services.AddSignalR();
+
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
@@ -157,6 +161,8 @@ app.UseRateLimiter();
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers().RequireRateLimiting("fixed");
+app.MapHub<NotificationHub>("/hubs/playhub");
+
 
 using (var scope = app.Services.CreateScope())
 {

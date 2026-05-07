@@ -30,6 +30,8 @@ public class GetUserByIdHandler : IRequestHandler<GetUserByIdQuery, UserDto?>
             Id = user.Id,
             Name = user.Name,
             Email = _encryptionService.Decrypt(user.Email),
+            Phone = !string.IsNullOrWhiteSpace(user.Phone) ? _encryptionService.Decrypt(user.Phone) : null,
+            Cpf = !string.IsNullOrWhiteSpace(user.Cpf) ? _encryptionService.Decrypt(user.Cpf) : null,
             Role = user.Role,
             Created = user.Created
         };

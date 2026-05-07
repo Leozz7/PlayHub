@@ -2,8 +2,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.AspNetCore.Authorization;
 using MongoDB.Driver;
-using System.Security.Claims;
-using System.IdentityModel.Tokens.Jwt;
 using MediatR;
 using PlayHub.Application.Common.Interfaces;
 using PlayHub.Application.Common.Security;
@@ -27,6 +25,7 @@ public class AuthController : ControllerBase
     private readonly IMediator _mediator;
     private readonly IEncryptionService _encryptionService;
     private readonly IHostEnvironment _env;
+    private readonly ICurrentUserService _currentUserService;
 
     public AuthController(
         IApplicationDbContext context,
@@ -34,7 +33,8 @@ public class AuthController : ControllerBase
         PasswordHasher passwordHasher,
         IMediator mediator,
         IEncryptionService encryptionService,
-        IHostEnvironment env)
+        IHostEnvironment env,
+        ICurrentUserService currentUserService)
     {
         _context = context;
         _tokenService = tokenService;
@@ -42,26 +42,13 @@ public class AuthController : ControllerBase
         _mediator = mediator;
         _encryptionService = encryptionService;
         _env = env;
+        _currentUserService = currentUserService;
     }
 
-    private Guid LoggedInUserId
-    {
-        get
-        {
-            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier) 
-                      ?? User.FindFirstValue(JwtRegisteredClaimNames.Sub) 
-                      ?? User.FindFirstValue("id");
-            
-            if (Guid.TryParse(userId, out var parsedId))
-                return parsedId;
-
-            throw new UnauthorizedAccessException("Usuário não possui uma claim de ID válida.");
-        }
-    }
+    private Guid LoggedInUserId => _currentUserService.UserId;
 
     private CookieOptions GetRefreshTokenCookieOptions(DateTime? expires = null)
     {
-        // Em desenvolvimento (HTTP local), Secure=false e SameSite=Lax para evitar bloqueio do browser
         var isDev = _env.EnvironmentName == "Development";
         return new CookieOptions
         {
@@ -104,6 +91,8 @@ public class AuthController : ControllerBase
                 user.Id, 
                 user.Name, 
                 Email = request.Email,
+                Phone = user.Phone != null ? _encryptionService.Decrypt(user.Phone) : null,
+                Cpf = user.Cpf != null ? _encryptionService.Decrypt(user.Cpf) : null,
                 user.Role 
             }
         });
@@ -171,44 +160,43 @@ public class AuthController : ControllerBase
     }
 
     [HttpPost("register")]
+    [AllowAnonymous]
     [EnableRateLimiting("fixed")]
     public async Task<IActionResult> Register([FromBody] RegisterRequest request, CancellationToken cancellationToken)
     {
-        var emailIndex = _encryptionService.CreateBlindIndex(request.Email);
-        
-        var existing = await _context.Users
-            .Find(u => u.EmailIndex == emailIndex)
-            .AnyAsync(cancellationToken);
-            
-        if (existing)
-            return BadRequest(new { message = "Email já cadastrado." });
-
-        var passwordHash = _passwordHasher.Hash(request.Password);
-        var encryptedEmail = _encryptionService.Encrypt(request.Email);
-        
-        var user = new User(request.Name, encryptedEmail, emailIndex, passwordHash);
-        
-        await _context.Users.InsertOneAsync(user, cancellationToken: cancellationToken);
-
-        var accessToken = _tokenService.GenerateToken(user);
-        var refreshToken = _tokenService.GenerateRefreshToken();
-        var refreshTokenExpiry = DateTime.UtcNow.AddDays(7);
-        user.SetRefreshToken(refreshToken, refreshTokenExpiry);
-        
-        await _context.Users.ReplaceOneAsync(u => u.Id == user.Id, user, cancellationToken: cancellationToken);
-
-        Response.Cookies.Append("refreshToken", refreshToken, GetRefreshTokenCookieOptions(refreshTokenExpiry));
-
-        return CreatedAtAction(nameof(GetMyProfile), new
+        try
         {
-            accessToken,
-            user = new { 
-                user.Id, 
-                user.Name, 
-                Email = request.Email,
-                user.Role 
-            }
-        });
+            var command = new PlayHub.Application.Features.Users.Commands.RegisterUser.RegisterUserCommand(request.Name, request.Email, request.Password);
+            var resultDto = await _mediator.Send(command, cancellationToken);
+
+            var user = await _context.Users
+                .Find(u => u.Id == resultDto.Id)
+                .FirstOrDefaultAsync(cancellationToken);
+
+            var accessToken = _tokenService.GenerateToken(user);
+            var refreshToken = _tokenService.GenerateRefreshToken();
+            var refreshTokenExpiry = DateTime.UtcNow.AddDays(7);
+            user.SetRefreshToken(refreshToken, refreshTokenExpiry);
+            
+            await _context.Users.ReplaceOneAsync(u => u.Id == user.Id, user, cancellationToken: cancellationToken);
+
+            Response.Cookies.Append("refreshToken", refreshToken, GetRefreshTokenCookieOptions(refreshTokenExpiry));
+
+            return CreatedAtAction(nameof(GetMyProfile), new
+            {
+                accessToken,
+                user = new { 
+                    resultDto.Id, 
+                    resultDto.Name, 
+                    resultDto.Email,
+                    resultDto.Role 
+                }
+            });
+        }
+        catch (InvalidOperationException ex)
+        {
+            return BadRequest(new { message = ex.Message });
+        }
     }
 
     [HttpPost("change-password")]

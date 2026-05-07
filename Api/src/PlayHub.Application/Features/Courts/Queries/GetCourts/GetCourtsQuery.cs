@@ -1,5 +1,4 @@
 using MediatR;
-using MongoDB.Driver;
 using PlayHub.Application.Common.Interfaces;
 using PlayHub.Application.Features.Courts.Dtos;
 using PlayHub.Domain.Enums;

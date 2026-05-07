@@ -4,23 +4,26 @@ using PlayHub.Application.Common.Interfaces;
 using PlayHub.Application.Common.Security;
 using PlayHub.Application.Features.Users.Dtos;
 using PlayHub.Domain.Entities;
+using System;
+using System.Threading;
+using System.Threading.Tasks;
 
-namespace PlayHub.Application.Features.Users.Commands.CreateUser;
+namespace PlayHub.Application.Features.Users.Commands.RegisterUser;
 
-public class CreateUserHandler : IRequestHandler<CreateUserCommand, UserDto>
+public class RegisterUserHandler : IRequestHandler<RegisterUserCommand, UserDto>
 {
     private readonly IApplicationDbContext _db;
     private readonly PasswordHasher _hasher;
     private readonly IEncryptionService _encryptionService;
 
-    public CreateUserHandler(IApplicationDbContext db, PasswordHasher hasher, IEncryptionService encryptionService)
+    public RegisterUserHandler(IApplicationDbContext db, PasswordHasher hasher, IEncryptionService encryptionService)
     {
         _db = db;
         _hasher = hasher;
         _encryptionService = encryptionService;
     }
 
-    public async Task<UserDto> Handle(CreateUserCommand request, CancellationToken ct)
+    public async Task<UserDto> Handle(RegisterUserCommand request, CancellationToken ct)
     {
         var emailIndex = _encryptionService.CreateBlindIndex(request.Email);
 
@@ -29,22 +32,13 @@ public class CreateUserHandler : IRequestHandler<CreateUserCommand, UserDto>
             .AnyAsync(ct);
 
         if (exists)
-            throw new InvalidOperationException($"Email '{request.Email}' já está em uso.");
+            throw new InvalidOperationException($"Email '{request.Email}' já está cadastrado.");
 
         var passwordHash = _hasher.Hash(request.Password);
         var encryptedEmail = _encryptionService.Encrypt(request.Email);
 
-        var user = new User(request.Name, encryptedEmail, emailIndex, passwordHash, request.Role);
-        
-        if (!string.IsNullOrWhiteSpace(request.Phone))
-        {
-            user.UpdatePhone(_encryptionService.Encrypt(request.Phone));
-        }
-
-        if (!string.IsNullOrWhiteSpace(request.Cpf))
-        {
-            user.UpdateCpf(_encryptionService.Encrypt(request.Cpf));
-        }
+        // Forçamos a role 'User' internamente para evitar criação de Admins/Managers maliciosamente
+        var user = new User(request.Name, encryptedEmail, emailIndex, passwordHash, "User");
 
         await _db.Users.InsertOneAsync(user, cancellationToken: ct);
 
