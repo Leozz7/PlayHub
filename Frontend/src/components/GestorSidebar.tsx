@@ -20,6 +20,7 @@ import {
 import { useAuthStore } from '@/data/useAuthStore';
 import { usePlayHubToast } from '@/hooks/usePlayHubToast';
 import { useTheme } from '@/components/ui/theme-provider';
+import { useTranslation } from 'react-i18next';
 import logoUrl from '../../assets/logo.png';
 
 interface NavItem {
@@ -28,33 +29,6 @@ interface NavItem {
   href: string;
   badge?: number;
 }
-
-const NAV_SECTIONS: { title: string; items: NavItem[] }[] = [
-  {
-    title: 'Principal',
-    items: [
-      { label: 'Dashboard', icon: LayoutDashboard, href: '/lz_gestor/dashboard' },
-      { label: 'Relatórios', icon: BarChart3, href: '/lz_gestor/reports' },
-    ],
-  },
-  {
-    title: 'Minhas Quadras',
-    items: [
-      { label: 'Quadras', icon: Building2, href: '/lz_gestor/courts' },
-      { label: 'Reservas', icon: CalendarDays, href: '/lz_gestor/reservations' },
-      { label: 'Horários', icon: Clock, href: '/lz_gestor/schedule' },
-      { label: 'Clientes', icon: Users, href: '/lz_gestor/clients' },
-    ],
-  },
-  {
-    title: 'Financeiro',
-    items: [
-      { label: 'Pagamentos', icon: CreditCard, href: '/lz_gestor/payments' },
-      { label: 'Notificações', icon: Bell, href: '/lz_gestor/notifications'},
-      { label: 'Configurações', icon: Settings, href: '/lz_gestor/settings' },
-    ],
-  },
-];
 
 function getInitials(name?: string) {
   if (!name) return 'G';
@@ -69,6 +43,34 @@ export function GestorSidebar() {
   const { user, logout } = useAuthStore();
   const phToast = usePlayHubToast();
   const { theme, setTheme } = useTheme();
+  const { t } = useTranslation();
+
+  const NAV_SECTIONS: { title: string; items: NavItem[] }[] = [
+    {
+      title: t('gestor.sidebar.main'),
+      items: [
+        { label: t('gestor.sidebar.dashboard'), icon: LayoutDashboard, href: '/lz_gestor/dashboard' },
+        { label: t('gestor.sidebar.reports'), icon: BarChart3, href: '/lz_gestor/reports' },
+      ],
+    },
+    {
+      title: t('gestor.sidebar.myCourts'),
+      items: [
+        { label: t('gestor.sidebar.courts'), icon: Building2, href: '/lz_gestor/courts' },
+        { label: t('gestor.sidebar.reservations'), icon: CalendarDays, href: '/lz_gestor/reservations' },
+        { label: t('gestor.sidebar.schedule'), icon: Clock, href: '/lz_gestor/schedule' },
+        { label: t('gestor.sidebar.clients'), icon: Users, href: '/lz_gestor/clients' },
+      ],
+    },
+    {
+      title: t('gestor.sidebar.financial'),
+      items: [
+        { label: t('gestor.sidebar.payments'), icon: CreditCard, href: '/lz_gestor/payments' },
+        { label: t('gestor.sidebar.notifications'), icon: Bell, href: '/lz_gestor/notifications'},
+        { label: t('gestor.sidebar.settings'), icon: Settings, href: '/lz_gestor/settings' },
+      ],
+    },
+  ];
 
   const handleLogout = () => {
     logout();
@@ -89,7 +91,7 @@ export function GestorSidebar() {
       <button
         onClick={() => setCollapsed(!collapsed)}
         className="absolute -right-3 top-6 z-20 w-6 h-6 rounded-full bg-white dark:bg-card border border-gray-200 dark:border-white/10 flex items-center justify-center shadow-md hover:shadow-lg hover:border-[#8CE600]/50 transition-all duration-300 group"
-        aria-label={collapsed ? 'Expandir sidebar' : 'Recolher sidebar'}
+        aria-label={collapsed ? t('gestor.sidebar.expand') : t('gestor.sidebar.collapse')}
       >
         {collapsed
           ? <ChevronRight className="w-3 h-3 text-gray-400 group-hover:text-[#8CE600] transition-colors" />
@@ -114,7 +116,7 @@ export function GestorSidebar() {
       {!collapsed && (
         <div className="mx-4 mt-4 mb-1 px-3 py-2 rounded-xl bg-blue-500/10 border border-blue-500/20 flex items-center gap-2">
           <Briefcase className="w-3.5 h-3.5 text-blue-500 shrink-0" />
-          <span className="text-[10px] font-black uppercase tracking-widest text-blue-500">Gestor de Quadra</span>
+          <span className="text-[10px] font-black uppercase tracking-widest text-blue-500">{t('gestor.sidebar.role')}</span>
         </div>
       )}
       {collapsed && (
@@ -185,14 +187,14 @@ export function GestorSidebar() {
             <button
               onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
               className="w-10 h-10 rounded-xl flex items-center justify-center text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-white/10 transition-all"
-              title={theme === 'dark' ? 'Tema claro' : 'Tema escuro'}
+              title={theme === 'dark' ? t('gestor.sidebar.lightTheme') : t('gestor.sidebar.darkTheme')}
             >
               {theme === 'dark' ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
             </button>
             <button
               onClick={handleLogout}
               className="w-10 h-10 rounded-xl flex items-center justify-center text-red-400 hover:bg-red-50 dark:hover:bg-red-950/30 transition-all"
-              title="Sair"
+              title={t('gestor.sidebar.logout')}
             >
               <LogOut className="w-4 h-4" />
             </button>
@@ -212,7 +214,7 @@ export function GestorSidebar() {
               <button
                 onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
                 className="w-10 h-10 rounded-xl flex items-center justify-center text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-white/10 transition-all shrink-0"
-                title={theme === 'dark' ? 'Mudar para tema claro' : 'Mudar para tema escuro'}
+                title={theme === 'dark' ? t('gestor.sidebar.lightTheme') : t('gestor.sidebar.darkTheme')}
               >
                 {theme === 'dark' ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
               </button>
@@ -221,7 +223,7 @@ export function GestorSidebar() {
                 className="flex-1 flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-red-500 hover:bg-red-50 dark:hover:bg-red-950/30 transition-all group"
               >
                 <LogOut className="w-4 h-4 group-hover:-translate-x-0.5 transition-transform" />
-                <span className="text-sm font-semibold">Sair</span>
+                <span className="text-sm font-semibold">{t('gestor.sidebar.logout')}</span>
               </button>
             </div>
           </div>

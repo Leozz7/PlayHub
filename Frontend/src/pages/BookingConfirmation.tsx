@@ -13,6 +13,9 @@ import { useState } from 'react';
 import { usePlayHubToast } from '@/hooks/usePlayHubToast';
 import { useAuthStore } from '@/data/useAuthStore';
 import { api } from '@/lib/api';
+import { useEffect } from 'react';
+import { signalRService } from '@/lib/signalr';
+
 
 
 export interface BookingConfirmationState {
@@ -56,7 +59,33 @@ export default function BookingConfirmation() {
     const [confirmed, setConfirmed]   = useState(false);
     const [paymentMethod, setPaymentMethod] = useState<'pix' | 'credit' | 'debit'>('pix');
     const [copiedPix, setCopiedPix] = useState(false);
+    const [isSlotTaken, setIsSlotTaken] = useState(false);
     const phToast = usePlayHubToast();
+
+    useEffect(() => {
+        const connection = signalRService.connection;
+        if (!connection || !state) return;
+
+        const handleReservationCreated = (data: { courtId: string, startTime: string }) => {
+            if (data.courtId === state.court.id) {
+                // Verificar se o horário reservado conflita com os slots selecionados
+                const reservedDate = new Date(data.startTime);
+                const reservedHour = reservedDate.getUTCHours();
+                const reservedDateStr = reservedDate.toISOString().split('T')[0];
+                const stateDateStr = new Date(state.date).toISOString().split('T')[0];
+
+                if (reservedDateStr === stateDateStr && state.slots.includes(reservedHour)) {
+                    setIsSlotTaken(true);
+                    phToast.error(t('confirmation.slotLost', "Infelizmente este horário acabou de ser reservado por outra pessoa."));
+                }
+            }
+        };
+
+        connection.on("ReservationCreated", handleReservationCreated);
+        return () => {
+            connection.off("ReservationCreated", handleReservationCreated);
+        };
+    }, [state, phToast, t]);
 
     if (!state) {
         return (
@@ -485,7 +514,7 @@ export default function BookingConfirmation() {
                                 <button
                                     id="btn-confirm-booking"
                                     onClick={handleConfirm}
-                                    disabled={confirming}
+                                    disabled={confirming || isSlotTaken}
                                     className="w-full py-4 rounded-2xl font-black text-sm uppercase tracking-widest transition-all duration-300 disabled:opacity-60 disabled:cursor-not-allowed bg-[#8CE600] text-gray-950 hover:bg-[#7bc900] shadow-xl shadow-[#8CE600]/20 relative overflow-hidden group"
                                 >
                                     <div className="absolute inset-0 bg-white/20 group-hover:translate-x-full -translate-x-full transition-transform duration-700 skew-x-12" />

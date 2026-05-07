@@ -12,7 +12,8 @@ import {
   Building2,
   FileText,
   ChevronDown,
-  ArrowUpRight
+  ArrowUpRight,
+  CheckCircle2
 } from 'lucide-react';
 import { 
   LineChart, 
@@ -45,6 +46,7 @@ import {
     TableRow,
 } from '@/components/ui/table';
 import { StatusModal } from '@/components/ui/PremiumModal';
+import { Dialog, DialogContent } from '@/components/ui/dialog';
 import { exportAdminReportPDF } from '@/pdf/AdminReportGenerator';
 
 export default function AdminReport() {
@@ -54,6 +56,16 @@ export default function AdminReport() {
     isOpen: false,
     status: 'loading',
     title: '',
+  });
+  const [isExportModalOpen, setIsExportModalOpen] = useState(false);
+  const [selectedCourts, setSelectedCourts] = useState<string[]>([]);
+
+  const { data: courtsData } = useQuery({
+    queryKey: ['admin', 'courts', 'management'],
+    queryFn: async () => {
+      const res = await api.get('/courts/management?pageSize=100');
+      return res.data.items || [];
+    }
   });
 
   const { data: reservationsData, isLoading: isLoadingRes } = useQuery({
@@ -124,7 +136,15 @@ export default function AdminReport() {
     return Object.entries(counts).map(([name, value]) => ({ name, value }));
   }, [reservationsData]);
 
+  const openExportModal = () => {
+    if (courtsData) {
+      setSelectedCourts(courtsData.map((c: any) => c.id));
+    }
+    setIsExportModalOpen(true);
+  };
+
   const exportPDF = async () => {
+    setIsExportModalOpen(false);
     setStatusModal({
       isOpen: true,
       status: 'loading',
@@ -133,13 +153,31 @@ export default function AdminReport() {
     });
     
     try {
-      await exportAdminReportPDF({ stats, reservationsData, t });
+      const filteredReservations = reservationsData?.filter((r: any) => selectedCourts.includes(r.courtId)) || [];
+      // Also we need to recalculate stats based on selected courts if necessary.
+      // But for simplicity and UI consistency, we will pass filtered reservations to the PDF.
+      // Let's also recalculate the stats to be passed to the PDF.
+      
+      const confirmedBookings = filteredReservations.filter((r: any) => r.status === 2).length;
+      const totalRevenue = paymentsData?.filter((p: any) => 
+        p.status === 2 && filteredReservations.some((r: any) => r.id === p.reservationId)
+      ).reduce((acc: number, p: any) => acc + p.amount, 0) || 0;
+
+      const filteredStats = {
+        totalBookings: filteredReservations.length,
+        confirmedBookings,
+        totalRevenue,
+        newUsers: stats.newUsers,
+        averageTicket: confirmedBookings > 0 ? totalRevenue / confirmedBookings : 0,
+      };
+
+      await exportAdminReportPDF({ stats: filteredStats, reservationsData: filteredReservations, t });
       
       setStatusModal({
         isOpen: true,
         status: 'success',
         title: 'Relatório Pronto!',
-        message: 'O download do seu relatório foi iniciado com sucesso.'
+        message: 'O seu relatório foi aberto em uma nova guia com sucesso.'
       });
     } catch (error) {
       setStatusModal({
@@ -148,6 +186,18 @@ export default function AdminReport() {
         title: 'Erro na Exportação',
         message: 'Não foi possível gerar o PDF no momento. Tente novamente.'
       });
+    }
+  };
+
+  const toggleCourt = (id: string) => {
+    setSelectedCourts(prev => prev.includes(id) ? prev.filter(c => c !== id) : [...prev, id]);
+  };
+
+  const toggleAllCourts = () => {
+    if (selectedCourts.length === (courtsData?.length || 0)) {
+      setSelectedCourts([]);
+    } else {
+      setSelectedCourts(courtsData?.map((c: any) => c.id) || []);
     }
   };
 
@@ -184,7 +234,7 @@ export default function AdminReport() {
           </DropdownMenu>
 
           <Button 
-            onClick={exportPDF}
+            onClick={openExportModal}
             className="h-12 px-6 bg-[#8CE600] text-gray-950 hover:opacity-90 font-black rounded-2xl shadow-lg shadow-[#8CE600]/20 transition-all hover:scale-[1.02]"
           >
             <Download className="w-4 h-4 mr-2" />
@@ -313,7 +363,7 @@ export default function AdminReport() {
             {t('admin.reports.pdf.bookingsDetail')}
           </h3>
           <Button variant="ghost" className="rounded-xl font-bold text-xs hover:bg-[#8CE600]/10 hover:text-[#8CE600]">
-            Ver tudo
+            {t('admin.dashboard.viewAll')}
           </Button>
         </div>
         
@@ -360,7 +410,7 @@ export default function AdminReport() {
                     <Badge className={`rounded-full text-[10px] font-black uppercase tracking-widest px-3 py-1 ${
                       r.status === 2 ? 'bg-[#8CE600]/10 text-[#6aad00] dark:text-[#8CE600] border border-[#8CE600]/20' : 'bg-gray-100 text-gray-500'
                     }`}>
-                      {r.status === 2 ? 'Confirmada' : 'Pendente'}
+                      {r.status === 2 ? t('admin.dashboard.resConfirmed') : t('admin.dashboard.resPending')}
                     </Badge>
                   </TableCell>
                 </TableRow>
@@ -383,6 +433,70 @@ export default function AdminReport() {
         message={statusModal.message}
         onClose={() => setStatusModal(prev => ({ ...prev, isOpen: false }))}
       />
+
+      {/* Modal de Seleção de Quadras para PDF */}
+      <Dialog open={isExportModalOpen} onOpenChange={setIsExportModalOpen}>
+        <DialogContent className="sm:max-w-[450px] p-0 overflow-hidden border border-gray-100 dark:border-white/10 bg-white dark:bg-card rounded-2xl shadow-xl">
+          <div className="p-6">
+            <h2 className="text-xl font-black text-gray-900 dark:text-white mb-2 flex items-center gap-2">
+              <Building2 className="w-5 h-5 text-[#8CE600]" />
+              Selecionar Quadras
+            </h2>
+            <p className="text-sm text-gray-500 dark:text-gray-400 mb-6">
+              Escolha quais quadras serão incluídas no relatório PDF.
+            </p>
+
+            <div className="space-y-2 max-h-[300px] overflow-y-auto pr-2 mb-6 custom-scrollbar">
+              <div 
+                className="flex items-center gap-3 p-3 rounded-xl hover:bg-gray-50 dark:hover:bg-white/5 cursor-pointer transition-colors border border-transparent hover:border-gray-100 dark:hover:border-white/10"
+                onClick={toggleAllCourts}
+              >
+                <div className={`w-5 h-5 rounded flex items-center justify-center border transition-all ${selectedCourts.length === (courtsData?.length || 0) && courtsData?.length > 0 ? 'bg-[#8CE600] border-[#8CE600]' : 'border-gray-300 dark:border-gray-600'}`}>
+                  {selectedCourts.length === (courtsData?.length || 0) && courtsData?.length > 0 && <CheckCircle2 className="w-3.5 h-3.5 text-white" />}
+                </div>
+                <span className="font-bold text-gray-900 dark:text-white">Selecionar Todas</span>
+              </div>
+              
+              {courtsData?.map((court: any) => (
+                <div 
+                  key={court.id} 
+                  className="flex items-center gap-3 p-3 rounded-xl hover:bg-gray-50 dark:hover:bg-white/5 cursor-pointer transition-colors border border-transparent hover:border-gray-100 dark:hover:border-white/10"
+                  onClick={() => toggleCourt(court.id)}
+                >
+                  <div className={`w-5 h-5 rounded flex items-center justify-center border transition-all ${selectedCourts.includes(court.id) ? 'bg-[#8CE600] border-[#8CE600]' : 'border-gray-300 dark:border-gray-600'}`}>
+                    {selectedCourts.includes(court.id) && <CheckCircle2 className="w-3.5 h-3.5 text-white" />}
+                  </div>
+                  <div>
+                    <span className="font-bold text-gray-900 dark:text-white block">{court.name}</span>
+                    <span className="text-xs text-gray-500 dark:text-gray-400">{court.sport}</span>
+                  </div>
+                </div>
+              ))}
+              
+              {courtsData?.length === 0 && (
+                <p className="text-center text-gray-500 py-4 text-sm font-medium">Nenhuma quadra encontrada.</p>
+              )}
+            </div>
+
+            <div className="grid grid-cols-2 gap-3">
+              <Button
+                variant="outline"
+                onClick={() => setIsExportModalOpen(false)}
+                className="h-12 font-bold rounded-xl"
+              >
+                Cancelar
+              </Button>
+              <Button
+                onClick={exportPDF}
+                disabled={selectedCourts.length === 0}
+                className="h-12 bg-[#8CE600] text-gray-950 hover:opacity-90 font-black rounded-xl"
+              >
+                Gerar PDF
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

@@ -1,7 +1,8 @@
 import { useState, useMemo } from 'react';
 import { format, startOfDay } from 'date-fns';
-import { ptBR } from 'date-fns/locale';
-import { Calendar, Clock, User, CheckCircle2, Building2, Search, ArrowRight, Lock, Unlock, AlertCircle } from 'lucide-react';
+import { ptBR, enUS, es } from 'date-fns/locale';
+import { useTranslation } from 'react-i18next';
+import { Calendar, Clock, User, CheckCircle2, Building2, Search, ArrowRight, Lock, Unlock, AlertCircle, Phone } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { ActionModal } from '@/components/ui/PremiumModal';
@@ -17,12 +18,15 @@ function CourtScheduleModal({ court, isOpen, onClose }: { court: any, isOpen: bo
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
   const { user } = useAuthStore();
   const phToast = usePlayHubToast();
+  const { t, i18n } = useTranslation();
   const [isBlocking, setIsBlocking] = useState(false);
   const [showBlockConfirm, setShowBlockConfirm] = useState(false);
   const [slotToBlock, setSlotToBlock] = useState<number | null>(null);
   const [selectedReservation, setSelectedReservation] = useState<any | null>(null);
   const [showReleaseConfirm, setShowReleaseConfirm] = useState(false);
   
+  const dateLocale = i18n.language === 'pt' ? ptBR : i18n.language === 'es' ? es : enUS;
+
   // Busca as reservas APENAS da quadra selecionada e do dia selecionado
   const { data: reservationsData, isLoading, refetch } = useReservations({
     courtId: court?.id,
@@ -44,7 +48,6 @@ function CourtScheduleModal({ court, isOpen, onClose }: { court: any, isOpen: bo
     setIsBlocking(true);
     try {
       const start = new Date(selectedDate);
-      // Usamos setUTCHours para alinhar com o sistema de reservas global
       start.setUTCHours(slotToBlock, 0, 0, 0);
       
       const end = new Date(selectedDate);
@@ -95,18 +98,18 @@ function CourtScheduleModal({ court, isOpen, onClose }: { court: any, isOpen: bo
               <div>
                 <div className="flex items-center gap-2 mb-2">
                   <span className="px-2 py-1 bg-[#8CE600]/10 text-[#8CE600] text-[10px] font-black uppercase tracking-widest rounded-md border border-[#8CE600]/20">
-                    Agenda Oficial
+                    {t('gestor.schedule.modal.officialSchedule')}
                   </span>
                 </div>
                 <DialogTitle className="text-3xl font-black text-gray-900 dark:text-white tracking-tight">
                   {court?.name}
                 </DialogTitle>
                 <DialogDescription className="text-sm text-gray-500 mt-1">
-                  Gerencie a disponibilidade e visualize as reservas em tempo real.
+                  {t('gestor.schedule.modal.manageAvailability')}
                 </DialogDescription>
               </div>
               <div className="hidden md:block text-right">
-                <p className="text-xs font-bold text-gray-400 uppercase tracking-widest">Modalidade</p>
+                <p className="text-xs font-bold text-gray-400 uppercase tracking-widest">{t('gestor.schedule.modal.modality')}</p>
                 <p className="text-sm font-black text-gray-900 dark:text-white">{court?.sport}</p>
               </div>
             </div>
@@ -121,9 +124,9 @@ function CourtScheduleModal({ court, isOpen, onClose }: { court: any, isOpen: bo
                 className="w-full md:w-56"
               />
               <div className="flex flex-col">
-                <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest leading-none mb-1">Dia Selecionado</span>
+                <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest leading-none mb-1">{t('gestor.schedule.modal.selectedDay')}</span>
                 <span className="text-base font-black text-[#8CE600] capitalize">
-                  {format(selectedDate, "EEEE, dd 'de' MMMM", { locale: ptBR })}
+                  {format(selectedDate, "EEEE, dd 'de' MMMM", { locale: dateLocale })}
                 </span>
               </div>
             </div>
@@ -131,15 +134,15 @@ function CourtScheduleModal({ court, isOpen, onClose }: { court: any, isOpen: bo
             <div className="flex items-center gap-6 px-6 py-3 bg-gray-50 dark:bg-white/5 rounded-2xl border border-gray-100 dark:border-white/5 w-full md:w-auto justify-center md:justify-start">
               <div className="flex items-center gap-2">
                 <div className="w-3 h-3 rounded-full bg-[#8CE600]/20 border border-[#8CE600] shadow-[0_0_8px_rgba(140,230,0,0.3)]" />
-                <span className="text-xs font-bold text-gray-500">Livre</span>
+                <span className="text-xs font-bold text-gray-500">{t('gestor.schedule.modal.status.free')}</span>
               </div>
               <div className="flex items-center gap-2">
                 <div className="w-3 h-3 rounded-full bg-red-500/20 border border-red-500 shadow-[0_0_8px_rgba(239,68,68,0.3)]" />
-                <span className="text-xs font-bold text-gray-500">Ocupado</span>
+                <span className="text-xs font-bold text-gray-500">{t('gestor.schedule.modal.status.occupied')}</span>
               </div>
               <div className="flex items-center gap-2">
                 <div className="w-3 h-3 rounded-full bg-gray-400/20 border border-gray-400" />
-                <span className="text-xs font-bold text-gray-500">Bloqueado</span>
+                <span className="text-xs font-bold text-gray-500">{t('gestor.schedule.modal.status.blocked')}</span>
               </div>
             </div>
           </div>
@@ -149,7 +152,7 @@ function CourtScheduleModal({ court, isOpen, onClose }: { court: any, isOpen: bo
             {isLoading ? (
               <div className="flex flex-col items-center justify-center py-20 gap-4">
                 <div className="w-10 h-10 border-3 border-[#8CE600]/20 border-t-[#8CE600] rounded-full animate-spin" />
-                <p className="text-sm font-bold text-gray-400">Carregando horários...</p>
+                <p className="text-sm font-bold text-gray-400">{t('gestor.schedule.loading')}</p>
               </div>
             ) : (
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -213,7 +216,7 @@ function CourtScheduleModal({ court, isOpen, onClose }: { court: any, isOpen: bo
                       <div className="relative z-10">
                         {isBlocked ? (
                           <div className="space-y-1">
-                            <p className="text-sm font-bold text-gray-500">Manutenção / Interno</p>
+                            <p className="text-sm font-bold text-gray-500">{t('gestor.schedule.modal.details.internalUse')}</p>
                             <p className="text-[10px] text-gray-400">Clique para ver detalhes</p>
                           </div>
                         ) : isOccupied ? (
@@ -223,7 +226,7 @@ function CourtScheduleModal({ court, isOpen, onClose }: { court: any, isOpen: bo
                                 {reservation.userName?.charAt(0) || 'U'}
                               </div>
                               <p className="text-sm font-bold text-gray-900 dark:text-white truncate">
-                                {reservation.userName || 'Cliente'}
+                                {reservation.userName || t('gestor.schedule.modal.details.client')}
                               </p>
                             </div>
                             <div className="flex items-center justify-between text-[10px] font-bold">
@@ -254,7 +257,7 @@ function CourtScheduleModal({ court, isOpen, onClose }: { court: any, isOpen: bo
           <div className="px-8 py-4 bg-amber-50 dark:bg-amber-950/20 border-t border-amber-100 dark:border-amber-900/30 flex items-center gap-3">
              <AlertCircle className="w-4 h-4 text-amber-500 shrink-0" />
              <p className="text-[11px] text-amber-700 dark:text-amber-400 font-medium">
-               Alterações na agenda são permanentes. Bloqueios impedem que novos clientes reservem estes horários.
+               {t('gestor.schedule.modal.warning')}
              </p>
           </div>
         </div>
@@ -267,9 +270,9 @@ function CourtScheduleModal({ court, isOpen, onClose }: { court: any, isOpen: bo
             setSlotToBlock(null);
           }}
           onAction={handleBlockSlot}
-          title="Bloquear Horário"
-          description={`Você deseja bloquear o horário das ${slotToBlock}:00 às ${Number(slotToBlock) + 1}:00 para manutenção ou uso interno?`}
-          actionText="Confirmar Bloqueio"
+          title={t('gestor.schedule.modal.blockConfirm.title')}
+          description={t('gestor.schedule.modal.blockConfirm.desc', { start: slotToBlock, end: Number(slotToBlock) + 1 })}
+          actionText={t('gestor.schedule.modal.blockConfirm.confirm')}
           variant="premium"
           icon={Lock}
           isLoading={isBlocking}
@@ -285,9 +288,9 @@ function CourtScheduleModal({ court, isOpen, onClose }: { court: any, isOpen: bo
                 </div>
                 <div>
                   <DialogTitle className="text-xl font-black text-gray-900 dark:text-white">
-                    {selectedReservation?.status === 5 ? 'Horário Bloqueado' : 'Detalhes da Reserva'}
+                    {selectedReservation?.status === 5 ? t('gestor.schedule.modal.details.blockedTitle') : t('gestor.schedule.modal.details.reservedTitle')}
                   </DialogTitle>
-                  <p className="text-xs text-gray-400 font-bold uppercase tracking-widest">Informações Operacionais</p>
+                  <p className="text-xs text-gray-400 font-bold uppercase tracking-widest">{t('gestor.schedule.modal.details.opInfo')}</p>
                 </div>
               </div>
             </DialogHeader>
@@ -296,15 +299,15 @@ function CourtScheduleModal({ court, isOpen, onClose }: { court: any, isOpen: bo
               {/* Info Grid */}
               <div className="grid grid-cols-2 gap-4">
                 <div className="p-4 bg-gray-50 dark:bg-white/5 rounded-2xl border border-gray-100 dark:border-white/5">
-                  <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">Horário</p>
+                  <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">{t('gestor.schedule.modal.details.time')}</p>
                   <p className="text-sm font-black text-gray-900 dark:text-white">
                     {selectedReservation && new Date(selectedReservation.startTime).getUTCHours()}:00 – {selectedReservation && new Date(selectedReservation.startTime).getUTCHours() + 1}:00
                   </p>
                 </div>
                 <div className="p-4 bg-gray-50 dark:bg-white/5 rounded-2xl border border-gray-100 dark:border-white/5">
-                  <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">Status</p>
+                  <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">{t('gestor.schedule.modal.details.status')}</p>
                   <p className={`text-sm font-black ${selectedReservation?.status === 5 ? 'text-gray-500' : 'text-red-500'}`}>
-                    {selectedReservation?.status === 5 ? 'Bloqueado' : 'Reservado'}
+                    {selectedReservation?.status === 5 ? t('gestor.schedule.modal.status.blocked') : t('gestor.schedule.modal.status.occupied')}
                   </p>
                 </div>
               </div>
@@ -316,18 +319,25 @@ function CourtScheduleModal({ court, isOpen, onClose }: { court: any, isOpen: bo
                      {selectedReservation?.userName?.charAt(0) || 'U'}
                    </div>
                    <div>
-                     <p className="text-sm font-black text-gray-900 dark:text-white">{selectedReservation?.userName || 'Uso Interno'}</p>
-                     <p className="text-[10px] text-gray-400 font-bold">Responsável pela ocupação</p>
+                     <p className="text-sm font-black text-gray-900 dark:text-white">{selectedReservation?.userName || t('gestor.schedule.modal.details.internalUse')}</p>
+                     <div className="flex flex-col gap-0.5 mt-1">
+                        <p className="text-[10px] text-gray-400 font-bold">{t('gestor.schedule.modal.details.responsible')}</p>
+                        {selectedReservation?.userPhone && (
+                           <p className="text-[10px] text-gray-500 font-medium flex items-center gap-1">
+                             <Phone className="w-3 h-3" /> {selectedReservation.userPhone}
+                           </p>
+                        )}
+                     </div>
                    </div>
                 </div>
                 
                 <div className="space-y-2 pt-2 border-t border-gray-200/50 dark:border-white/5">
                    <div className="flex justify-between items-center text-xs">
-                     <span className="text-gray-400 font-bold">ID da Reserva:</span>
+                     <span className="text-gray-400 font-bold">{t('gestor.schedule.modal.details.reservationId')}</span>
                      <span className="text-gray-900 dark:text-white font-mono">{selectedReservation?.id.substring(0, 12)}...</span>
                    </div>
                    <div className="flex justify-between items-center text-xs">
-                     <span className="text-gray-400 font-bold">Valor Total:</span>
+                     <span className="text-gray-400 font-bold">{t('gestor.schedule.modal.details.totalValue')}</span>
                      <span className="text-[#8CE600] font-black">R$ {selectedReservation?.totalPrice || '0,00'}</span>
                    </div>
                 </div>
@@ -339,7 +349,7 @@ function CourtScheduleModal({ court, isOpen, onClose }: { court: any, isOpen: bo
                   onClick={() => setSelectedReservation(null)}
                   className="w-full py-6 rounded-2xl font-black uppercase text-[11px] tracking-widest border-gray-200 dark:border-white/10"
                 >
-                  Fechar Detalhes
+                  {t('gestor.schedule.modal.details.close')}
                 </Button>
                 
                 {selectedReservation?.status === 5 && (
@@ -348,7 +358,7 @@ function CourtScheduleModal({ court, isOpen, onClose }: { court: any, isOpen: bo
                     onClick={() => setShowReleaseConfirm(true)}
                     className="w-full py-6 rounded-2xl font-black uppercase text-[11px] tracking-widest shadow-lg shadow-red-500/20"
                   >
-                    Liberar Horário
+                    {t('gestor.schedule.modal.details.release')}
                   </Button>
                 )}
               </div>
@@ -361,9 +371,9 @@ function CourtScheduleModal({ court, isOpen, onClose }: { court: any, isOpen: bo
           isOpen={showReleaseConfirm}
           onClose={() => setShowReleaseConfirm(false)}
           onAction={handleReleaseSlot}
-          title="Liberar Horário"
-          description="Você deseja liberar este horário? Ele voltará a ficar disponível para reserva por qualquer cliente."
-          actionText="Confirmar Liberação"
+          title={t('gestor.schedule.modal.releaseConfirm.title')}
+          description={t('gestor.schedule.modal.releaseConfirm.desc')}
+          actionText={t('gestor.schedule.modal.releaseConfirm.confirm')}
           variant="danger"
           icon={Unlock}
         />
@@ -374,6 +384,7 @@ function CourtScheduleModal({ court, isOpen, onClose }: { court: any, isOpen: bo
 
 // Componente de Card de Quadra
 function CourtCard({ court, onOpenSchedule }: { court: any, onOpenSchedule: () => void }) {
+  const { t } = useTranslation();
   return (
     <div className="group bg-white dark:bg-white/[0.03] border border-gray-100 dark:border-white/[0.06] rounded-[2rem] overflow-hidden hover:shadow-2xl hover:shadow-gray-200/50 dark:hover:shadow-black/40 transition-all duration-500 flex flex-col h-full">
       <div className="relative h-48 overflow-hidden">
@@ -398,14 +409,14 @@ function CourtCard({ court, onOpenSchedule }: { court: any, onOpenSchedule: () =
       <div className="p-6 flex-1 flex flex-col">
         <div className="grid grid-cols-2 gap-4 mb-6">
           <div className="p-3 bg-gray-50 dark:bg-white/5 rounded-2xl border border-gray-100 dark:border-white/5">
-            <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">Horário</p>
+            <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">{t('gestor.schedule.card.time')}</p>
             <p className="text-xs font-black text-gray-900 dark:text-white flex items-center gap-1.5">
               <Clock className="w-3 h-3 text-[#8CE600]" />
               {court.openingHour}h – {court.closingHour}h
             </p>
           </div>
           <div className="p-3 bg-gray-50 dark:bg-white/5 rounded-2xl border border-gray-100 dark:border-white/5">
-            <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">Preço/h</p>
+            <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">{t('gestor.schedule.card.price')}</p>
             <p className="text-xs font-black text-gray-900 dark:text-white flex items-center gap-1.5">
               <span className="text-[#8CE600]">R$</span> {court.hourlyRate || court.price}
             </p>
@@ -417,7 +428,7 @@ function CourtCard({ court, onOpenSchedule }: { court: any, onOpenSchedule: () =
           className="w-full py-6 bg-gray-950 dark:bg-white text-white dark:text-gray-950 rounded-2xl font-black uppercase tracking-widest text-[11px] hover:bg-[#8CE600] dark:hover:bg-[#8CE600] hover:text-gray-950 transition-all group/btn shadow-lg mt-auto"
         >
           <Calendar className="w-4 h-4 mr-2 group-hover/btn:scale-110 transition-transform" />
-          Gerenciar Agenda
+          {t('gestor.schedule.card.manageSchedule')}
           <ArrowRight className="w-4 h-4 ml-2 opacity-0 -translate-x-2 group-hover/btn:opacity-100 group-hover/btn:translate-x-0 transition-all" />
         </Button>
       </div>
@@ -430,11 +441,12 @@ export default function GestorSchedule() {
   const [searchTerm, setSearchTerm] = useState('');
   const { data: pagedData, isLoading } = useManagementCourts({ pageSize: 100 });
   const [selectedCourt, setSelectedCourt] = useState<any | null>(null);
+  const { t } = useTranslation();
 
   const courts = pagedData?.items || [];
   
   const filteredCourts = useMemo(() => {
-    return courts.filter(c => 
+    return courts.filter((c: any) => 
       c.name.toLowerCase().includes(searchTerm.toLowerCase()) || 
       c.sport.toLowerCase().includes(searchTerm.toLowerCase())
     );
@@ -451,13 +463,13 @@ export default function GestorSchedule() {
                 <div className="w-8 h-8 rounded-xl bg-[#8CE600]/10 flex items-center justify-center">
                   <Calendar className="w-4 h-4 text-[#8CE600]" />
                 </div>
-                <span className="text-[10px] font-black uppercase tracking-widest text-gray-500">Gestão de Disponibilidade</span>
+                <span className="text-[10px] font-black uppercase tracking-widest text-gray-500">{t('gestor.schedule.management')}</span>
               </div>
               <h1 className="text-4xl font-black tracking-tight text-gray-900 dark:text-white">
-                Agenda das Quadras
+                {t('gestor.schedule.title')}
               </h1>
               <p className="text-gray-500 dark:text-gray-400 text-sm max-w-lg">
-                Visualize ocupações, confirme reservas pendentes e realize bloqueios estratégicos para manutenção ou uso interno.
+                {t('gestor.schedule.subtitle')}
               </p>
             </div>
 
@@ -466,7 +478,7 @@ export default function GestorSchedule() {
               <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 group-focus-within:text-[#8CE600] transition-colors" />
               <input 
                 type="text" 
-                placeholder="Buscar quadra ou esporte..."
+                placeholder={t('gestor.schedule.searchPlaceholder')}
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="w-full pl-11 pr-4 py-4 bg-gray-100 dark:bg-white/5 border-none rounded-2xl text-sm font-bold text-gray-900 dark:text-white focus:ring-2 focus:ring-[#8CE600] transition-all outline-none"
@@ -489,16 +501,16 @@ export default function GestorSchedule() {
             <div className="w-20 h-20 rounded-3xl bg-gray-100 dark:bg-white/5 flex items-center justify-center mb-6">
               <Building2 className="w-10 h-10 text-gray-300" />
             </div>
-            <h3 className="text-xl font-black text-gray-900 dark:text-white mb-2">Nenhuma quadra encontrada</h3>
+            <h3 className="text-xl font-black text-gray-900 dark:text-white mb-2">{t('gestor.schedule.noCourts')}</h3>
             <p className="text-gray-500 max-w-sm">
               {searchTerm 
-                ? 'Tente ajustar sua busca para encontrar o que procura.' 
-                : 'Você ainda não possui quadras vinculadas para gerenciar a agenda.'}
+                ? t('gestor.schedule.noCourtsDesc') 
+                : t('gestor.schedule.noCourtsDesc')}
             </p>
           </div>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
-            {filteredCourts.map(court => (
+            {filteredCourts.map((court: any) => (
               <CourtCard 
                 key={court.id} 
                 court={court} 

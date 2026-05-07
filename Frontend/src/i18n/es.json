@@ -2,14 +2,37 @@
   "common": {
     "actions": {
       "login": "Entrar",
-      "enter": "Reservar Ahora",
-      "logout": "Cerrar sesión"
-    },
-    "navigation": {
-      "dashboard": "Mi Panel",
-      "courts": "Canchas",
-      "leagues": "Deportes"
+      "register": "Crear Cuenta",
+      "save": "Guardar",
+      "cancel": "Cancelar",
+      "delete": "Eliminar",
+      "edit": "Editar",
+      "view": "Ver",
+      "enter": "Empezar ahora",
+      "logout": "Cerrar sesión",
+      "favorite": "Favorito",
+      "favorited": "Favorito",
+      "addFavorite": "Añadir a favoritos",
+      "removeFavorite": "Eliminar de favoritos",
+      "currency": "$",
+      "perHour": "/h"
     }
+  },
+  "searchWidget": {
+    "location": "Ubicación",
+    "locationPlaceholder": "Seleccionar ciudad",
+    "noCities": "No se encontraron ciudades",
+    "sport": "Deporte",
+    "sportPlaceholder": "¿Qué jugar?",
+    "noSports": "No se encontraron deportes",
+    "date": "Fecha",
+    "datePlaceholder": "¿Cuándo?",
+    "searchBtn": "Buscar ahora",
+    "months": {
+      "0": "Enero", "1": "Febrero", "2": "Marzo", "3": "Abril", "4": "Mayo", "5": "Junio",
+      "6": "Julio", "7": "Agosto", "8": "Septiembre", "9": "Octubre", "10": "Noviembre", "11": "Diciembre"
+    },
+    "weekDays": ["D", "L", "M", "M", "J", "V", "S"]
   },
   "menu": {
     "profile": {
@@ -124,13 +147,244 @@
       },
       {
         "n": "02",
-        "label": "Encuentra canchas en tu zona"
+        "label": "Encuentra canchas en tu región"
       },
       {
         "n": "03",
         "label": "Reserva y juega sin burocracia"
       }
-    ]
+    ],
+    "validation": {
+      "nameMin": "El nombre debe tener al menos 2 caracteres",
+      "lastNameMin": "El apellido debe tener al menos 2 caracteres",
+      "emailInvalid": "Correo electrónico inválido",
+      "passwordMin": "La contraseña debe tener al menos 6 caracteres",
+      "passwordMismatch": "Las contraseñas no coinciden",
+      "genericError": "Ocurrió un error al criar la cuenta."
+    }
+  },
+  "userProfile": {
+    "back": "Volver",
+    "idLabel": "ID del Sistema",
+    "role": {
+      "admin": "Administrador",
+      "manager": "Gestor de Cancha",
+      "athlete": "Atleta"
+    },
+    "sections": {
+      "info": {
+        "title": "Información del Perfil",
+        "subtitle": "Actualice su nombre y dirección de correo"
+      },
+      "security": {
+        "title": "Seguridad",
+        "subtitle": "Cambie su contraseña de acceso"
+      },
+      "notifications": {
+        "title": "Notificaciones",
+        "subtitle": "Elija cómo desea ser notificado"
+      },
+      "quickAccess": {
+        "title": "Acceso Rápido"
+      },
+      "danger": {
+        "title": "Zona de Peligro",
+        "subtitle": "Acciones irreversibles — proceda con cuidado"
+      }
+    },
+    "labels": {
+      "fullName": "Nombre completo",
+      "email": "Correo electrónico",
+      "phone": "Teléfono (Opcional)",
+      "phoneHint": "Solo para contacto si es necesario.",
+      "cpf": "CPF (Opcional)",
+      "cpfHint": "Necesario para realizar reservas.",
+      "emailHint": "Cambiar el correo puede requerir verificación.",
+      "currentPassword": "Contraseña actual",
+      "newPassword": "Nueva contraseña",
+      "confirmPassword": "Confirmar nueva contraseña",
+      "passwordMismatch": "⚠️ Las contraseñas no coinciden.",
+      "deleteAccount": "Eliminar cuenta",
+      "deleteAccountDesc": "Elimina permanentemente su cuenta y todos los datos asociados."
+    },
+    "placeholders": {
+      "fullName": "Su nombre completo",
+      "email": "su@correo.com",
+      "phone": "(00) 00000-0000",
+      "cpf": "000.000.000-00"
+    },
+    "buttons": {
+      "save": "Guardar Cambios",
+      "saving": "Guardando…",
+      "changePassword": "Cambiar Contraseña",
+      "changing": "Cambiando…",
+      "delete": "Eliminar mi cuenta"
+    },
+    "notifications": {
+      "email": {
+        "label": "Correo de confirmación",
+        "desc": "Reciba confirmaciones y recordatorios de reservas por correo"
+      },
+      "sms": {
+        "label": "SMS",
+        "desc": "Alertas vía SMS para su próximo partido"
+      },
+      "promo": {
+        "label": "Promociones y novedades",
+        "desc": "Ofertas exclusivas y novedades de PlayHub"
+      }
+    },
+    "passwordStrength": {
+      "weak": "Débil",
+      "fair": "Regular",
+      "good": "Buena",
+      "strong": "Fuerte",
+      "checks": {
+        "length": "Mínimo 8 caracteres",
+        "upper": "Letra mayúscula",
+        "number": "Número",
+        "special": "Carácter especial"
+      }
+    },
+    "feedbacks": {
+      "nameEmpty": "El nombre no puede estar vacío.",
+      "emailInvalid": "Ingrese un correo válido.",
+      "updateSuccess": "¡Perfil actualizado con éxito!",
+      "updateError": "Error al actualizar perfil. Intente de nuevo.",
+      "currentPassRequired": "Ingrese su contraseña actual.",
+      "newPassLength": "La nueva contraseña debe tener al menos 8 caracteres.",
+      "passMismatch": "Las contraseñas no coinciden.",
+      "passSuccess": "¡Contraseña cambiada con éxito!"
+    },
+    "quickAccessItems": {
+      "reservations": {
+        "label": "Mis Reservas",
+        "desc": "Ver historial y próximas reservas"
+      },
+      "settings": {
+        "label": "Configuraciones",
+        "desc": "Tema, idioma y preferencias"
+      }
+    }
+  },
+  "user": {
+    "dashboard": {
+      "title": "Mis Reservas",
+      "welcome": "Hola, <0>{{name}}</0> — sigue y gestiona tus reservas de canchas.",
+      "stats": {
+        "totalReservations": "Total de Reservas",
+        "confirmed": "Confirmadas",
+        "sports": "Deportes",
+        "totalSpent": "Total Gastado"
+      },
+      "nextReservation": {
+        "badge": "Próxima Reserva",
+        "viewCourt": "Ver Cancha",
+        "cancel": "Cancelar"
+      },
+      "tabs": {
+        "all": "Todas",
+        "upcoming": "Próximas",
+        "completed": "Completadas",
+        "cancelled": "Canceladas"
+      },
+      "searchPlaceholder": "Buscar cancha o deporte…",
+      "noResults": "Ninguna reserva encontrada",
+      "noResultsDesc": "Intenta cambiar el filtro o buscar otro término",
+      "findCourt": "Encontrar una cancha",
+      "table": {
+        "deletedCourt": "Cancha Eliminada",
+        "sport": "Deporte",
+        "locationNotAvailable": "Ubicación no disponible",
+        "evaluate": "Califica esta cancha",
+        "cancel": "Cancelar reserva",
+        "viewCourt": "Ver cancha",
+        "reservationsCount": "{{count}} reserva",
+        "reservationsCount_plural": "{{count}} reservas",
+        "makeNew": "Hacer nueva reserva"
+      },
+      "status": {
+        "confirmed": "Confirmada",
+        "completed": "Completada",
+        "cancelled": "Cancelada",
+        "pending": "Pendiente"
+      },
+      "achievements": {
+        "title": "Logros",
+        "firstGame": {
+          "label": "Primer Juego",
+          "desc": "1ª reserva realizada"
+        },
+        "regular": {
+          "label": "Frecuente",
+          "desc": "5 reservas confirmadas"
+        },
+        "reviewer": {
+          "label": "Evaluador",
+          "desc": "3 evaluaciones enviadas"
+        },
+        "dedicated": {
+          "label": "Dedicado",
+          "desc": "10 reservas en el mes"
+        }
+      },
+      "cta": {
+        "title": "Explora más canchas",
+        "desc": "Más de 50 canchas premium en todo el país esperando tu próximo partido.",
+        "button": "Ver Catálogo Completo"
+      }
+    },
+    "favorites": {
+      "collection": "Mi Colección",
+      "title": "Canchas <span class=\"text-[#8CE600]\">Favoritas</span>",
+      "subtitle": {
+        "withItems": "Has seleccionado {{count}} arena increíble para tu próximo juego.",
+        "withItems_plural": "Has seleccionado {{count}} arenas increíbles para tu próximo juego.",
+        "empty": "Tu lista de deseos está lista para ser llenada con las mejores arenas de la región."
+      },
+      "stats": {
+        "totalSaved": "Total Guardado"
+      },
+      "view": {
+        "grid": "Vista de Cuadrícula",
+        "exploreMore": "Explorar Más"
+      },
+      "empty": {
+        "title": "Tu colección está vacía",
+        "desc": "Encuentra las mejores canchas y arenas. Toca el corazón para guardarlas aquí y facilitar tu próxima reserva.",
+        "button": "Explorar Catálogo"
+      },
+      "card": {
+        "status": {
+          "available": "Disponible",
+          "busy": "Ocupada",
+          "closed": "Cerrada"
+        },
+        "priceLabel": "Valor Hora",
+        "book": "Reservar"
+      }
+    },
+    "sidebar": {
+      "sections": {
+        "general": "General",
+        "explore": "Explorar",
+        "account": "Cuenta"
+      },
+      "items": {
+        "dashboard": "Panel",
+        "myBookings": "Mis Reservas",
+        "courts": "Canchas",
+        "favorites": "Favoritos",
+        "reviews": "Reseñas",
+        "profile": "Perfil",
+        "notifications": "Notificaciones",
+        "settings": "Ajustes"
+      },
+      "role": "Atleta",
+      "logout": "Cerrar Sesión",
+      "expand": "Expandir barra lateral",
+      "collapse": "Contraer barra lateral"
+    }
   },
   "index": {
     "marquee": {
@@ -142,10 +396,15 @@
       "item6": "SOPORTE 24/7"
     },
     "sports": {
-      "title": "Modalidades Destacadas",
-      "subtitle": "Elige tu deporte y mira las canchas disponibles ahora.",
-      "viewAll": "Ver todas",
-      "bookNow": "Reservar →",
+      "title": "Modalidades",
+      "subtitle": "Encuentra el deporte perfecto para tu próximo partido.",
+      "viewAll": "Ver todas las modalidades"
+    },
+    "featuredCourts": {
+      "title": "Canchas Destacadas",
+      "subtitle": "Espacios premium seleccionados con infraestructura completa.",
+      "viewAll": "Ver todas las canchas",
+      "reserve": "Reservar →",
       "perHour": " / hora"
     },
     "hero": {
@@ -374,7 +633,13 @@
     "bookingSuccess": "Tu reserva en",
     "bookingSuccessSuffix": "se realizó con éxito. Recibirás un correo electrónico de confirmación en breve.",
     "goToHome": "Ir al inicio",
-    "viewCatalog": "Ver catálogo"
+    "viewCatalog": "Ver catálogo",
+    "cpfModal": {
+      "title": "Acción Requerida",
+      "description": "Para garantizar la seguridad de todos, es obligatorio tener el CPF registrado para realizar una reserva.",
+      "completeProfile": "Completar Perfil",
+      "cancel": "Cancelar"
+    }
   },
   "confirmation": {
     "eyebrow": "¡Casi listo!",
@@ -487,6 +752,84 @@
     }
   },
   "admin": {
+    "sidebar": {
+      "main": "Principal",
+      "management": "Gestión",
+      "system": "Sistema",
+      "dashboard": "Dashboard",
+      "reports": "Informes",
+      "activity": "Actividad",
+      "users": "Usuarios",
+      "courts": "Canchas",
+      "bookings": "Reservas",
+      "payments": "Pagos",
+      "logs": "Logs",
+      "notifications": "Notificaciones",
+      "settings": "Configuración",
+      "role": "Administrador",
+      "logout": "Salir",
+      "lightTheme": "Cambiar a tema claro",
+      "darkTheme": "Cambiar a tema oscuro",
+      "expand": "Expandir barra lateral",
+      "collapse": "Contraer barra lateral"
+    },
+    "dashboard": {
+      "greeting": "Hola, {{name}}",
+      "adminBadge": "Administrador",
+      "viewSite": "Ver sitio",
+      "kpi": {
+        "users": "Usuarios Registrados",
+        "courts": "Canchas Registradas",
+        "reservations": "Total de Reservas",
+        "revenue": "Ingresos Totales"
+      },
+      "alerts": {
+        "pendingPayments": "{{count}} pagos en espera de confirmación",
+        "pendingReservations": "{{count}} reservas pendientes de aprobación",
+        "noAlerts": "Sin alertas activas en este momento"
+      },
+      "revenueChart": "Ingresos por Cancha",
+      "revenueDesc": "Rendimiento financiero acumulado",
+      "viewAllCourts": "Ver todas",
+      "paymentBreakdown": "Pagos por Estado",
+      "paymentApproved": "Aprobados",
+      "paymentPending": "Pendientes",
+      "paymentFailed": "Fallidos / Revertidos",
+      "reservationStatus": "Reservas por Estado",
+      "resConfirmed": "Confirmadas",
+      "resPending": "Pendientes",
+      "resCancelled": "Canceladas",
+      "resCompleted": "Completadas",
+      "topCourts": "Top Canchas",
+      "topCourtsDesc": "Por ingresos generados",
+      "recentActivity": "Actividad Reciente",
+      "recentReservations": "Últimas Reservas",
+      "recentUsers": "Nuevos Usuarios",
+      "viewAll": "Ver todos",
+      "quickActions": "Acciones Rápidas",
+      "addCourt": "Añadir Cancha",
+      "createManager": "Crear Gestor",
+      "generateReport": "Generar Informe",
+      "managePayments": "Gestionar Pagos",
+      "id": "ID",
+      "user": "Usuario",
+      "court": "Cancha",
+      "schedule": "Horario",
+      "value": "Valor",
+      "status": "Estado",
+      "role": "Perfil",
+      "joinedAt": "Registrado",
+      "reservations": "reservas",
+      "athlete": "Atleta",
+      "manager": "Gestor",
+      "noReservations": "No se encontraron reservas.",
+      "noUsers": "No se encontraron usuarios.",
+      "systemHealth": "Salud del Sistema",
+      "confirmedRate": "Tasa de Confirmación",
+      "paymentRate": "Tasa de Pago",
+      "avgTicket": "Ticket Promedio",
+      "occupancyRate": "Tasa de Ocupación"
+    },
     "activities": {
       "title": "Actividades",
       "subtitle": "Historial reciente de acciones y eventos en la plataforma.",
@@ -537,7 +880,427 @@
         "status": "Estado",
         "value": "Valor",
         "court": "Cancha"
+      },
+      "dashboard": {
+        "viewAll": "Ver todo",
+        "resConfirmed": "Confirmada",
+        "resPending": "Pendiente",
+        "role": {
+          "admin": "Admin",
+          "manager": "Gestor",
+          "athlete": "Atleta"
+        }
+      },
+      "users": {
+        "title": "Gestión de Usuarios",
+        "subtitle": "Gestione perfiles, permisos y asociaciones de canchas en la plataforma.",
+        "newUser": "Nuevo Usuario",
+        "searchPlaceholder": "Buscar por nombre o correo...",
+        "rolePlaceholder": "Papel",
+        "allRoles": "Todos los Papeles",
+        "noUsers": "No se encontraron usuarios",
+        "noUsersDesc": "Intente ajustar sus filtros o cree un nuevo usuario.",
+        "stats": {
+          "total": "Total de Usuarios",
+          "admins": "Administradores",
+          "managers": "Gestores de Arena",
+          "athletes": "Usuarios Comunes"
+        },
+        "table": {
+          "user": "Usuario",
+          "email": "Correo",
+          "role": "Papel",
+          "courts": "Canchas Assoc.",
+          "joined": "Registro"
+        },
+        "modals": {
+          "errorTitle": "Error",
+          "updateErrorMessage": "Ocurrió un problema al intentar guardar los cambios del usuario.",
+          "createErrorMessage": "Ocurrió un problema al intentar registrar al nuevo usuario.",
+          "deleteSuccessTitle": "Usuario Eliminado",
+          "deleteSuccessMessage": "El usuario ha sido eliminado permanentemente de la plataforma.",
+          "deleteErrorMessage": "No se pudo eliminar a este usuario en este momento."
+        },
+        "toasts": {
+          "updateSuccess": "¡Usuario actualizado con éxito!",
+          "updateError": "Error al actualizar usuario.",
+          "createSuccess": "¡Usuario creado con éxito!",
+          "createError": "Error al crear usuario.",
+          "deleteSuccess": "¡Usuario eliminado con éxito!",
+          "deleteError": "Error al eliminar usuario."
+        }
+      },
+      "settings": {
+        "title": "Configuraciones del Sistema",
+        "subtitle": "Ajuste los parámetros globales de la plataforma y las preferencias del panel.",
+        "save": "Guardar Cambios",
+        "saving": "Guardando...",
+        "saveSuccess": "¡Configuraciones guardadas con éxito!",
+        "statusModal": {
+          "loadingTitle": "Guardando Configuraciones",
+          "loadingMsg": "Espere un momento mientras aplicamos las nuevas directrices al sistema.",
+          "successTitle": "Configuraciones Guardadas",
+          "successMsg": "¡Todo listo! Los cambios se han aplicado correctamente en toda la plataforma."
+        },
+        "sections": {
+          "general": {
+            "title": "Información Básica",
+            "subtitle": "Datos principales de la plataforma",
+            "siteName": "Nombre de la Plataforma",
+            "currency": "Moneda Predeterminada",
+            "supportEmail": "Correo de Soporte"
+          },
+          "notifications": {
+            "title": "Notificaciones",
+            "subtitle": "Alertas del sistema",
+            "email": "Correos Transaccionales",
+            "emailDesc": "Enviar confirmaciones de reserva e alertas por correo.",
+            "sms": "Alertas por SMS / WhatsApp",
+            "smsDesc": "Notificar a los jugadores por móvil. (Requiere integración)."
+          },
+          "appearance": {
+            "title": "Apariencia",
+            "subtitle": "Tema del panel",
+            "light": "Claro",
+            "dark": "Oscuro"
+          },
+          "danger": {
+            "title": "Zona de Riesgo",
+            "subtitle": "Acciones críticas",
+            "maintenance": "Modo de Mantenimiento",
+            "maintenanceDesc": "Bloquea el acceso a usuarios regulares. Solo los administradores pueden entrar al sistema.",
+            "clearCache": "Limpiar Caché"
+          },
+          "profile": {
+            "title": "Mi Perfil (Admin)",
+            "subtitle": "Sus datos personales de acceso",
+            "phone": "Teléfono",
+            "cpf": "CPF"
+          }
       }
+    }
+  }
+},
+  "gestor": {
+    "sidebar": {
+      "main": "Principal",
+      "dashboard": "Dashboard",
+      "reports": "Informes",
+      "myCourts": "Mis Canchas",
+      "courts": "Canchas",
+      "reservations": "Reservas",
+      "schedule": "Horarios",
+      "clients": "Clientes",
+      "financial": "Financiero",
+      "payments": "Pagos",
+      "notifications": "Notificaciones",
+      "settings": "Configuración",
+      "role": "Gestor de Cancha",
+      "lightTheme": "Tema claro",
+      "darkTheme": "Tema oscuro",
+      "logout": "Salir"
+    },
+    "dashboard": {
+      "greeting": "Panel del Gestor, {{name}} 🏟️",
+      "managerBadge": "Gestor",
+      "newCourt": "Nueva Cancha",
+      "stats": {
+        "managedCourts": "Canchas Gestionadas",
+        "reservationsMonth": "Reservas este Mes",
+        "uniqueClients": "Clientes Únicos",
+        "monthlyRevenue": "Ingresos Mensuales"
+      },
+      "myCourts": "Mis Canchas",
+      "manage": "Gestionar",
+      "courtStatus": {
+        "active": "Activa",
+        "maintenance": "Mantenimiento",
+        "inactive": "Inactiva"
+      },
+      "actions": {
+        "blockTime": "Bloquear horario",
+        "viewRequests": "Ver solicitudes",
+        "editCourt": "Editar cancha"
+      },
+      "reservationsPerMonth": "Reservas/mes",
+      "revenue": "Ingresos",
+      "tabs": {
+        "recentReservations": "Reservas Recientes",
+        "todaysSchedule": "Agenda de Hoy"
+      },
+      "table": {
+        "id": "ID",
+        "client": "Cliente",
+        "court": "Cancha",
+        "time": "Horario",
+        "value": "Valor",
+        "status": "Estado"
+      },
+      "viewAll": "Ver todas",
+      "revenueByCourt": "Ingresos por Cancha",
+      "todaySummary": "Resumen de Hoy",
+      "todayStats": {
+        "reservations": "Reservas hoy",
+        "revenue": "Ingresos hoy",
+        "clients": "Clientes hoy"
+      },
+      "quickActions": "Acciones Rápidas",
+      "quickActionsDesc": "Gestione sus canchas con agilidad"
+    },
+    "schedule": {
+      "title": "Agenda de Canchas",
+      "subtitle": "Visualice ocupaciones, confirme reservas pendientes y realice bloqueos estratégicos para mantenimiento o uso interno.",
+      "management": "Gestión de Disponibilidad",
+      "searchPlaceholder": "Buscar cancha o deporte...",
+      "loading": "Cargando horarios...",
+      "noCourts": "Ninguna cancha encontrada",
+      "noCourtsDesc": "Intente ajustar su búsqueda o aún no tiene canchas vinculadas.",
+      "card": {
+        "time": "Horario",
+        "price": "Precio/h",
+        "manageSchedule": "Gestionar Agenda"
+      },
+      "modal": {
+        "officialSchedule": "Agenda Oficial",
+        "manageAvailability": "Gestione la disponibilidad y visualice las reservas en tiempo real.",
+        "modality": "Modalidad",
+        "selectedDay": "Día Seleccionado",
+        "status": {
+          "free": "Libre",
+          "occupied": "Ocupado",
+          "blocked": "Bloqueado"
+        },
+        "blockConfirm": {
+          "title": "Bloquear Horario",
+          "desc": "¿Desea bloquear el horario de las {{start}}:00 a las {{end}}:00 para mantenimiento o uso interno?",
+          "confirm": "Confirmar Bloqueo"
+        },
+        "details": {
+          "blockedTitle": "Horario Bloqueado",
+          "reservedTitle": "Detalles de la Reserva",
+          "opInfo": "Información Operativa",
+          "time": "Horario",
+          "status": "Estado",
+          "client": "Cliente",
+          "internalUse": "Uso Interno",
+          "responsible": "Responsable de la ocupación",
+          "reservationId": "ID de Reserva:",
+          "totalValue": "Valor Total:",
+          "close": "Cerrar Detalles",
+          "release": "Liberar Horario"
+        },
+        "releaseConfirm": {
+          "title": "Liberar Horario",
+          "desc": "¿Desea liberar este horario? Volverá a estar disponible para reserva por cualquier cliente.",
+          "confirm": "Confirmar Liberación"
+        },
+        "warning": "Los cambios en la agenda son permanentes. Los bloqueos impiden que nuevos clientes reserven estos horarios."
+      }
+    },
+    "courts": {
+      "title": "Gestión de Canchas",
+      "subtitle": "Cree, edite y siga el rendimiento de sus canchas.",
+      "management": "Mis Canchas",
+      "searchPlaceholder": "Buscar cancha...",
+      "addCourt": "Nueva Cancha",
+      "noCourts": "Ninguna cancha encontrada",
+      "noCourtsDesc": "Aún no tiene canchas o la búsqueda no encontró resultados.",
+      "table": {
+        "court": "Cancha",
+        "location": "Ubicación",
+        "sport": "Modalidad",
+        "price": "Precio/h",
+        "status": "Estado",
+        "actions": "Acciones"
+      },
+      "stats": {
+        "total": "Total de Canchas",
+        "active": "Canchas Activas",
+        "occupancy": "Tasa de Ocupación",
+        "maintenance": "En Mantenimiento"
+      },
+      "form": {
+        "newTitle": "Nueva Cancha",
+        "newSubtitle": "Complete los detalles para registrar una nueva cancha",
+        "editTitle": "Editar Cancha",
+        "editSubtitle": "Cambie la configuración de la cancha seleccionada",
+        "tabs": {
+          "general": "Información",
+          "location": "Ubicación",
+          "features": "Deportes y Extras",
+          "media": "Medios y Galería",
+          "availability": "Disponibilidad"
+        },
+        "name": "Nombre de la Arena",
+        "type": "Modalidad Principal",
+        "price": "Precio por Hora (R$)",
+        "capacity": "Capacidad (Jugadores)",
+        "description": "Descripción Detallada",
+        "descPlaceholder": "Describa los puntos destacados de su cancha...",
+        "badge": "Distintivo / Destaque",
+        "status": "Estado de la Cancha",
+        "location": "Dirección Completa",
+        "neighborhood": "Barrio",
+        "city": "Ciudad",
+        "state": "Estado",
+        "features": "Seleccione las comodidades ofrecidas",
+        "sportsTitle": "Modalidades y Deportes",
+        "extrasTitle": "Comodidades (Extras)",
+        "newAmenity": "Nueva comodidad...",
+        "galleryTitle": "Galería de Imágenes",
+        "upload": "Subir",
+        "noImages": "Aún no se han subido imágenes.",
+        "hoursTitle": "Horarios de Funcionamiento",
+        "default8": "Estándar 08h-22h",
+        "total6": "Total 06h-23h",
+        "closedState": "Cerrado",
+        "openState": "Abierto",
+        "openingPrefix": "Apertura:",
+        "closingPrefix": "Cierre:",
+        "uploadImage": "Subir Imagen",
+        "uploadHint": "Formatos soportados: JPG, PNG. Máx 5MB.",
+        "openingHour": "Apertura (Hora)",
+        "closingHour": "Cierre (Hora)",
+        "discard": "Descartar",
+        "saveChanges": "Guardar Cambios",
+        "createCourt": "Crear Arena",
+        "saving": "Guardando..."
+      },
+      "deleteConfirm": {
+        "title": "Eliminar Cancha",
+        "desc": "¿Está seguro de que desea eliminar esta cancha? Esta acción no se puede deshacer y todas las reservas futuras se verán afectadas.",
+        "confirm": "Eliminar Definitivamente",
+        "cancel": "Cancelar"
+      },
+      "allTypes": "Todos los Tipos",
+      "allStatuses": "Todos los Estados",
+      "type": "Tipo",
+      "active": "Activa",
+      "maintenance": "Mantenimiento",
+      "closed": "Cerrada",
+      "edit": "Editar",
+      "delete": "Eliminar",
+      "noResults": "Ninguna cancha encontrada",
+      "clients": {
+        "lastVisit": "Última Visita",
+        "noResults": "Ningún cliente encontrado",
+        "deletedUser": "Usuario Eliminado",
+        "notInformed": "No informado"
+      }
+    },
+    "reservations": {
+      "title": "Reservas",
+      "subtitle": "Gestione todas las reservas realizadas en sus canchas.",
+      "searchPlaceholder": "Buscar por cliente o ID...",
+      "allCourts": "Todas las Canchas",
+      "allStatuses": "Todos los Estados",
+      "noResults": "No se encontraron reservas.",
+      "cancelReservation": "Cancelar Reserva",
+      "cancelConfirm": {
+        "title": "¿Cancelar Reserva?",
+        "desc": "¿Realmente desea cancelar esta reserva? El cliente será notificado.",
+        "confirm": "Sí, Cancelar"
+      },
+      "cancelSuccess": "¡Reserva cancelada con éxito!",
+      "cancelError": "Error al cancelar la reserva.",
+      "table": {
+        "id": "ID",
+        "client": "Cliente",
+        "court": "Cancha",
+        "date": "Fecha y Hora",
+        "price": "Precio",
+        "status": "Estado",
+        "actions": "Acciones"
+      }
+      },
+      "settings": {
+        "title": "Configuración de la Cuenta",
+        "subtitle": "Gestione su perfil y preferencias de notificación.",
+        "profile": {
+          "title": "Perfil",
+          "name": "Nombre Completo",
+          "email": "Correo electrónico",
+          "phone": "Teléfono",
+          "cpf": "CPF"
+        },
+        "preferences": {
+          "title": "Preferencias",
+          "emailNotif": "Notificaciones por Correo",
+          "emailNotifDesc": "Reciba actualizaciones sobre reservas en su correo",
+          "pushNotif": "Notificaciones Push",
+          "pushNotifDesc": "Alertas instantáneas en el navegador",
+          "theme": "Tema del Sistema"
+        },
+        "save": "Guardar Cambios",
+        "saving": "Guardando...",
+        "saveSuccess": "¡Configuraciones guardadas con éxito!"
+    }
+  },
+  "privacy": {
+    "title": "Política de Privacidad",
+    "lastUpdate": "Última actualización: 30 de abril de 2026",
+    "sections": {
+      "collection": {
+        "title": "1. Recopilación de Información",
+        "text": "Recopilamos información que nos proporciona directamente, como cuando crea una cuenta, actualiza su perfil, usa las funciones interactivas de nuestros servicios o se comunica con nosotros. Los tipos de información que podemos recopilar incluyen su nombre, dirección de correo electrónico, número de teléfono e información de pago."
+      },
+      "usage": {
+        "title": "2. Uso de la Información",
+        "text": "Utilizamos la información que recopilamos para proporcionar, mantener y mejorar nuestros servicios, procesar transacciones, enviar avisos técnicos, actualizaciones, alertas de seguridad y mensajes administrativos, así como para responder a sus comentarios y preguntas."
+      },
+      "sharing": {
+        "title": "3. Intercambio de Información",
+        "text": "Podemos compartir su información con socios que administran las canchas para facilitar sus reservas. No vendemos, alquilamos ni compartimos su información personal con terceros para fines de marketing sin su consentimiento explícito."
+      },
+      "security": {
+        "title": "4. Seguridad",
+        "text": "Tomamos medidas razonables para ayudar a proteger la información sobre usted contra pérdida, robo, uso indebido, acceso no autorizado, divulgación, alteración y destrucción. Sin embargo, recuerde que ningún sistema de transmisión o almacenamiento de datos en Internet es 100% seguro."
+      }
+    }
+  },
+  "terms": {
+    "title": "Términos de Uso",
+    "lastUpdate": "Última actualización: 30 de abril de 2026",
+    "sections": {
+      "acceptance": {
+        "title": "1. Aceptación de los Términos",
+        "text": "Al acceder y utilizar la plataforma PlayHub, acepta cumplir y estar sujeto a estos Términos de Uso. Si no está de acuerdo con alguna parte de estos términos, no debe utilizar nuestros servicios."
+      },
+      "usage": {
+        "title": "2. Uso de la Plataforma",
+        "text": "Acepta utilizar la plataforma solo para fines legales y de una manera que no infrinja los derechos de terceros o restrinja el uso de la plataforma por parte de cualquier otra persona."
+      },
+      "bookings": {
+        "title": "3. Reservas y Cancelaciones",
+        "text": "Las políticas de reserva y cancelación son establecidas por cada administrador de la cancha deportiva. PlayHub actúa únicamente como intermediario en la reserva."
+      },
+      "liability": {
+        "title": "4. Limitación de Responsabilidad",
+        "text": "PlayHub no es responsable de los daños directos, indirectos, incidentales o consecuentes que resulten del uso o la incapacidad de usar nuestros servicios."
+      }
+    }
+  },
+  "errorBoundary": {
+    "title": "¡Vaya! Algo salió mal.",
+    "description": "Encontramos un error inesperado al cargar la aplicación. Nuestro equipo ha sido notificado.",
+    "retry": "Intentar de nuevo"
+  },
+  "sports": {
+    "soccerSociety": "Fútbol Society",
+    "beachTennis": "Tenis de Playa",
+    "beachVolleyball": "Voleibol de Playa",
+    "basketball": "Baloncesto",
+    "futsal": "Futsal",
+    "padel": "Pádel",
+    "tennis": "Tenis",
+    "handball": "Balonmano",
+    "volleyball": "Voleibol de Cancha",
+    "footvolley": "Fútbol Tenis",
+    "tags": {
+      "popular": "Más Popular",
+      "trending": "En Tendencia",
+      "classic": "Clásico",
+      "featured": "Destacado"
     }
   }
 }

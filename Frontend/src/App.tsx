@@ -7,7 +7,8 @@ import { ThemeProvider } from '@/components/ui/theme-provider';
 import { useAuthStore } from '@/data/useAuthStore';
 import { Toaster } from '@/components/ui/sonner';
 
-// --- Pages (Lazy Loaded) ---
+import { useSignalR } from '@/hooks/useSignalR';
+
 const Index = lazy(() => import('@/pages/Index').then(m => ({ default: m.Index })));
 const Catalog = lazy(() => import('@/pages/Catalog'));
 const Contact = lazy(() => import('@/pages/Contact'));
@@ -21,7 +22,6 @@ const Privacy = lazy(() => import('@/pages/Privacy'));
 const BookingConfirmation = lazy(() => import('@/pages/BookingConfirmation'));
 const MyBookings = lazy(() => import('@/pages/MyBookings'));
 
-// --- Dashboards ---
 const AdminDashboard = lazy(() => import('@/pages/admin/AdminDashboard'));
 const AdminActivities = lazy(() => import('@/pages/admin/AdminActivities'));
 const AdminReport = lazy(() => import('@/pages/admin/AdminReport'));
@@ -35,17 +35,21 @@ const AdminLogs = lazy(() => import('@/pages/admin/AdminLogs'));
 const AdminNotification = lazy(() => import('@/pages/admin/AdminNotification'));
 const GestorDashboard = lazy(() => import('@/pages/gestor/GestorDashboard'));
 const GestorSchedule = lazy(() => import('@/pages/gestor/GestorSchedule'));
+const GestorReservations = lazy(() => import('@/pages/gestor/GestorReservations'));
+const GestorReports = lazy(() => import('@/pages/gestor/GestorReports'));
+const GestorClients = lazy(() => import('@/pages/gestor/GestorClients'));
+const GestorPayments = lazy(() => import('@/pages/gestor/GestorPayments'));
+const GestorNotifications = lazy(() => import('@/pages/gestor/GestorNotifications'));
+const GestorSettings = lazy(() => import('@/pages/gestor/GestorSettings'));
 const UserDashboard = lazy(() => import('@/pages/user/UserDashboard'));
 const UserProfile = lazy(() => import('@/pages/user/UserProfile'));
 const UserFavorites = lazy(() => import('@/pages/user/UserFavorites'));
 const ConfigUser = lazy(() => import('@/ConfigUser').then(m => ({ default: m.ConfigUser })));
 
-// --- Layouts ---
 const LazyUserLayout = lazy(() => import('@/pages/user/UserLayout'));
 const LazyGestorLayout = lazy(() => import('@/pages/gestor/GestorLayout'));
 const LazyAdminLayout = lazy(() => import('@/pages/admin/AdminLayout'));
 
-// --- Utilities ---
 const ScrollToTop = () => {
   const { pathname } = useLocation();
   useEffect(() => { window.scrollTo(0, 0); }, [pathname]);
@@ -98,7 +102,9 @@ function UserLayoutShell() { return <Suspense fallback={<PageLoader />}><LazyUse
 function GestorLayoutShell() { return <Suspense fallback={<PageLoader />}><LazyGestorLayout /></Suspense>; }
 function AdminLayoutShell() { return <Suspense fallback={<PageLoader />}><LazyAdminLayout /></Suspense>; }
 
-export function App() {
+export default function App() {
+  useSignalR();
+
   return (
     <ThemeProvider defaultTheme="light" storageKey="playhub-theme">
       <QueryClientProvider client={queryClient}>
@@ -107,7 +113,6 @@ export function App() {
           <GlobalAuthListener />
           <Suspense fallback={<PageLoader />}>
             <Routes>
-              {/* Public */}
               <Route path="/" element={<Index />} />
               <Route path="/catalog" element={<Catalog />} />
               <Route path="/about" element={<About />} />
@@ -120,7 +125,6 @@ export function App() {
               <Route path="/privacy" element={<Privacy />} />
               <Route path="/booking/confirm" element={<BookingConfirmation />} />
 
-              {/* User */}
               <Route element={<ProtectedRoute />}>
                 <Route element={<UserLayoutShell />}>
                   <Route path="/my-bookings" element={<MyBookings />} />
@@ -131,17 +135,21 @@ export function App() {
                 <Route path="/config" element={<ConfigUser />} />
               </Route>
 
-              {/* Manager/Admin */}
               <Route element={<RoleProtectedRoute allowedRoles={["Manager", "Admin"]} />}>
                 <Route element={<GestorLayoutShell />}>
                   <Route path="/lz_gestor/dashboard" element={<GestorDashboard />} />
                   <Route path="/lz_gestor/courts" element={<GestorCourt />} />
                   <Route path="/lz_gestor/schedule" element={<GestorSchedule />} />
+                  <Route path="/lz_gestor/reservations" element={<GestorReservations />} />
+                  <Route path="/lz_gestor/reports" element={<GestorReports />} />
+                  <Route path="/lz_gestor/clients" element={<GestorClients />} />
+                  <Route path="/lz_gestor/payments" element={<GestorPayments />} />
+                  <Route path="/lz_gestor/notifications" element={<GestorNotifications />} />
+                  <Route path="/lz_gestor/settings" element={<GestorSettings />} />
                 </Route>
 
               </Route>
 
-              {/* Admin Only */}
               <Route element={<RoleProtectedRoute allowedRoles={["Admin"]} />}>
                 <Route element={<AdminLayoutShell />}>
                   <Route path="/lz_admin/dashboard" element={<AdminDashboard />} />
@@ -157,7 +165,6 @@ export function App() {
                 </Route>
               </Route>
 
-              {/* Fallback */}
               <Route path="*" element={<Navigate to="/" replace />} />
             </Routes>
           </Suspense>

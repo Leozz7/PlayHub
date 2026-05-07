@@ -12,6 +12,9 @@ import { usePlayHubToast } from '@/hooks/usePlayHubToast';
 import { FavoriteButton } from '@/components/FavoriteButton';
 import { useCourt, useCourtReviews, useSubmitReview } from '@/features/courts/hooks/useCourts';
 import { useCourtAvailability } from '@/features/courts/hooks/useCourtAvailability';
+import { useQueryClient } from '@tanstack/react-query';
+import { signalRService } from '@/lib/signalr';
+
 import { Court } from './CatalogData';
 
 const ClockIcon    = () => <Clock className="w-4 h-4 text-[#8CE600]" strokeWidth={1.5} />;
@@ -179,10 +182,43 @@ export default function CourtsDetails() {
     const [reviewHover,  setReviewHover]  = useState(0);
     const [reviewText,   setReviewText]   = useState('');
     const [isReviewsModalOpen, setIsReviewsModalOpen] = useState(false);
+    const [isCpfModalOpen, setIsCpfModalOpen] = useState(false);
     const phToast = usePlayHubToast();
 
     const { data: reviews = [], isLoading: isReviewsLoading } = useCourtReviews(id || '');
     const submitReview = useSubmitReview(id || '');
+    const queryClient = useQueryClient();
+
+    // Ouvir atualizações em tempo real do SignalR
+    useEffect(() => {
+        const connection = signalRService.connection;
+        if (!connection) return;
+
+        const handleReservationCreated = (data: { courtId: string, startTime: string }) => {
+            if (data.courtId === id) {
+                // Invalidamos a busca de disponibilidade
+                queryClient.invalidateQueries({ queryKey: ['courtAvailability', id] });
+
+                // Verificamos se o horário reservado conflita com a seleção atual
+                // Convertemos a string ISO para data e pegamos a hora
+                const reservedHour = new Date(data.startTime).getUTCHours();
+                
+                setSelectedSlots(prev => {
+                    if (prev.includes(reservedHour)) {
+                        phToast.error(t('details.slotTakenWarning', "Este horário acabou de ser reservado por outro usuário!"));
+                        return prev.filter(h => h !== reservedHour);
+                    }
+                    phToast.info(t('details.realTimeUpdate', "A disponibilidade da quadra foi atualizada."));
+                    return prev;
+                });
+            }
+        };
+
+        connection.on("ReservationCreated", handleReservationCreated);
+        return () => {
+            connection.off("ReservationCreated", handleReservationCreated);
+        };
+    }, [id, queryClient, phToast]);
 
     const alreadyReviewed = useMemo(() => {
         if (!user || reviews.length === 0) return false;
@@ -273,6 +309,12 @@ export default function CourtsDetails() {
 
     function handleBook() {
         if (!court) return;
+
+        if (isAuthenticated && user && !user.cpf) {
+            setIsCpfModalOpen(true);
+            return;
+        }
+
         navigate('/booking/confirm', {
             state: {
                 court: {
@@ -617,7 +659,15 @@ export default function CourtsDetails() {
                                         </div>
                                     ) : (
                                         hours.map(hour => {
-                                            const status: SlotStatus = selectedSlots.includes(hour) ? 'selected' : busySlots.includes(hour) ? 'busy' : 'available';
+                                            const isBusy = busySlots.includes(hour);
+                                            const isSelected = selectedSlots.includes(hour);
+                                            
+                                            // Se o horário ficou ocupado enquanto estava selecionado, removemos da seleção
+                                            if (isBusy && isSelected) {
+                                                setSelectedSlots(prev => prev.filter(h => h !== hour));
+                                            }
+
+                                            const status: SlotStatus = isBusy ? 'busy' : isSelected ? 'selected' : 'available';
                                             return (
                                                 <TimeSlot key={hour} hour={hour} status={status} onClick={() => toggleSlot(hour)} />
                                             );
@@ -798,15 +848,15 @@ export default function CourtsDetails() {
                                                             <div className="flex items-center gap-2.5">
                                                                 <div className="w-8 h-8 rounded-xl bg-[#8CE600] text-gray-950 flex items-center justify-center text-[11px] font-black shrink-0">{r.userInitials}</div>
                                                                 <div>
-                                                                    <p className="font-bold text-sm text-gray-900 dark:text-white leading-tight">{r.userName}</p>
-                                                                    <p className="text-[10px] text-gray-400">
+                                                                    <p className="font-bold text-sm text-gray-900 dark:text-white">{r.userName}</p>
+                                                                    <p className="text-[10px] text-gray-500 dark:text-gray-400">
                                                                         {format(new Date(r.createdAt), "dd 'de' MMM yyyy", { locale: ptBR })}
                                                                     </p>
                                                                 </div>
                                                             </div>
                                                             <div className="flex gap-0.5">
                                                                 {[1,2,3,4,5].map(n => (
-                                                                    <Star key={n} className="w-3 h-3" fill={n <= r.rating ? '#8CE600' : 'none'} stroke={n <= r.rating ? '#8CE600' : 'currentColor'} strokeWidth={1.5} />
+                                                                    <Star key={n} className="w-3.5 h-3.5" fill={n <= r.rating ? '#8CE600' : 'none'} stroke={n <= r.rating ? '#8CE600' : 'currentColor'} strokeWidth={1.5} />
                                                                 ))}
                                                             </div>
                                                         </div>
@@ -817,6 +867,40 @@ export default function CourtsDetails() {
                                         </div>
                                     </div>
                                 )}
+
+                                {/* CPF Modal */}
+                                {isCpfModalOpen && (
+                                    <div className="fixed inset-0 z-[200] flex items-center justify-center p-4">
+                                        <div
+                                            className="absolute inset-0 bg-black/60 backdrop-blur-sm"
+                                            onClick={() => setIsCpfModalOpen(false)}
+                                        />
+                                        <div className="relative z-10 w-full max-w-sm flex flex-col bg-white dark:bg-background rounded-3xl border border-gray-100 dark:border-white/10 shadow-2xl p-6 text-center animate-in zoom-in-95 duration-200">
+                                            <div className="w-16 h-16 mx-auto bg-amber-100 dark:bg-amber-900/30 text-amber-600 dark:text-amber-400 rounded-full flex items-center justify-center mb-4">
+                                                <Shield className="w-8 h-8" />
+                                            </div>
+                                            <h2 className="text-xl font-black tracking-tight text-gray-900 dark:text-white mb-2">{t('details.cpfModal.title')}</h2>
+                                            <p className="text-sm text-gray-600 dark:text-gray-400 mb-6">
+                                                {t('details.cpfModal.description')}
+                                            </p>
+                                            <div className="flex flex-col gap-2">
+                                                <button
+                                                    onClick={() => navigate('/lz_user/profile')}
+                                                    className="w-full py-3 rounded-xl font-black text-sm uppercase tracking-widest bg-[#8CE600] text-gray-950 hover:bg-[#7bc900] transition-colors"
+                                                >
+                                                    {t('details.cpfModal.completeProfile')}
+                                                </button>
+                                                <button
+                                                    onClick={() => setIsCpfModalOpen(false)}
+                                                    className="w-full py-3 rounded-xl font-bold text-sm text-gray-500 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-white/5 transition-colors"
+                                                >
+                                                    {t('details.cpfModal.cancel')}
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                )}
+
                             </>
                         )}
 

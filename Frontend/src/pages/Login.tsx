@@ -54,7 +54,6 @@ export default function Login() {
 
   return (
     <div className="min-h-screen w-full flex bg-white dark:bg-background transition-colors duration-500">
-      {/* Painel Esquerdo: Branding */}
       <div className="hidden lg:flex w-1/2 relative bg-gray-50 dark:bg-background items-center justify-center overflow-hidden border-r border-gray-100 dark:border-white/10">
         <HeroBackground />
         <div className="relative z-10 p-12 max-w-xl text-center">
@@ -77,7 +76,6 @@ export default function Login() {
         </div>
       </div>
 
-      {/* Painel Direito: Formulário */}
       <div className="w-full lg:w-1/2 flex flex-col relative bg-white dark:bg-background">
 
         <div className="absolute top-4 left-6 z-20">

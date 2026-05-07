@@ -1,9 +1,10 @@
 import React from 'react'
 import ReactDOM from 'react-dom/client'
-import { App } from './App'
+import App from './App'
 import './index.css'
 
-// Global Error Boundary to prevent white screen of death
+import i18n from '@/i18n/i18n';
+
 class GlobalErrorBoundary extends React.Component<{children: React.ReactNode}, {hasError: boolean}> {
   constructor(props: {children: React.ReactNode}) {
     super(props);
@@ -20,15 +21,15 @@ class GlobalErrorBoundary extends React.Component<{children: React.ReactNode}, {
                 <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
               </svg>
             </div>
-            <h2 className="text-2xl font-black text-gray-900 dark:text-white mb-3">Ops! Algo deu errado.</h2>
+            <h2 className="text-2xl font-black text-gray-900 dark:text-white mb-3">{i18n.t('errorBoundary.title')}</h2>
             <p className="text-gray-500 dark:text-gray-400 mb-8 text-sm leading-relaxed">
-              Encontramos um erro inesperado ao carregar a aplicação. Nossa equipe já foi notificada.
+              {i18n.t('errorBoundary.description')}
             </p>
             <button 
               onClick={() => window.location.reload()} 
               className="bg-[#8CE600] text-gray-950 px-6 py-4 rounded-xl font-bold text-sm uppercase tracking-widest w-full hover:bg-[#7bc900] transition-colors shadow-lg shadow-[#8CE600]/20"
             >
-              Tentar novamente
+              {i18n.t('errorBoundary.retry')}
             </button>
           </div>
         </div>

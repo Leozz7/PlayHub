@@ -113,7 +113,7 @@ const AMENITIES_OPTIONS = [
 
 const COURT_TYPES = [
     { value: 1, label: 'Tênis' },
-    { value: 2, label: 'Futebol Society (Fut7)' },
+    { value: 2, label: 'Futebol Society' },
     { value: 3, label: 'Futevôlei' },
     { value: 4, label: 'Vôlei' },
     { value: 5, label: 'Basquete' },
@@ -432,6 +432,15 @@ export default function AdminCourt() {
             });
         }
     };
+
+    // Auto-sync sports list when main type changes
+    const watchType = watch('type');
+    useEffect(() => {
+        const typeLabel = COURT_TYPES.find(t => t.value === watchType)?.label;
+        if (typeLabel && typeLabel !== 'Outro' && !selectedSportsList.includes(typeLabel)) {
+            setSelectedSportsList(prev => [...prev, typeLabel]);
+        }
+    }, [watchType]);
 
     const toggleSport = (sport: string) => {
         setSelectedSportsList(prev => prev.includes(sport) ? prev.filter(s => s !== sport) : [...prev, sport]);

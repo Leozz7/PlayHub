@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useSearchParams } from 'react-router-dom';
 import { useQueryClient, useMutation } from '@tanstack/react-query';
 
@@ -88,60 +89,22 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 
 
 
-const courtSchema = z.object({
-    name: z.string().min(3, 'Nome deve ter pelo menos 3 caracteres'),
-    city: z.string().min(2, 'Cidade é obrigatória'),
-    neighborhood: z.string().min(2, 'Bairro é obrigatório'),
-    address: z.string().min(5, 'Endereço é obrigatório'),
-    hourlyRate: z.number().min(1, 'Preço deve ser maior que zero'),
-    capacity: z.number().min(1, 'Capacidade deve ser pelo menos 1'),
+const getCourtSchema = (t: any) => z.object({
+    name: z.string().min(3, t('register.validation.nameMin')),
+    city: z.string().min(2, t('catalog.searchCity')),
+    neighborhood: z.string().min(2, t('gestor.courts.form.neighborhood')),
+    address: z.string().min(5, t('gestor.courts.form.location')),
+    hourlyRate: z.number().min(1, t('gestor.courts.form.price')),
+    capacity: z.number().min(1, t('gestor.courts.form.capacity')),
     description: z.string().optional(),
     openingHour: z.number().min(0).max(23),
     closingHour: z.number().min(0).max(23),
     badge: z.string().optional(),
-    type: z.number().min(1, 'Tipo é obrigatório'),
+    type: z.number().min(1, t('gestor.courts.form.type')),
     status: z.number().optional(),
 });
 
-type CourtFormValues = z.infer<typeof courtSchema>;
-
-const AMENITIES_OPTIONS = [
-    'Vestiário', 'Estacionamento', 'Iluminação', 'Wifi', 'Lanchonete', 'Ducha', 'Academia', 'Piscina', 'Arquibancada'
-];
-
-const COURT_TYPES = [
-    { value: 1, label: 'Tênis' },
-    { value: 2, label: 'Futebol Society (Fut7)' },
-    { value: 3, label: 'Futevôlei' },
-    { value: 4, label: 'Vôlei' },
-    { value: 5, label: 'Basquete' },
-    { value: 6, label: 'Futsal' },
-    { value: 99, label: 'Outro' },
-];
-
-const COURT_STATUS_OPTIONS = [
-    { value: 1, label: 'Ativa' },
-    { value: 3, label: 'Manutenção' },
-    { value: 2, label: 'Inativa' },
-];
-
-const DAYS_OF_WEEK = [
-    { value: 0, label: 'Domingo' },
-    { value: 1, label: 'Segunda-feira' },
-    { value: 2, label: 'Terça-feira' },
-    { value: 3, label: 'Quarta-feira' },
-    { value: 4, label: 'Quinta-feira' },
-    { value: 5, label: 'Sexta-feira' },
-    { value: 6, label: 'Sábado' },
-];
-
-const INITIAL_SCHEDULE: OperatingDay[] = DAYS_OF_WEEK.map(day => ({
-    day: day.value,
-    openingHour: 6,
-    closingHour: 23,
-    isClosed: false
-}));
-
+type CourtFormValues = z.infer<ReturnType<typeof getCourtSchema>>;
 
 interface GalleryImage {
     id: string;
@@ -156,6 +119,7 @@ interface SortablePhotoItemProps {
 }
 
 function SortablePhotoItem({ img, mainImage, onSetMain, onRemove }: SortablePhotoItemProps) {
+    const { t } = useTranslation();
     const {
         attributes,
         listeners,
@@ -183,7 +147,7 @@ function SortablePhotoItem({ img, mainImage, onSetMain, onRemove }: SortablePhot
         >
             <img
                 src={img.url}
-                alt="Gallery item"
+                alt={t('gestor.courts.form.galleryTitle')}
                 className="w-full h-full object-cover pointer-events-none select-none"
             />
 
@@ -213,13 +177,63 @@ function SortablePhotoItem({ img, mainImage, onSetMain, onRemove }: SortablePhot
                 </button>
             </div>
             {mainImage === img.url && (
-                <div className="absolute top-4 left-4 bg-[#8CE600] text-gray-950 text-[10px] font-black uppercase px-3 py-1 rounded-full shadow-lg z-20">Capa</div>
+                <div className="absolute top-4 left-4 bg-[#8CE600] text-gray-950 text-[10px] font-black uppercase px-3 py-1 rounded-full shadow-lg z-20">{t('common.cover')}</div>
             )}
         </div>
     );
 }
 
 export default function GestorCourt() {
+    const { t } = useTranslation();
+    
+    const AMENITIES_OPTIONS = [
+        t('gestor.courts.form.amenities.lockerRoom'),
+        t('gestor.courts.form.amenities.parking'),
+        t('gestor.courts.form.amenities.lighting'),
+        t('gestor.courts.form.amenities.wifi'),
+        t('gestor.courts.form.amenities.snackBar'),
+        t('gestor.courts.form.amenities.shower'),
+        t('gestor.courts.form.amenities.gym'),
+        t('gestor.courts.form.amenities.pool'),
+        t('gestor.courts.form.amenities.bleachers')
+    ];
+
+    const COURT_TYPES = [
+        { value: 1, label: t('sports.tennis') },
+        { value: 2, label: t('sports.soccerSociety') },
+        { value: 3, label: t('sports.footvolley') },
+        { value: 4, label: t('sports.volleyball') },
+        { value: 5, label: t('sports.basketball') },
+        { value: 6, label: t('sports.futsal') },
+        { value: 7, label: t('sports.beachTennis') },
+        { value: 8, label: t('sports.padel') },
+        { value: 9, label: t('sports.handball') },
+        { value: 99, label: t('common.other') },
+    ];
+
+    const COURT_STATUS_OPTIONS = [
+        { value: 1, label: t('gestor.courts.active') },
+        { value: 3, label: t('gestor.courts.maintenance') },
+        { value: 2, label: t('gestor.courts.inactive') },
+    ];
+
+    const DAYS_OF_WEEK = [
+        { value: 0, label: t('common.days.sunday') },
+        { value: 1, label: t('common.days.monday') },
+        { value: 2, label: t('common.days.tuesday') },
+        { value: 3, label: t('common.days.wednesday') },
+        { value: 4, label: t('common.days.thursday') },
+        { value: 5, label: t('common.days.friday') },
+        { value: 6, label: t('common.days.saturday') },
+    ];
+
+    const INITIAL_SCHEDULE: OperatingDay[] = DAYS_OF_WEEK.map(day => ({
+        day: day.value,
+        openingHour: 6,
+        closingHour: 23,
+        isClosed: false
+    }));
+
     const { user } = useAuthStore();
     const queryClient = useQueryClient();
     const [searchParams, setSearchParams] = useSearchParams();
@@ -234,6 +248,7 @@ export default function GestorCourt() {
         if (selectedStatus !== 'all') params.set('status', selectedStatus);
         setSearchParams(params, { replace: true });
     }, [searchTerm, selectedType, selectedStatus, setSearchParams]);
+
     const [isDialogOpen, setIsDialogOpen] = useState(false);
     const [editingCourt, setEditingCourt] = useState<Court | null>(null);
 
@@ -252,29 +267,29 @@ export default function GestorCourt() {
         mutationFn: courtService.createCourt,
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['courts'] });
-            toast.success('Quadra criada com sucesso!');
+            toast.success(t('gestor.courts.toasts.createSuccess'));
             setIsDialogOpen(false);
         },
-        onError: () => toast.error('Erro ao criar quadra.')
+        onError: () => toast.error(t('gestor.courts.toasts.createError'))
     });
 
     const updateMutation = useMutation({
         mutationFn: ({ id, data }: { id: string; data: Partial<Court> }) => courtService.updateCourt(id, data),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['courts'] });
-            toast.success('Quadra atualizada com sucesso!');
+            toast.success(t('gestor.courts.toasts.updateSuccess'));
             setIsDialogOpen(false);
         },
-        onError: () => toast.error('Erro ao atualizar quadra.')
+        onError: () => toast.error(t('gestor.courts.toasts.updateError'))
     });
 
     const deleteMutation = useMutation({
         mutationFn: courtService.deleteCourt,
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['courts'] });
-            toast.success('Quadra excluída com sucesso!');
+            toast.success(t('gestor.courts.toasts.deleteSuccess'));
         },
-        onError: () => toast.error('Erro ao excluir quadra.')
+        onError: () => toast.error(t('gestor.courts.toasts.deleteError'))
     });
 
     const {
@@ -285,7 +300,7 @@ export default function GestorCourt() {
         watch,
         formState: { errors }
     } = useForm<CourtFormValues>({
-        resolver: zodResolver(courtSchema),
+        resolver: zodResolver(getCourtSchema(t)),
         defaultValues: {
             openingHour: 6,
             closingHour: 23,
@@ -295,6 +310,14 @@ export default function GestorCourt() {
     });
 
     const [selectedSportsList, setSelectedSportsList] = useState<string[]>([]);
+    const watchType = watch('type');
+    useEffect(() => {
+        const typeLabel = COURT_TYPES.find(t => t.value === watchType)?.label;
+        if (typeLabel && typeLabel !== t('common.other') && !selectedSportsList.includes(typeLabel)) {
+            setSelectedSportsList(prev => [...prev, typeLabel]);
+        }
+    }, [watchType, selectedSportsList, t, COURT_TYPES]);
+
     const [selectedAmenitiesList, setSelectedAmenitiesList] = useState<string[]>([]);
     const [galleryImages, setGalleryImages] = useState<GalleryImage[]>([]);
     const [mainImage, setMainImage] = useState<string | null>(null);
@@ -463,37 +486,48 @@ export default function GestorCourt() {
     };
 
     const handleDelete = (id: string) => {
-        if (confirm('Tem certeza que deseja excluir esta quadra?')) {
+        if (confirm(t('gestor.courts.deleteConfirm.desc'))) {
             deleteMutation.mutate(id);
         }
+    };
+
+    const sportToKey: Record<string, string> = {
+        'Futebol Society': 'sports.soccerSociety',
+        'Beach Tennis': 'sports.beachTennis',
+        'Vôlei de Praia': 'sports.beachVolleyball',
+        'Basquete': 'sports.basketball',
+        'Futsal': 'sports.futsal',
+        'Padel': 'sports.padel',
+        'Tênis': 'sports.tennis',
+        'Handebol': 'sports.handball',
     };
 
     return (
         <div className="p-8 space-y-8 animate-in fade-in duration-700">
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
                 <div>
-                    <h1 className="text-3xl font-black tracking-tight text-gray-900 dark:text-white mb-2">Gerenciamento de Quadras</h1>
-                    <p className="text-gray-500 dark:text-gray-400">Administre suas arenas, preços e disponibilidade.</p>
+                    <h1 className="text-3xl font-black tracking-tight text-gray-900 dark:text-white mb-2">{t('gestor.courts.title')}</h1>
+                    <p className="text-gray-500 dark:text-gray-400">{t('gestor.courts.subtitle')}</p>
                 </div>
                 <Button onClick={handleOpenCreate} className="bg-[#8CE600] text-gray-950 hover:opacity-90 font-black px-6 py-6 rounded-2xl shadow-lg shadow-[#8CE600]/20">
                     <Plus className="w-5 h-5 mr-2" />
-                    Nova Quadra
+                    {t('gestor.courts.addCourt')}
                 </Button>
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                 {[
-                    { label: 'Total de Quadras', value: pagedData?.totalCount || 0, icon: Activity, color: 'text-blue-500' },
-                    { label: 'Quadras Ativas', value: courts.filter(c => c.status === 'available').length, icon: CheckCircle2, color: 'text-[#8CE600]' },
+                    { label: t('gestor.courts.stats.total'), value: pagedData?.totalCount || 0, icon: Activity, color: 'text-blue-500' },
+                    { label: t('gestor.courts.stats.active'), value: courts.filter(c => c.status === 'available').length, icon: CheckCircle2, color: 'text-[#8CE600]' },
                     {
-                        label: 'Taxa de Ocupação',
+                        label: t('gestor.courts.stats.occupancy'),
                         value: courts.length > 0
                             ? `${Math.round((courts.filter(c => c.status === 'busy').length / courts.length) * 100)}%`
                             : '0%',
                         icon: TrendingUp,
                         color: 'text-purple-500'
                     },
-                    { label: 'Em Manutenção', value: courts.filter(c => c.status === 'closed').length, icon: AlertCircle, color: 'text-amber-500' },
+                    { label: t('gestor.courts.stats.maintenance'), value: courts.filter(c => c.status === 'closed').length, icon: AlertCircle, color: 'text-amber-500' },
                 ].map((stat, i) => (
                     <motion.div
                         initial={{ opacity: 0, y: 20 }}
@@ -518,7 +552,7 @@ export default function GestorCourt() {
                     <div className="relative flex-1 w-full">
                         <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
                         <Input
-                            placeholder="Buscar por nome, cidade ou bairro..."
+                            placeholder={t('gestor.courts.searchPlaceholder')}
                             className="pl-11 h-12 bg-gray-50 dark:bg-white/5 border-none rounded-2xl focus-visible:ring-2 focus-visible:ring-[#8CE600]/50"
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
@@ -527,10 +561,10 @@ export default function GestorCourt() {
                     <div className="flex w-full md:w-auto gap-4">
                         <Select value={selectedType} onValueChange={setSelectedType}>
                             <SelectTrigger className="w-full md:w-48 h-12 bg-gray-50 dark:bg-white/5 border-none rounded-2xl focus:ring-2 focus:ring-[#8CE600]/50">
-                                <SelectValue placeholder="Tipo" />
+                                <SelectValue placeholder={t('gestor.courts.type')} />
                             </SelectTrigger>
                             <SelectContent className="rounded-2xl border-gray-100 dark:border-white/10">
-                                <SelectItem value="all">Todos os Tipos</SelectItem>
+                                <SelectItem value="all">{t('gestor.courts.allTypes')}</SelectItem>
                                 {COURT_TYPES.map(type => (
                                     <SelectItem key={type.value} value={String(type.value)}>{type.label}</SelectItem>
                                 ))}
@@ -539,13 +573,13 @@ export default function GestorCourt() {
 
                         <Select value={selectedStatus} onValueChange={setSelectedStatus}>
                             <SelectTrigger className="w-full md:w-40 h-12 bg-gray-50 dark:bg-white/5 border-none rounded-2xl focus:ring-2 focus:ring-[#8CE600]/50">
-                                <SelectValue placeholder="Status" />
+                                <SelectValue placeholder={t('gestor.courts.status')} />
                             </SelectTrigger>
                             <SelectContent className="rounded-2xl border-gray-100 dark:border-white/10">
-                                <SelectItem value="all">Todos os Status</SelectItem>
-                                <SelectItem value="available">Ativa</SelectItem>
-                                <SelectItem value="busy">Manutenção</SelectItem>
-                                <SelectItem value="closed">Fechada</SelectItem>
+                                <SelectItem value="all">{t('gestor.courts.allStatuses')}</SelectItem>
+                                <SelectItem value="available">{t('gestor.courts.active')}</SelectItem>
+                                <SelectItem value="busy">{t('gestor.courts.maintenance')}</SelectItem>
+                                <SelectItem value="closed">{t('gestor.courts.closed')}</SelectItem>
                             </SelectContent>
                         </Select>
                     </div>
@@ -555,10 +589,10 @@ export default function GestorCourt() {
                     <Table>
                         <TableHeader>
                             <TableRow className="border-b border-gray-100 dark:border-white/10 hover:bg-transparent">
-                                <TableHead className="px-6 py-4 font-black text-xs uppercase tracking-widest text-gray-400">Quadra</TableHead>
-                                <TableHead className="px-6 py-4 font-black text-xs uppercase tracking-widest text-gray-400">Localização</TableHead>
-                                <TableHead className="px-6 py-4 font-black text-xs uppercase tracking-widest text-gray-400">Preço/h</TableHead>
-                                <TableHead className="px-6 py-4 font-black text-xs uppercase tracking-widest text-gray-400">Status</TableHead>
+                                <TableHead className="px-6 py-4 font-black text-xs uppercase tracking-widest text-gray-400">{t('gestor.courts.table.court')}</TableHead>
+                                <TableHead className="px-6 py-4 font-black text-xs uppercase tracking-widest text-gray-400">{t('gestor.courts.table.location')}</TableHead>
+                                <TableHead className="px-6 py-4 font-black text-xs uppercase tracking-widest text-gray-400">{t('gestor.courts.table.price')}</TableHead>
+                                <TableHead className="px-6 py-4 font-black text-xs uppercase tracking-widest text-gray-400">{t('gestor.courts.table.status')}</TableHead>
                                 <TableHead className="px-6 py-4 text-right"></TableHead>
                             </TableRow>
                         </TableHeader>
@@ -580,8 +614,7 @@ export default function GestorCourt() {
                                             <div className="p-4 bg-gray-50 dark:bg-white/5 rounded-full mb-4">
                                                 <AlertCircle className="w-8 h-8" />
                                             </div>
-                                            <p className="font-bold">Nenhuma quadra encontrada</p>
-                                            <p className="text-sm">Tente ajustar sua busca ou crie uma nova quadra.</p>
+                                            <p className="font-bold">{t('gestor.courts.noResults')}</p>
                                         </div>
                                     </TableCell>
                                 </TableRow>
@@ -603,7 +636,9 @@ export default function GestorCourt() {
                                                         <p className="font-black text-sm text-gray-900 dark:text-white">{court.name}</p>
                                                         <div className="flex flex-wrap gap-1 mt-1">
                                                             {court.sports.slice(0, 2).map(s => (
-                                                                <span key={s} className="text-[9px] font-bold text-[#8CE600] bg-[#8CE600]/10 px-1.5 py-0.5 rounded-full">{s}</span>
+                                                                <span key={s} className="text-[9px] font-bold text-[#8CE600] bg-[#8CE600]/10 px-1.5 py-0.5 rounded-full">
+                                                                    {t(sportToKey[s] || s)}
+                                                                </span>
                                                             ))}
                                                         </div>
                                                     </div>
@@ -625,7 +660,7 @@ export default function GestorCourt() {
                                                             ? 'bg-amber-500/10 text-amber-500 border-amber-500/20'
                                                             : 'bg-red-500/10 text-red-500 border-red-500/20'
                                                     }`}>
-                                                    {court.frontendStatus === 'available' ? 'Ativa' : (court.frontendStatus === 'busy' ? 'Manutenção' : 'Fechada')}
+                                                    {court.frontendStatus === 'available' ? t('gestor.courts.active') : (court.frontendStatus === 'busy' ? t('gestor.courts.maintenance') : t('gestor.courts.closed'))}
                                                 </Badge>
                                             </TableCell>
                                             <TableCell className="px-6 py-4 text-right">
@@ -636,13 +671,13 @@ export default function GestorCourt() {
                                                         </Button>
                                                     </DropdownMenuTrigger>
                                                     <DropdownMenuContent align="end" className="w-40 bg-white dark:bg-background border border-gray-100 dark:border-white/10 rounded-2xl shadow-xl">
-                                                        <DropdownMenuLabel className="text-[10px] font-black uppercase tracking-widest text-gray-400">Ações</DropdownMenuLabel>
+                                                        <DropdownMenuLabel className="text-[10px] font-black uppercase tracking-widest text-gray-400">{t('gestor.courts.table.actions')}</DropdownMenuLabel>
                                                         <DropdownMenuItem onClick={() => handleOpenEdit(court)} className="flex items-center gap-2 text-xs font-bold py-2.5 rounded-xl cursor-pointer">
-                                                            <Edit2 className="w-3.5 h-3.5" /> Editar
+                                                            <Edit2 className="w-3.5 h-3.5" /> {t('gestor.courts.edit')}
                                                         </DropdownMenuItem>
                                                         <DropdownMenuSeparator className="bg-gray-100 dark:bg-white/10" />
                                                         <DropdownMenuItem onClick={() => handleDelete(court.id)} className="flex items-center gap-2 text-xs font-bold text-red-500 py-2.5 rounded-xl cursor-pointer hover:bg-red-500/10!">
-                                                            <Trash2 className="w-3.5 h-3.5" /> Excluir
+                                                            <Trash2 className="w-3.5 h-3.5" /> {t('gestor.courts.delete')}
                                                         </DropdownMenuItem>
                                                     </DropdownMenuContent>
                                                 </DropdownMenu>
@@ -665,17 +700,16 @@ export default function GestorCourt() {
                                 <div className="w-12 h-12 bg-[#8CE600] rounded-2xl flex items-center justify-center mb-4 shadow-lg shadow-[#8CE600]/20">
                                     <Building2 className="w-6 h-6 text-gray-950" />
                                 </div>
-                                <h2 className="text-xl font-black tracking-tight">{editingCourt ? 'Editar Arena' : 'Nova Arena'}</h2>
-                                <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mt-1">Configurações Gerais</p>
+                                <h2 className="text-xl font-black tracking-tight">{editingCourt ? t('gestor.courts.edit') : t('gestor.courts.addCourt')}</h2>
                             </div>
 
                             <nav className="flex-1 space-y-2">
                                 {[
-                                    { id: 'general', label: 'Informações', icon: Info },
-                                    { id: 'location', label: 'Localização', icon: MapIcon },
-                                    { id: 'features', label: 'Esportes e Extras', icon: Shield },
-                                    { id: 'media', label: 'Mídia e Galeria', icon: Camera },
-                                    { id: 'availability', label: 'Disponibilidade', icon: Clock },
+                                    { id: 'general', label: t('gestor.courts.form.tabs.general'), icon: Info },
+                                    { id: 'location', label: t('gestor.courts.form.tabs.location'), icon: MapIcon },
+                                    { id: 'features', label: t('gestor.courts.form.tabs.features'), icon: Shield },
+                                    { id: 'media', label: t('gestor.courts.form.tabs.media'), icon: Camera },
+                                    { id: 'availability', label: t('gestor.courts.form.tabs.availability'), icon: Clock },
                                 ].map(item => (
                                     <button
                                         key={item.id}
@@ -690,18 +724,6 @@ export default function GestorCourt() {
                                     </button>
                                 ))}
                             </nav>
-
-                            <div className="mt-auto pt-8 border-t border-gray-100 dark:border-white/10">
-                                <div className="flex items-center gap-3 p-3 bg-white dark:bg-background rounded-2xl border border-gray-100 dark:border-white/5 shadow-sm">
-                                    <div className="w-8 h-8 rounded-lg bg-blue-500/10 flex items-center justify-center text-blue-500">
-                                        <Activity className="w-4 h-4" />
-                                    </div>
-                                    <div className="min-w-0">
-                                        <p className="text-[10px] font-black text-gray-400 uppercase">Status</p>
-                                        <p className="text-[11px] font-bold text-emerald-500 truncate">Pronto para salvar</p>
-                                    </div>
-                                </div>
-                            </div>
                         </div>
 
                         <div className="flex-1 flex flex-col overflow-hidden bg-white dark:bg-background">
@@ -712,18 +734,18 @@ export default function GestorCourt() {
                                         <div className="space-y-6 animate-in fade-in slide-in-from-right-4 duration-500">
                                             <div className="flex items-center gap-2 mb-2">
                                                 <div className="w-2 h-8 bg-[#8CE600] rounded-full" />
-                                                <h3 className="text-xl font-black">Informações Básicas</h3>
+                                                <h3 className="text-xl font-black">{t('gestor.courts.form.tabs.general')}</h3>
                                             </div>
 
                                             <div className="grid grid-cols-2 gap-6">
                                                 <div className="space-y-2 col-span-2">
-                                                    <Label className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-400 ml-1">Nome da Arena</Label>
-                                                    <Input {...register('name')} placeholder="Ex: Arena Prime Society" className="h-14 bg-gray-50 dark:bg-white/5 border-none rounded-2xl text-base font-bold focus-visible:ring-[#8CE600]/50" />
+                                                    <Label className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-400 ml-1">{t('gestor.courts.form.name')}</Label>
+                                                    <Input {...register('name')} placeholder={t('gestor.courts.form.namePlaceholder')} className="h-14 bg-gray-50 dark:bg-white/5 border-none rounded-2xl text-base font-bold focus-visible:ring-[#8CE600]/50" />
                                                     {errors.name && <p className="text-[10px] text-red-500 font-bold ml-1">{errors.name.message}</p>}
                                                 </div>
 
                                                 <div className="space-y-2 col-span-2">
-                                                    <Label className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-400 ml-1">Modalidade Principal</Label>
+                                                    <Label className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-400 ml-1">{t('gestor.courts.form.type')}</Label>
                                                     <select
                                                         {...register('type', { valueAsNumber: true })}
                                                         className="w-full h-14 bg-gray-50 dark:bg-white/5 border-none rounded-2xl text-base font-bold focus-visible:ring-2 focus-visible:ring-[#8CE600]/50 px-4 appearance-none outline-none"
@@ -737,7 +759,7 @@ export default function GestorCourt() {
                                                 </div>
 
                                                 <div className="space-y-2">
-                                                    <Label className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-400 ml-1">Preço por Hora (R$)</Label>
+                                                    <Label className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-400 ml-1">{t('gestor.courts.form.price')}</Label>
                                                     <div className="relative">
                                                         <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 font-bold">R$</span>
                                                         <Input type="number" {...register('hourlyRate', { valueAsNumber: true })} className="h-14 pl-12 bg-gray-50 dark:bg-white/5 border-none rounded-2xl text-base font-bold focus-visible:ring-[#8CE600]/50" />
@@ -745,22 +767,22 @@ export default function GestorCourt() {
                                                 </div>
 
                                                 <div className="space-y-2">
-                                                    <Label className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-400 ml-1">Capacidade (Jogadores)</Label>
+                                                    <Label className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-400 ml-1">{t('gestor.courts.form.capacity')}</Label>
                                                     <Input type="number" {...register('capacity', { valueAsNumber: true })} className="h-14 bg-gray-50 dark:bg-white/5 border-none rounded-2xl text-base font-bold focus-visible:ring-[#8CE600]/50" />
                                                 </div>
 
                                                 <div className="space-y-2 col-span-2">
-                                                    <Label className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-400 ml-1">Descrição Detalhada</Label>
-                                                    <Textarea {...register('description')} placeholder="Descreva os diferenciais da sua quadra..." className="bg-gray-50 dark:bg-white/5 border-none rounded-3xl text-sm font-medium focus-visible:ring-[#8CE600]/50 min-h-[150px] p-4" />
+                                                    <Label className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-400 ml-1">{t('gestor.courts.form.description')}</Label>
+                                                    <Textarea {...register('description')} placeholder={t('gestor.courts.form.descPlaceholder')} className="bg-gray-50 dark:bg-white/5 border-none rounded-3xl text-sm font-medium focus-visible:ring-[#8CE600]/50 min-h-[150px] p-4" />
                                                 </div>
 
                                                 <div className="space-y-2 col-span-2">
-                                                    <Label className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-400 ml-1">Destaque / Badge</Label>
-                                                    <Input {...register('badge')} placeholder="Ex: Promoção de Verão, Quadra Oficial, etc." className="h-14 bg-gray-50 dark:bg-white/5 border-none rounded-2xl text-base font-bold focus-visible:ring-[#8CE600]/50" />
+                                                    <Label className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-400 ml-1">{t('gestor.courts.form.badge')}</Label>
+                                                    <Input {...register('badge')} placeholder={t('gestor.courts.form.badgePlaceholder')} className="h-14 bg-gray-50 dark:bg-white/5 border-none rounded-2xl text-base font-bold focus-visible:ring-[#8CE600]/50" />
                                                 </div>
 
                                                 <div className="space-y-4 col-span-2">
-                                                    <Label className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-400 ml-1">Status da Quadra</Label>
+                                                    <Label className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-400 ml-1">{t('gestor.courts.form.status')}</Label>
                                                     <div className="grid grid-cols-3 gap-3">
                                                         {COURT_STATUS_OPTIONS.map(opt => {
                                                             const isSelected = watch('status') === opt.value;
@@ -792,38 +814,37 @@ export default function GestorCourt() {
                                         <div className="space-y-6 animate-in fade-in slide-in-from-right-4 duration-500">
                                             <div className="flex items-center gap-2 mb-2">
                                                 <div className="w-2 h-8 bg-blue-500 rounded-full" />
-                                                <h3 className="text-xl font-black">Localização</h3>
+                                                <h3 className="text-xl font-black">{t('gestor.courts.form.tabs.location')}</h3>
                                             </div>
 
                                             <div className="grid grid-cols-2 gap-6">
                                                 <div className="space-y-2 col-span-2">
-                                                    <Label className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-400 ml-1">Endereço</Label>
+                                                    <Label className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-400 ml-1">{t('gestor.courts.form.location')}</Label>
                                                     <div className="relative">
                                                         <MapIcon className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
-                                                        <Input {...register('address')} placeholder="Ex: Rua das Olimpíadas, 205" className="h-14 pl-12 bg-gray-50 dark:bg-white/5 border-none rounded-2xl text-base font-bold focus-visible:ring-[#8CE600]/50" />
+                                                        <Input {...register('address')} placeholder={t('gestor.courts.form.addressPlaceholder')} className="h-14 pl-12 bg-gray-50 dark:bg-white/5 border-none rounded-2xl text-base font-bold focus-visible:ring-[#8CE600]/50" />
                                                     </div>
                                                 </div>
 
                                                 <div className="space-y-2">
-                                                    <Label className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-400 ml-1">Bairro</Label>
-                                                    <Input {...register('neighborhood')} placeholder="Ex: Vila Olímpia" className="h-14 bg-gray-50 dark:bg-white/5 border-none rounded-2xl text-base font-bold focus-visible:ring-[#8CE600]/50" />
+                                                    <Label className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-400 ml-1">{t('gestor.courts.form.neighborhood')}</Label>
+                                                    <Input {...register('neighborhood')} placeholder={t('gestor.courts.form.neighborhoodPlaceholder')} className="h-14 bg-gray-50 dark:bg-white/5 border-none rounded-2xl text-base font-bold focus-visible:ring-[#8CE600]/50" />
                                                 </div>
 
                                                 <div className="space-y-2">
-                                                    <Label className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-400 ml-1">Cidade</Label>
-                                                    <Input {...register('city')} placeholder="Ex: São Paulo" className="h-14 bg-gray-50 dark:bg-white/5 border-none rounded-2xl text-base font-bold focus-visible:ring-[#8CE600]/50" />
+                                                    <Label className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-400 ml-1">{t('gestor.courts.form.city')}</Label>
+                                                    <Input {...register('city')} placeholder={t('gestor.courts.form.cityPlaceholder')} className="h-14 bg-gray-50 dark:bg-white/5 border-none rounded-2xl text-base font-bold focus-visible:ring-[#8CE600]/50" />
                                                 </div>
                                             </div>
                                         </div>
                                     )}
 
-                                    {/* Tab: Features */}
                                     {activeTab === 'features' && (
                                         <div className="space-y-8 animate-in fade-in slide-in-from-right-4 duration-500">
                                             <div className="space-y-4">
                                                 <div className="flex items-center gap-2 mb-2">
                                                     <div className="w-2 h-8 bg-amber-500 rounded-full" />
-                                                    <h3 className="text-xl font-black">Modalidades e Esportes</h3>
+                                                    <h3 className="text-xl font-black">{t('gestor.courts.form.sportsTitle')}</h3>
                                                 </div>
                                                 <div className="flex flex-wrap gap-2 p-6 bg-gray-50 dark:bg-white/[0.02] rounded-[2.5rem] border border-gray-100 dark:border-white/5">
                                                     {SPORTS_LIST.map(sport => (
@@ -846,13 +867,13 @@ export default function GestorCourt() {
                                                 <div className="flex items-center justify-between mb-2">
                                                     <div className="flex items-center gap-2">
                                                         <div className="w-2 h-8 bg-purple-500 rounded-full" />
-                                                        <h3 className="text-xl font-black">Comodidades (Extras)</h3>
+                                                        <h3 className="text-xl font-black">{t('gestor.courts.form.extrasTitle')}</h3>
                                                     </div>
                                                     <div className="flex items-center gap-2">
                                                         <Input
                                                             value={newAmenity}
                                                             onChange={(e) => setNewAmenity(e.target.value)}
-                                                            placeholder="Nova comodidade..."
+                                                            placeholder={t('gestor.courts.form.newAmenity')}
                                                             className="h-9 w-40 bg-gray-50 dark:bg-white/5 border-none rounded-xl text-xs font-bold"
                                                             onKeyDown={(e) => {
                                                                 if (e.key === 'Enter') {
@@ -891,16 +912,15 @@ export default function GestorCourt() {
                                         </div>
                                     )}
 
-                                    {/* Tab: Media */}
                                     {activeTab === 'media' && (
                                         <div className="space-y-6 animate-in fade-in slide-in-from-right-4 duration-500">
                                             <div className="flex items-center justify-between">
                                                 <div className="flex items-center gap-2">
                                                     <div className="w-2 h-8 bg-pink-500 rounded-full" />
-                                                    <h3 className="text-xl font-black">Galeria de Imagens</h3>
+                                                    <h3 className="text-xl font-black">{t('gestor.courts.form.galleryTitle')}</h3>
                                                 </div>
                                                 <label className="bg-[#8CE600] text-gray-950 px-4 py-2 rounded-xl text-xs font-black cursor-pointer hover:opacity-90 transition-all flex items-center gap-2 shadow-lg shadow-[#8CE600]/20">
-                                                    <Plus className="w-4 h-4" /> Upload
+                                                    <Plus className="w-4 h-4" /> {t('gestor.courts.form.upload')}
                                                     <input type="file" multiple accept="image/*" onChange={handleFileUpload} className="hidden" />
                                                 </label>
                                             </div>
@@ -932,23 +952,22 @@ export default function GestorCourt() {
                                             {galleryImages.length === 0 && (
                                                 <div className="flex flex-col items-center justify-center py-20 bg-gray-50 dark:bg-white/[0.02] rounded-[3rem] border border-dashed border-gray-200 dark:border-white/10">
                                                     <Camera className="w-12 h-12 text-gray-300 dark:text-gray-700 mb-4" />
-                                                    <p className="text-sm font-bold text-gray-500">Nenhuma imagem carregada ainda.</p>
+                                                    <p className="text-sm font-bold text-gray-500">{t('gestor.courts.form.noImages')}</p>
                                                 </div>
                                             )}
                                         </div>
                                     )}
 
-                                    {/* Tab: Availability */}
                                     {activeTab === 'availability' && (
                                         <div className="space-y-6 animate-in fade-in slide-in-from-right-4 duration-500">
                                             <div className="flex items-center justify-between">
                                                 <div className="flex items-center gap-2">
                                                     <div className="w-2 h-8 bg-emerald-500 rounded-full" />
-                                                    <h3 className="text-xl font-black">Horários de Funcionamento</h3>
+                                                    <h3 className="text-xl font-black">{t('gestor.courts.form.hoursTitle')}</h3>
                                                 </div>
                                                 <div className="flex items-center gap-2 bg-gray-50 dark:bg-white/5 p-1 rounded-xl">
-                                                    <Button type="button" variant="ghost" size="sm" onClick={() => applyToAllDays(8, 22)} className="text-[10px] font-black uppercase h-8 rounded-lg hover:bg-[#8CE600]/10 hover:text-[#8CE600]">Padrão 08h-22h</Button>
-                                                    <Button type="button" variant="ghost" size="sm" onClick={() => applyToAllDays(6, 23)} className="text-[10px] font-black uppercase h-8 rounded-lg hover:bg-[#8CE600]/10 hover:text-[#8CE600]">Total 06h-23h</Button>
+                                                    <Button type="button" variant="ghost" size="sm" onClick={() => applyToAllDays(8, 22)} className="text-[10px] font-black uppercase h-8 rounded-lg hover:bg-[#8CE600]/10 hover:text-[#8CE600]">{t('gestor.courts.form.default8')}</Button>
+                                                    <Button type="button" variant="ghost" size="sm" onClick={() => applyToAllDays(6, 23)} className="text-[10px] font-black uppercase h-8 rounded-lg hover:bg-[#8CE600]/10 hover:text-[#8CE600]">{t('gestor.courts.form.total6')}</Button>
                                                 </div>
                                             </div>
 
@@ -959,14 +978,14 @@ export default function GestorCourt() {
                                                         <div key={day.value} className={`flex items-center gap-6 p-5 rounded-[2rem] border transition-all ${schedule.isClosed ? 'bg-red-50/30 dark:bg-red-950/10 border-red-100 dark:border-red-900/30' : 'bg-gray-50/50 dark:bg-white/5 border-gray-100 dark:border-white/10 hover:border-[#8CE600]/30'}`}>
                                                             <div className="w-32">
                                                                 <p className="text-sm font-black text-gray-900 dark:text-white">{day.label}</p>
-                                                                <p className={`text-[10px] font-bold uppercase ${schedule.isClosed ? 'text-red-500' : 'text-emerald-500'}`}>{schedule.isClosed ? 'Fechado' : 'Aberto'}</p>
+                                                                <p className={`text-[10px] font-bold uppercase ${schedule.isClosed ? 'text-red-500' : 'text-emerald-500'}`}>{schedule.isClosed ? t('gestor.courts.form.closedState') : t('gestor.courts.form.openState')}</p>
                                                             </div>
 
                                                             <div className="flex-1 flex items-center gap-8">
                                                                 <div className="flex-1 space-y-1">
                                                                     <div className="flex justify-between text-[10px] font-black uppercase text-gray-400">
-                                                                        <span>Abertura: {schedule.openingHour}h</span>
-                                                                        <span>Fechamento: {schedule.closingHour}h</span>
+                                                                        <span>{t('gestor.courts.form.openingPrefix')} {schedule.openingHour}h</span>
+                                                                        <span>{t('gestor.courts.form.closingPrefix')} {schedule.closingHour}h</span>
                                                                     </div>
                                                                     <div className="flex items-center gap-4">
                                                                         <Input
@@ -1006,9 +1025,8 @@ export default function GestorCourt() {
                                 </form>
                             </ScrollArea>
 
-                            {/* Footer do Modal */}
                             <div className="p-8 border-t border-gray-100 dark:border-white/10 flex items-center justify-between bg-gray-50/50 dark:bg-white/[0.02]">
-                                <Button type="button" variant="ghost" onClick={() => setIsDialogOpen(false)} className="rounded-2xl font-bold h-12 px-6">Descartar</Button>
+                                <Button type="button" variant="ghost" onClick={() => setIsDialogOpen(false)} className="rounded-2xl font-bold h-12 px-6">{t('gestor.courts.form.discard')}</Button>
                                 <div className="flex items-center gap-3">
                                     <Button
                                         form="court-form"
@@ -1017,8 +1035,8 @@ export default function GestorCourt() {
                                         className="bg-[#8CE600] text-gray-950 hover:opacity-90 font-black h-12 px-10 rounded-2xl shadow-xl shadow-[#8CE600]/20"
                                     >
                                         {(createMutation.isPending || updateMutation.isPending) ? (
-                                            <span className="flex items-center gap-2"><Activity className="w-4 h-4 animate-spin" /> Salvando...</span>
-                                        ) : editingCourt ? 'Salvar Alterações' : 'Criar Arena'}
+                                            <span className="flex items-center gap-2"><Activity className="w-4 h-4 animate-spin" /> {t('gestor.courts.form.saving')}</span>
+                                        ) : editingCourt ? t('gestor.courts.form.saveChanges') : t('gestor.courts.form.createCourt')}
                                     </Button>
                                 </div>
                             </div>

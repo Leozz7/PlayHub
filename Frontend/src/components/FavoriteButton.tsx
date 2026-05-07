@@ -1,4 +1,5 @@
 import { Heart } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { useFavoritesStore } from '@/data/useFavoritesStore';
 import { useToggleFavorite } from '@/features/favorites/hooks/useFavorites';
 import { useAuthStore } from '@/data/useAuthStore';
@@ -6,7 +7,6 @@ import { useNavigate } from 'react-router-dom';
 
 interface FavoriteButtonProps {
   courtId: string;
-  /** Variante visual: icon-only circular ou pill com texto */
   variant?: 'icon' | 'pill';
   size?: 'sm' | 'md' | 'lg';
   className?: string;
@@ -17,19 +17,13 @@ const SIZE_MAP = {
   md: { icon: 'w-4 h-4',   btn: 'w-9 h-9' },
   lg: { icon: 'w-5 h-5',   btn: 'w-11 h-11' },
 };
-
-/**
- * Botão reutilizável de favoritar quadra.
- * - Redireciona para /login se o usuário não estiver autenticado.
- * - Aplica optimistic update instantâneo via useFavoritesStore.
- * - Aceita variante `icon` (botão circular) ou `pill` (com texto).
- */
 export function FavoriteButton({
   courtId,
   variant = 'icon',
   size = 'md',
   className = '',
 }: FavoriteButtonProps) {
+  const { t } = useTranslation();
   const isAuthenticated = useAuthStore(s => s.isAuthenticated);
   const isFav = useFavoritesStore(s => s.isFavorite(courtId));
   const { mutate: toggle, isPending } = useToggleFavorite();
@@ -55,7 +49,7 @@ export function FavoriteButton({
         type="button"
         onClick={handleClick}
         disabled={isPending}
-        aria-label={isFav ? 'Remover dos favoritos' : 'Adicionar aos favoritos'}
+        aria-label={isFav ? t('common.actions.removeFavorite') : t('common.actions.addFavorite')}
         className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold border transition-all duration-200 disabled:opacity-60 ${
           isFav
             ? 'bg-red-50 dark:bg-red-950/30 border-red-200 dark:border-red-800/30 text-red-500'
@@ -65,7 +59,7 @@ export function FavoriteButton({
         <Heart
           className={`${sz.icon} transition-all duration-200 ${isFav ? 'fill-red-500 text-red-500' : ''}`}
         />
-        {isFav ? 'Favoritado' : 'Favoritar'}
+        {isFav ? t('common.actions.favorited') : t('common.actions.favorite')}
       </button>
     );
   }
@@ -75,7 +69,7 @@ export function FavoriteButton({
       type="button"
       onClick={handleClick}
       disabled={isPending}
-      aria-label={isFav ? 'Remover dos favoritos' : 'Adicionar aos favoritos'}
+      aria-label={isFav ? t('common.actions.removeFavorite') : t('common.actions.addFavorite')}
       className={`group/fav ${sz.btn} rounded-full flex items-center justify-center border transition-all duration-200 disabled:opacity-60 ${
         isFav
           ? 'bg-red-50 dark:bg-red-950/30 border-red-200 dark:border-red-800/30'

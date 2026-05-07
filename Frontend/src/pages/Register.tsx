@@ -14,25 +14,25 @@ import logo from '/assets/logo.png';
 import { api } from '@/lib/api';
 import { useAuthStore } from '@/data/useAuthStore';
 
-const registerSchema = z.object({
-  firstName: z.string().min(2, 'O nome deve ter pelo menos 2 caracteres'),
-  lastName: z.string().min(2, 'O sobrenome deve ter pelo menos 2 caracteres'),
-  email: z.string().email('E-mail inválido'),
-  password: z.string().min(6, 'A senha deve ter pelo menos 6 caracteres'),
-  confirmPassword: z.string()
-}).refine((data) => data.password === data.confirmPassword, {
-  message: "As senhas não coincidem",
-  path: ["confirmPassword"],
-});
-
-type RegisterFormValues = z.infer<typeof registerSchema>;
-
 export default function Register() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
-  const { t } = useTranslation();
   const phToast = usePlayHubToast();
   const setAuth = useAuthStore((state) => state.setAuth);
+
+  const registerSchema = z.object({
+    firstName: z.string().min(2, t('register.validation.nameMin')),
+    lastName: z.string().min(2, t('register.validation.lastNameMin')),
+    email: z.string().email(t('register.validation.emailInvalid')),
+    password: z.string().min(6, t('register.validation.passwordMin')),
+    confirmPassword: z.string()
+  }).refine((data) => data.password === data.confirmPassword, {
+    message: t('register.validation.passwordMismatch'),
+    path: ["confirmPassword"],
+  });
+
+  type RegisterFormValues = z.infer<typeof registerSchema>;
 
   const {
     register,
@@ -67,7 +67,7 @@ export default function Register() {
         navigate('/login');
       }
     } catch (err: any) {
-      phToast.registerError(err?.response?.data?.message || 'Ocorreu um erro ao criar a conta.');
+      phToast.registerError(err?.response?.data?.message || t('register.validation.genericError'));
     } finally {
       setIsLoading(false);
     }
@@ -75,7 +75,6 @@ export default function Register() {
 
   return (
     <div className="min-h-screen w-full flex bg-white dark:bg-background transition-colors duration-500">
-      {/* Painel Esquerdo: Branding */}
       <div className="hidden lg:flex w-1/2 relative bg-gray-50 dark:bg-background items-center justify-center overflow-hidden border-r border-gray-100 dark:border-white/10">
         <HeroBackground />
         <div className="relative z-10 p-12 max-w-xl text-center">
@@ -98,7 +97,6 @@ export default function Register() {
         </div>
       </div>
 
-      {/* Painel Direito: Formulário */}
       <div className="w-full lg:w-1/2 flex flex-col relative bg-white dark:bg-background overflow-y-auto">
 
         <div className="absolute top-4 left-6 z-20">

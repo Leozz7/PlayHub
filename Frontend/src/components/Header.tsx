@@ -18,7 +18,6 @@ import { usePlayHubToast } from '@/hooks/usePlayHubToast';
 import { useFavoritesStore } from '@/data/useFavoritesStore';
 import { useMyFavorites } from '@/features/favorites/hooks/useFavorites';
 
-// ─── Favorites Popover
 
 function FavoritesPopover() {
   const navigate = useNavigate();
@@ -43,7 +42,6 @@ function FavoritesPopover() {
         sideOffset={12}
         className="z-[200] w-[340px] rounded-[1.5rem] p-0 bg-white/90 dark:bg-background/90 backdrop-blur-2xl border border-white/40 dark:border-white/10 shadow-[0_16px_40px_-12px_rgba(0,0,0,0.1)] dark:shadow-[0_16px_40px_-12px_rgba(0,0,0,0.5)] overflow-hidden ring-1 ring-black/5 dark:ring-white/5"
       >
-        {/* Header do popover */}
         <div className="flex items-center justify-between px-5 py-4 border-b border-gray-100 dark:border-white/5 bg-white/50 dark:bg-white/[0.02]">
           <div className="flex items-center gap-3">
             <div className="p-2 bg-red-50 dark:bg-red-500/10 rounded-xl">
@@ -58,7 +56,6 @@ function FavoritesPopover() {
           )}
         </div>
 
-        {/* Conteúdo */}
         <div className="max-h-[320px] overflow-y-auto" style={{ scrollbarWidth: 'none' }}>
           {isLoading ? (
             <div className="flex items-center justify-center py-12">
@@ -80,7 +77,6 @@ function FavoritesPopover() {
                   onClick={() => { navigate(`/courts/${court.id}`); setOpen(false); }}
                   className="w-full flex items-center gap-4 px-5 py-3 hover:bg-gray-50/80 dark:hover:bg-white/[0.03] cursor-pointer transition-all duration-300 text-left group rounded-none outline-none"
                 >
-                  {/* Thumb */}
                   <div className="w-14 h-14 rounded-2xl overflow-hidden shrink-0 bg-gray-100 dark:bg-gray-900 relative shadow-inner">
                     {court.img ? (
                       <img src={court.img} alt={court.name} className="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-700 ease-out" loading="lazy" />
@@ -89,7 +85,6 @@ function FavoritesPopover() {
                     )}
                     <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors duration-300" />
                   </div>
-                  {/* Info */}
                   <div className="flex-1 min-w-0 flex flex-col justify-center">
                     <p className="text-sm font-bold text-gray-900 dark:text-gray-100 truncate group-hover:text-[#8CE600] transition-colors">{court.name}</p>
                     <p className="text-[11px] font-medium text-gray-500 dark:text-gray-400 mt-1">
@@ -105,7 +100,6 @@ function FavoritesPopover() {
           )}
         </div>
 
-        {/* Footer */}
         <div className="p-4 border-t border-gray-100 dark:border-white/5 bg-white/50 dark:bg-white/[0.01] backdrop-blur-md">
           <DropdownMenuItem
             onClick={() => { navigate('/lz_user/favorites'); setOpen(false); }}
@@ -232,7 +226,7 @@ export function Header() {
   const { isAuthenticated, user, logout } = useAuthStore();
 
   const NAV_LINKS = [
-    { label: t('footer.navigation.championships'), href: '/catalog' },
+    { label: t('footer.navigation.courts'), href: '/catalog' },
     { label: t('footer.institutional.about'), href: '/about' },
     { label: t('footer.bottom.contactUs'), href: '/contact' },
   ];
@@ -261,7 +255,6 @@ export function Header() {
         <div className="px-4 sm:px-6 lg:px-8">
           <div className={`flex items-center justify-between transition-all duration-500 ${scrolled ? 'h-16' : 'h-20'}`}>
             
-            {/* LOGO */}
             <Link to="/" className="flex items-center gap-3 group" id="header-logo">
               <img 
                 src={logoUrl} 
@@ -274,7 +267,6 @@ export function Header() {
               </span>
             </Link>
 
-            {/* DESKTOP NAV */}
             <nav className="hidden md:flex items-center gap-8" aria-label="Navegação principal">
               {NAV_LINKS.map((link) => (
                 <a
@@ -288,7 +280,6 @@ export function Header() {
               ))}
             </nav>
 
-            {/* DESKTOP ACTIONS */}
             <div className="hidden md:flex items-center gap-5">
               <button
                 onClick={toggleTheme}
@@ -325,7 +316,6 @@ export function Header() {
               )}
             </div>
 
-            {/* MOBILE MENU BUTTON */}
             <div className="flex items-center gap-3 md:hidden">
               <button
                 onClick={toggleTheme}
@@ -358,7 +348,6 @@ export function Header() {
           </div>
         </div>
 
-        {/* MOBILE NAV */}
         <div
           className={`md:hidden overflow-hidden transition-all duration-500 ease-in-out bg-white/40 dark:bg-background/40 backdrop-blur-md ${
             mobileOpen ? 'max-h-[500px] opacity-100 border-t border-gray-200/50 dark:border-white/10/50' : 'max-h-0 opacity-0'

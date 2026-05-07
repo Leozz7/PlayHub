@@ -13,8 +13,7 @@ export function useSignalR() {
     }
 
     return () => {
-      // Opt to keep alive or close on unmount
-      // signalRService.stopConnection();
+      signalRService.stopConnection();
     };
   }, [token]);
 

@@ -1,12 +1,13 @@
 import { useState, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useTranslation } from 'react-i18next';
 import { api } from '@/lib/api';
 import { toast } from 'sonner';
 import { 
   Users, Search, Filter, ShieldAlert, User as UserIcon, Edit2, 
   Mail, Lock, Info, Activity, ShieldCheck, MapPin, 
-  MoreHorizontal, Trash2, Plus
+  MoreHorizontal, Trash2, Plus, Phone
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Dialog, DialogContent } from '@/components/ui/dialog';
@@ -41,6 +42,8 @@ type UserDto = {
   id: string;
   name: string;
   email: string;
+  phone?: string;
+  cpf?: string;
   role: string;
   coutsId: string[];
   created: string;
@@ -56,6 +59,7 @@ export type CourtDto = {
 
 
 export default function AdminUsers() {
+  const { t } = useTranslation();
   const queryClient = useQueryClient();
   const [searchParams, setSearchParams] = useSearchParams();
   
@@ -78,6 +82,8 @@ export default function AdminUsers() {
   const [editId, setEditId] = useState('');
   const [editName, setEditName] = useState('');
   const [editEmail, setEditEmail] = useState('');
+  const [editPhone, setEditPhone] = useState('');
+  const [editCpf, setEditCpf] = useState('');
   const [editPassword, setEditPassword] = useState('');
   const [editRole, setEditRole] = useState<string>('User');
   const [editCourts, setEditCourts] = useState<string[]>([]);
@@ -125,6 +131,8 @@ export default function AdminUsers() {
         id: editId,
         name: editName,
         email: editEmail,
+        phone: editPhone,
+        cpf: editCpf,
         password: editPassword || undefined,
         role: editRole,
         coutsId: editRole === 'Manager' ? editCourts : [],
@@ -133,17 +141,17 @@ export default function AdminUsers() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['admin', 'users'] });
-      toast.success('Usuário atualizado com sucesso!');
+      toast.success(t('admin.users.toasts.updateSuccess'));
       setIsModalOpen(false);
     },
     onError: () => {
       setStatusModal({
         isOpen: true,
         status: 'error',
-        title: 'Erro ao Atualizar',
-        message: 'Ocorreu um problema ao tentar salvar as alterações do usuário.'
+        title: t('admin.users.modals.errorTitle'),
+        message: t('admin.users.modals.updateErrorMessage')
       });
-      toast.error('Erro ao atualizar usuário.');
+      toast.error(t('admin.users.toasts.updateError'));
     }
   });
 
@@ -152,6 +160,8 @@ export default function AdminUsers() {
       const payload = {
         name: editName,
         email: editEmail,
+        phone: editPhone,
+        cpf: editCpf,
         password: editPassword,
         role: editRole,
       };
@@ -162,6 +172,8 @@ export default function AdminUsers() {
            id: newUserId,
            name: editName,
            email: editEmail,
+           phone: editPhone,
+           cpf: editCpf,
            role: editRole,
            coutsId: editCourts,
          };
@@ -170,17 +182,17 @@ export default function AdminUsers() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['admin', 'users'] });
-      toast.success('Usuário criado com sucesso!');
+      toast.success(t('admin.users.toasts.createSuccess'));
       setIsModalOpen(false);
     },
     onError: (error: any) => {
       setStatusModal({
         isOpen: true,
         status: 'error',
-        title: 'Erro ao Criar',
-        message: error?.response?.data || 'Ocorreu um problema ao tentar cadastrar o novo usuário.'
+        title: t('admin.users.modals.errorTitle'),
+        message: error?.response?.data || t('admin.users.modals.createErrorMessage')
       });
-      toast.error(error?.response?.data || 'Erro ao criar usuário.');
+      toast.error(error?.response?.data || t('admin.users.toasts.createError'));
     }
   });
 
@@ -194,20 +206,20 @@ export default function AdminUsers() {
       setStatusModal({
         isOpen: true,
         status: 'success',
-        title: 'Usuário Removido',
-        message: 'O usuário foi excluído permanentemente da plataforma.'
+        title: t('admin.users.modals.deleteSuccessTitle'),
+        message: t('admin.users.modals.deleteSuccessMessage')
       });
-      toast.success('Usuário excluído com sucesso!');
+      toast.success(t('admin.users.toasts.deleteSuccess'));
     },
     onError: () => {
       setDeleteModalOpen(false);
       setStatusModal({
         isOpen: true,
         status: 'error',
-        title: 'Erro na Exclusão',
-        message: 'Não foi possível remover este usuário no momento.'
+        title: t('admin.users.modals.errorTitle'),
+        message: t('admin.users.modals.deleteErrorMessage')
       });
-      toast.error('Erro ao excluir usuário.');
+      toast.error(t('admin.users.toasts.deleteError'));
     }
   });
 
@@ -218,6 +230,8 @@ export default function AdminUsers() {
     setEditId('');
     setEditName('');
     setEditEmail('');
+    setEditPhone('');
+    setEditCpf('');
     setEditPassword('');
     setEditRole('User');
     setEditCourts([]);
@@ -231,6 +245,8 @@ export default function AdminUsers() {
     setEditId(user.id);
     setEditName(user.name);
     setEditEmail(user.email);
+    setEditPhone(user.phone || '');
+    setEditCpf(user.cpf || '');
     setEditPassword('');
     setEditRole(user.role);
     setEditCourts(user.coutsId || []);
@@ -254,9 +270,9 @@ export default function AdminUsers() {
   };
 
   const getRoleBadge = (role: string) => {
-    if (role === 'Admin') return <Badge className="rounded-full font-black text-[10px] uppercase tracking-widest bg-red-500/10 text-red-500 border-red-500/20 px-3 py-1.5"><ShieldAlert className="w-3.5 h-3.5 mr-1.5" /> Admin</Badge>;
-    if (role === 'Manager') return <Badge className="rounded-full font-black text-[10px] uppercase tracking-widest bg-blue-500/10 text-blue-500 border-blue-500/20 px-3 py-1.5"><ShieldCheck className="w-3.5 h-3.5 mr-1.5" /> Gestor</Badge>;
-    return <Badge className="rounded-full font-black text-[10px] uppercase tracking-widest bg-[#8CE600]/10 text-[#6aad00] dark:text-[#8CE600] border border-[#8CE600]/20 px-3 py-1.5"><UserIcon className="w-3.5 h-3.5 mr-1.5" /> Usuário</Badge>;
+    if (role === 'Admin') return <Badge className="rounded-full font-black text-[10px] uppercase tracking-widest bg-red-500/10 text-red-500 border-red-500/20 px-3 py-1.5"><ShieldAlert className="w-3.5 h-3.5 mr-1.5" /> {t('admin.dashboard.role.admin')}</Badge>;
+    if (role === 'Manager') return <Badge className="rounded-full font-black text-[10px] uppercase tracking-widest bg-blue-500/10 text-blue-500 border-blue-500/20 px-3 py-1.5"><ShieldCheck className="w-3.5 h-3.5 mr-1.5" /> {t('admin.dashboard.role.manager')}</Badge>;
+    return <Badge className="rounded-full font-black text-[10px] uppercase tracking-widest bg-[#8CE600]/10 text-[#6aad00] dark:text-[#8CE600] border border-[#8CE600]/20 px-3 py-1.5"><UserIcon className="w-3.5 h-3.5 mr-1.5" /> {t('admin.dashboard.role.athlete')}</Badge>;
   };
 
   return (
@@ -267,25 +283,25 @@ export default function AdminUsers() {
             <div className="w-12 h-12 rounded-2xl bg-[#8CE600]/10 border border-[#8CE600]/20 flex items-center justify-center text-[#8CE600]">
               <Users className="w-6 h-6" />
             </div>
-            Gestão de Usuários
+            {t('admin.users.title')}
           </h1>
-          <p className="text-gray-500 dark:text-gray-400">Gerencie perfis, permissões e associações de quadras na plataforma.</p>
+          <p className="text-gray-500 dark:text-gray-400">{t('admin.users.subtitle')}</p>
         </div>
         <Button 
           onClick={handleCreateClick}
           className="bg-[#8CE600] text-gray-950 hover:opacity-90 font-black px-6 py-6 rounded-2xl shadow-lg shadow-[#8CE600]/20"
         >
           <Plus className="w-5 h-5 mr-2" />
-          Novo Usuário
+          {t('admin.users.newUser')}
         </Button>
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         {[
-          { label: 'Total de Usuários', value: pagedUsers?.totalCount || 0, icon: Users, color: 'text-blue-500' },
-          { label: 'Administradores', value: users.filter(u => u.role === 'Admin').length, icon: ShieldAlert, color: 'text-red-500' },
-          { label: 'Gestores de Arena', value: users.filter(u => u.role === 'Manager').length, icon: ShieldCheck, color: 'text-purple-500' },
-          { label: 'Usuários Comuns', value: users.filter(u => u.role === 'User').length, icon: UserIcon, color: 'text-[#8CE600]' },
+          { label: t('admin.users.stats.total'), value: pagedUsers?.totalCount || 0, icon: Users, color: 'text-blue-500' },
+          { label: t('admin.users.stats.admins'), value: users.filter(u => u.role === 'Admin').length, icon: ShieldAlert, color: 'text-red-500' },
+          { label: t('admin.users.stats.managers'), value: users.filter(u => u.role === 'Manager').length, icon: ShieldCheck, color: 'text-purple-500' },
+          { label: t('admin.users.stats.athletes'), value: users.filter(u => u.role === 'User').length, icon: UserIcon, color: 'text-[#8CE600]' },
         ].map((stat, i) => (
           <motion.div 
             initial={{ opacity: 0, y: 20 }}
@@ -310,7 +326,7 @@ export default function AdminUsers() {
           <div className="relative flex-1 w-full">
             <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
             <Input
-              placeholder="Buscar por nome ou e-mail..."
+              placeholder={t('admin.users.searchPlaceholder')}
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               className="pl-11 h-12 bg-gray-50 dark:bg-white/5 border-none rounded-xl focus-visible:ring-2 focus-visible:ring-[#8CE600]/50"
@@ -320,13 +336,13 @@ export default function AdminUsers() {
             <Select value={selectedRole} onValueChange={setSelectedRole}>
               <SelectTrigger className="h-12 bg-gray-50 dark:bg-white/5 border-none rounded-xl focus:ring-2 focus:ring-[#8CE600]/50">
                 <Filter className="w-4 h-4 mr-2 text-gray-400" />
-                <SelectValue placeholder="Papel" />
+                <SelectValue placeholder={t('admin.users.rolePlaceholder')} />
               </SelectTrigger>
               <SelectContent className="rounded-xl border-gray-100 dark:border-white/10">
-                <SelectItem value="all">Todos os Papéis</SelectItem>
-                <SelectItem value="Admin">Admin</SelectItem>
-                <SelectItem value="Manager">Gestor</SelectItem>
-                <SelectItem value="User">Usuário</SelectItem>
+                <SelectItem value="all">{t('admin.users.allRoles')}</SelectItem>
+                <SelectItem value="Admin">{t('admin.dashboard.role.admin')}</SelectItem>
+                <SelectItem value="Manager">{t('admin.dashboard.role.manager')}</SelectItem>
+                <SelectItem value="User">{t('admin.dashboard.role.athlete')}</SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -336,11 +352,11 @@ export default function AdminUsers() {
           <Table>
             <TableHeader>
               <TableRow className="border-b border-gray-100 dark:border-white/10 hover:bg-transparent">
-                <TableHead className="px-6 py-4 font-bold text-xs uppercase tracking-widest text-gray-400">Usuário</TableHead>
-                <TableHead className="px-6 py-4 font-bold text-xs uppercase tracking-widest text-gray-400">E-mail</TableHead>
-                <TableHead className="px-6 py-4 font-bold text-xs uppercase tracking-widest text-gray-400">Papel</TableHead>
-                <TableHead className="px-6 py-4 font-bold text-xs uppercase tracking-widest text-gray-400">Quadras Assoc.</TableHead>
-                <TableHead className="px-6 py-4 font-bold text-xs uppercase tracking-widest text-gray-400">Cadastro</TableHead>
+                <TableHead className="px-6 py-4 font-bold text-xs uppercase tracking-widest text-gray-400">{t('admin.users.table.user')}</TableHead>
+                <TableHead className="px-6 py-4 font-bold text-xs uppercase tracking-widest text-gray-400">{t('admin.users.table.email')}</TableHead>
+                <TableHead className="px-6 py-4 font-bold text-xs uppercase tracking-widest text-gray-400">{t('admin.users.table.role')}</TableHead>
+                <TableHead className="px-6 py-4 font-bold text-xs uppercase tracking-widest text-gray-400">{t('admin.users.table.courts')}</TableHead>
+                <TableHead className="px-6 py-4 font-bold text-xs uppercase tracking-widest text-gray-400">{t('admin.users.table.joined')}</TableHead>
                 <TableHead className="px-6 py-4 text-right"></TableHead>
               </TableRow>
             </TableHeader>
@@ -363,8 +379,8 @@ export default function AdminUsers() {
                       <div className="p-4 bg-gray-50 dark:bg-white/5 rounded-full mb-4">
                         <Users className="w-8 h-8" />
                       </div>
-                      <p className="font-bold">Nenhum usuário encontrado</p>
-                      <p className="text-sm">Tente ajustar seus filtros ou crie um novo usuário.</p>
+                      <p className="font-bold">{t('admin.users.noUsers')}</p>
+                      <p className="text-sm">{t('admin.users.noUsersDesc')}</p>
                     </div>
                   </TableCell>
                 </TableRow>
@@ -571,6 +587,40 @@ export default function AdminUsers() {
                                 onChange={e => setEditEmail(e.target.value)}
                                 className="h-12 pl-12 bg-gray-50 dark:bg-white/5 border-none rounded-xl text-base font-bold focus-visible:ring-[#8CE600]/50"
                                 placeholder="joao@playhub.com"
+                              />
+                            </div>
+                          </div>
+
+                          <div className="space-y-2 col-span-2 md:col-span-1">
+                            <Label className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-400 ml-1">Telefone (Opcional)</Label>
+                            <div className="relative">
+                              <Phone className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                              <Input 
+                                value={editPhone}
+                                onChange={e => setEditPhone(e.target.value)}
+                                className="h-12 pl-12 bg-gray-50 dark:bg-white/5 border-none rounded-xl text-base font-bold focus-visible:ring-[#8CE600]/50"
+                                placeholder="(11) 99999-9999"
+                              />
+                            </div>
+                          </div>
+
+                          <div className="space-y-2 col-span-2 md:col-span-1">
+                            <Label className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-400 ml-1">CPF (Opcional)</Label>
+                            <div className="relative">
+                              <UserIcon className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                              <Input 
+                                value={editCpf}
+                                onChange={e => {
+                                  const val = e.target.value.replace(/\D/g, '').slice(0, 11);
+                                  const formatted = val
+                                    .replace(/(\d{3})(\d)/, '$1.$2')
+                                    .replace(/(\d{3})(\d)/, '$1.$2')
+                                    .replace(/(\d{3})(\d{1,2})$/, '$1-$2');
+                                  setEditCpf(formatted);
+                                }}
+                                className="h-12 pl-12 bg-gray-50 dark:bg-white/5 border-none rounded-xl text-base font-bold focus-visible:ring-[#8CE600]/50"
+                                placeholder="000.000.000-00"
+                                maxLength={14}
                               />
                             </div>
                           </div>
