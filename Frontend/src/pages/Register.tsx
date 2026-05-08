@@ -25,7 +25,10 @@ export default function Register() {
     firstName: z.string().min(2, t('register.validation.nameMin')),
     lastName: z.string().min(2, t('register.validation.lastNameMin')),
     email: z.string().email(t('register.validation.emailInvalid')),
-    password: z.string().min(6, t('register.validation.passwordMin')),
+    password: z.string()
+      .min(8, t('register.validation.passwordMin'))
+      .regex(/[A-Z]/, t('register.validation.passwordUpper'))
+      .regex(/[0-9]/, t('register.validation.passwordNumber')),
     confirmPassword: z.string()
   }).refine((data) => data.password === data.confirmPassword, {
     message: t('register.validation.passwordMismatch'),

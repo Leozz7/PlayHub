@@ -1,7 +1,9 @@
+import { useState, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { 
   FileText, Search, Filter, ShieldAlert, Activity, Monitor, 
-  Terminal, User, Clock, CheckCircle2, AlertCircle, Trash2, ArrowDownToLine
+  Terminal, User, Clock, CheckCircle2, AlertCircle, Trash2, ArrowDownToLine,
+  RefreshCcw, Database, ShieldCheck, HeartPulse
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Input } from '@/components/ui/input';
@@ -18,17 +20,23 @@ import {
 } from '@/components/ui/table';
 
 const MOCK_LOGS = [
-  { id: 'LOG-001', type: 'info', action: 'Login Bem-sucedido', user: 'admin@playhub.com', date: new Date().toISOString(), ip: '192.168.1.45', details: 'Autenticação via Web' },
-  { id: 'LOG-002', type: 'warning', action: 'Tentativa de Login Falha', user: 'desconhecido', date: new Date(Date.now() - 3600000).toISOString(), ip: '45.22.19.100', details: 'Senha incorreta 3 vezes' },
-  { id: 'LOG-003', type: 'error', action: 'Falha no Pagamento', user: 'joao.silva@email.com', date: new Date(Date.now() - 7200000).toISOString(), ip: '177.10.20.5', details: 'Cartão recusado pelo banco' },
-  { id: 'LOG-004', type: 'success', action: 'Reserva Confirmada', user: 'maria.souza@email.com', date: new Date(Date.now() - 86400000).toISOString(), ip: '177.50.30.1', details: 'Reserva #RES-998 na Quadra Principal' },
-  { id: 'LOG-005', type: 'info', action: 'Atualização de Sistema', user: 'system', date: new Date(Date.now() - 172800000).toISOString(), ip: '127.0.0.1', details: 'Migração de banco de dados V2' },
+  { id: 'LOG-001', type: 'info', action: 'HTTP GET /api/courts', user: 'admin@playhub.com', date: new Date().toISOString(), ip: '192.168.1.45', details: 'Query: { "city": "São Paulo" } - 200 OK (45ms)' },
+  { id: 'LOG-002', type: 'warning', action: 'Fail-Fast Validation', user: 'desconhecido', date: new Date(Date.now() - 3600000).toISOString(), ip: '45.22.19.100', details: 'Password complexity failed - Request blocked before hashing' },
+  { id: 'LOG-003', type: 'error', action: 'Database Connection', user: 'system', date: new Date(Date.now() - 7200000).toISOString(), ip: '127.0.0.1', details: 'MongoDB replicaset timeout - Automatic retry initiated' },
+  { id: 'LOG-004', type: 'success', action: 'Price Calculated', user: 'maria.souza@email.com', date: new Date(Date.now() - 86400000).toISOString(), ip: '177.50.30.1', details: 'Server-side price calculation for Reservation #RES-998' },
+  { id: 'LOG-005', type: 'info', action: 'Serilog Initialized', user: 'system', date: new Date(Date.now() - 172800000).toISOString(), ip: '127.0.0.1', details: 'Structured logging sink: logs/playhub-2024.log' },
 ];
 
 export default function AdminLogs() {
   const [searchParams, setSearchParams] = useSearchParams();
+  const [isRefreshing, setIsRefreshing] = useState(false);
   const search = searchParams.get('search') || '';
   const selectedType = searchParams.get('type') || 'all';
+
+  const handleRefresh = () => {
+    setIsRefreshing(true);
+    setTimeout(() => setIsRefreshing(false), 800);
+  };
 
   const updateFilters = (key: string, value: string) => {
     const params = new URLSearchParams(searchParams);
@@ -66,15 +74,49 @@ export default function AdminLogs() {
             </div>
             Logs do Sistema
           </h1>
-          <p className="text-gray-500 dark:text-gray-400">Rastreamento de auditoria e registro de atividades da plataforma.</p>
+          <p className="text-gray-500 dark:text-gray-400 font-medium">Auditoria estruturada com Serilog & Observabilidade RFC 7807.</p>
         </div>
         <div className="flex gap-3">
+          <Button 
+            onClick={handleRefresh}
+            variant="outline" 
+            className="h-12 px-6 rounded-2xl font-bold text-gray-700 dark:text-gray-300 border-gray-200 dark:border-white/10 hover:bg-gray-50 dark:hover:bg-white/5"
+          >
+            <RefreshCcw className={`w-4 h-4 mr-2 ${isRefreshing ? 'animate-spin' : ''}`} /> Sincronizar
+          </Button>
           <Button variant="outline" className="h-12 px-6 rounded-2xl font-bold text-gray-700 dark:text-gray-300 border-gray-200 dark:border-white/10 hover:bg-gray-50 dark:hover:bg-white/5">
-            <ArrowDownToLine className="w-4 h-4 mr-2" /> Exportar CSV
+            <ArrowDownToLine className="w-4 h-4 mr-2" /> Exportar
           </Button>
-          <Button variant="outline" className="h-12 px-6 rounded-2xl font-bold text-red-500 border-red-500/20 hover:bg-red-500/10 hover:text-red-600">
-            <Trash2 className="w-4 h-4 mr-2" /> Limpar Logs Antigos
-          </Button>
+        </div>
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="bg-white dark:bg-card p-6 rounded-[2rem] border border-gray-100 dark:border-white/10 shadow-sm flex items-center gap-4">
+          <div className="w-12 h-12 rounded-2xl bg-[#8CE600]/10 flex items-center justify-center text-[#8CE600]">
+            <HeartPulse className="w-6 h-6" />
+          </div>
+          <div>
+            <p className="text-[10px] font-black uppercase tracking-widest text-gray-400">Health Check</p>
+            <p className="text-xl font-black text-gray-900 dark:text-white">Saudável</p>
+          </div>
+        </div>
+        <div className="bg-white dark:bg-card p-6 rounded-[2rem] border border-gray-100 dark:border-white/10 shadow-sm flex items-center gap-4">
+          <div className="w-12 h-12 rounded-2xl bg-blue-500/10 flex items-center justify-center text-blue-500">
+            <Database className="w-6 h-6" />
+          </div>
+          <div>
+            <p className="text-[10px] font-black uppercase tracking-widest text-gray-400">Log Sink</p>
+            <p className="text-xl font-black text-gray-900 dark:text-white">MongoDB / File</p>
+          </div>
+        </div>
+        <div className="bg-white dark:bg-card p-6 rounded-[2rem] border border-gray-100 dark:border-white/10 shadow-sm flex items-center gap-4">
+          <div className="w-12 h-12 rounded-2xl bg-purple-500/10 flex items-center justify-center text-purple-500">
+            <ShieldCheck className="w-6 h-6" />
+          </div>
+          <div>
+            <p className="text-[10px] font-black uppercase tracking-widest text-gray-400">Segurança</p>
+            <p className="text-xl font-black text-gray-900 dark:text-white">Padrão RFC 7807</p>
+          </div>
         </div>
       </div>
 
@@ -83,7 +125,7 @@ export default function AdminLogs() {
           <div className="relative flex-1 w-full">
             <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
             <Input
-              placeholder="Buscar por ação ou usuário..."
+              placeholder="Buscar por evento, detalhes ou usuário..."
               value={search}
               onChange={(e) => updateFilters('search', e.target.value)}
               className="pl-11 h-12 bg-white dark:bg-card border-none shadow-sm rounded-2xl focus-visible:ring-2 focus-visible:ring-[#8CE600]/50"
@@ -110,11 +152,11 @@ export default function AdminLogs() {
           <Table>
             <TableHeader>
               <TableRow className="border-b border-gray-100 dark:border-white/10 hover:bg-transparent">
-                <TableHead className="px-6 py-4 font-black text-xs uppercase tracking-widest text-gray-400">Data e Hora</TableHead>
-                <TableHead className="px-6 py-4 font-black text-xs uppercase tracking-widest text-gray-400">Ação / Evento</TableHead>
-                <TableHead className="px-6 py-4 font-black text-xs uppercase tracking-widest text-gray-400">Tipo</TableHead>
-                <TableHead className="px-6 py-4 font-black text-xs uppercase tracking-widest text-gray-400">Usuário / Origem</TableHead>
-                <TableHead className="px-6 py-4 font-black text-xs uppercase tracking-widest text-gray-400">IP</TableHead>
+                <TableHead className="px-6 py-4 font-black text-xs uppercase tracking-widest text-gray-400">Timestamp</TableHead>
+                <TableHead className="px-6 py-4 font-black text-xs uppercase tracking-widest text-gray-400">Evento Estruturado</TableHead>
+                <TableHead className="px-6 py-4 font-black text-xs uppercase tracking-widest text-gray-400">Nível</TableHead>
+                <TableHead className="px-6 py-4 font-black text-xs uppercase tracking-widest text-gray-400">Identidade</TableHead>
+                <TableHead className="px-6 py-4 font-black text-xs uppercase tracking-widest text-gray-400">Network IP</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -126,7 +168,7 @@ export default function AdminLogs() {
                         <FileText className="w-8 h-8" />
                       </div>
                       <p className="font-bold">Nenhum log encontrado</p>
-                      <p className="text-sm">Tente ajustar seus filtros de busca.</p>
+                      <p className="text-sm">Os sinks do Serilog não retornaram resultados.</p>
                     </div>
                   </TableCell>
                 </TableRow>
@@ -152,9 +194,11 @@ export default function AdminLogs() {
                         </div>
                       </TableCell>
                       <TableCell className="px-6 py-4">
-                        <div className="flex flex-col">
-                          <span className="text-sm font-black text-gray-900 dark:text-white">{log.action}</span>
-                          <span className="text-xs text-gray-500 dark:text-gray-400 line-clamp-1">{log.details}</span>
+                        <div className="flex flex-col max-w-md">
+                          <span className="text-sm font-black text-gray-900 dark:text-white truncate">{log.action}</span>
+                          <span className="text-xs font-mono text-gray-500 dark:text-gray-400 line-clamp-2 bg-gray-50 dark:bg-white/5 p-2 rounded-lg mt-1">
+                            {log.details}
+                          </span>
                         </div>
                       </TableCell>
                       <TableCell className="px-6 py-4">
@@ -185,3 +229,4 @@ export default function AdminLogs() {
     </div>
   );
 }
+

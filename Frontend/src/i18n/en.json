@@ -170,7 +170,9 @@
       "nameMin": "Name must be at least 2 characters",
       "lastNameMin": "Last name must be at least 2 characters",
       "emailInvalid": "Invalid email",
-      "passwordMin": "Password must be at least 6 characters",
+      "passwordMin": "Password must be at least 8 characters",
+      "passwordUpper": "Password must contain at least one uppercase letter",
+      "passwordNumber": "Password must contain at least one number",
       "passwordMismatch": "Passwords do not match",
       "genericError": "An error occurred while creating the account."
     }
