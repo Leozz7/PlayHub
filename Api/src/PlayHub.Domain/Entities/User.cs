@@ -17,6 +17,9 @@ public class User : BaseEntity
     public string? RefreshToken { get; private set; }
     public DateTime? RefreshTokenExpiryTime { get; private set; }
 
+    public string? ResetPasswordToken { get; private set; }
+    public DateTime? ResetPasswordTokenExpiry { get; private set; }
+
     private User() { }
 
     public User(string name, string email, string emailIndex, string passwordHash, string role = "User")

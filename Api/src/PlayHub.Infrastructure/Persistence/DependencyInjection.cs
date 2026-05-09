@@ -44,6 +44,10 @@ public static class DependencyInjection
         services.AddHttpContextAccessor();
         services.AddScoped<ICurrentUserService, CurrentUserService>();
 
+        var resendApiKey = config["Resend:ApiKey"] ?? "re_xxxxxxxxx";
+        services.AddHttpClient();
+        services.AddSingleton<IResend>(ResendClient.Create(resendApiKey));
+        services.AddScoped<IEmailService, EmailService>();
 
         return services;
     }

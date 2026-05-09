@@ -10,6 +10,7 @@ import { Label } from '@/components/ui/label';
 import { usePlayHubToast } from '@/hooks/usePlayHubToast';
 import { ArrowLeft, Mail } from 'lucide-react';
 import { HeroBackground } from '@/components/ui/HeroBackground';
+import { api } from '@/lib/api';
 import logo from '/assets/logo.png';
 
 const forgotPasswordSchema = z.object({
@@ -31,12 +32,17 @@ export default function ForgotPassword() {
     resolver: zodResolver(forgotPasswordSchema),
   });
 
-  const onSubmit = async (_data: ForgotPasswordFormValues) => {
+  const onSubmit = async (data: ForgotPasswordFormValues) => {
     setIsSubmitting(true);
-    setTimeout(() => {
-      setIsSubmitting(false);
+    try {
+      await api.post('/auth/forgot-password', { email: data.email });
       phToast.forgotPasswordSuccess();
-    }, 1500);
+    } catch (error: any) {
+      const message = error.response?.data?.message || 'Erro ao processar solicitação.';
+      phToast.error(message);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
