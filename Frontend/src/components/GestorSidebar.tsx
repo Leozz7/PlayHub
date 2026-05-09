@@ -66,7 +66,7 @@ export function GestorSidebar() {
       title: t('gestor.sidebar.financial'),
       items: [
         { label: t('gestor.sidebar.payments'), icon: CreditCard, href: '/lz_gestor/payments' },
-        { label: t('gestor.sidebar.notifications'), icon: Bell, href: '/lz_gestor/notifications'},
+        { label: t('gestor.sidebar.notifications'), icon: Bell, href: '/lz_gestor/notifications' },
         { label: t('gestor.sidebar.settings'), icon: Settings, href: '/lz_gestor/settings' },
       ],
     },
@@ -80,9 +80,8 @@ export function GestorSidebar() {
 
   return (
     <aside
-      className={`relative flex flex-col h-screen bg-white dark:bg-background border-r border-gray-100 dark:border-white/[0.06] transition-all duration-500 ease-in-out flex-shrink-0 ${
-        collapsed ? 'w-[72px]' : 'w-[260px]'
-      }`}
+      className={`relative flex flex-col h-screen bg-white dark:bg-background border-r border-gray-100 dark:border-white/[0.06] transition-all duration-500 ease-in-out flex-shrink-0 ${collapsed ? 'w-[72px]' : 'w-[260px]'
+        }`}
     >
       {/* Glow background */}
       <div className="absolute top-0 left-0 right-0 h-64 bg-gradient-to-b from-[#8CE600]/5 to-transparent pointer-events-none" />
@@ -144,16 +143,14 @@ export function GestorSidebar() {
                     <Link
                       to={item.href}
                       title={collapsed ? item.label : undefined}
-                      className={`relative flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-200 group ${
-                        isActive
+                      className={`relative flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-200 group ${isActive
                           ? 'bg-[#8CE600] text-gray-950 shadow-lg shadow-[#8CE600]/25'
                           : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-white/[0.05] hover:text-gray-900 dark:hover:text-white'
-                      } ${collapsed ? 'justify-center' : ''}`}
+                        } ${collapsed ? 'justify-center' : ''}`}
                     >
                       <item.icon
-                        className={`shrink-0 transition-transform group-hover:scale-110 ${
-                          collapsed ? 'w-5 h-5' : 'w-4 h-4'
-                        }`}
+                        className={`shrink-0 transition-transform group-hover:scale-110 ${collapsed ? 'w-5 h-5' : 'w-4 h-4'
+                          }`}
                         strokeWidth={isActive ? 2.5 : 1.75}
                       />
                       {!collapsed && (
@@ -162,9 +159,8 @@ export function GestorSidebar() {
                         </span>
                       )}
                       {!collapsed && item.badge && (
-                        <span className={`min-w-[20px] h-5 px-1.5 rounded-full text-[10px] font-black flex items-center justify-center ${
-                          isActive ? 'bg-gray-950/20 text-gray-950' : 'bg-[#8CE600]/15 text-[#6aad00]'
-                        }`}>
+                        <span className={`min-w-[20px] h-5 px-1.5 rounded-full text-[10px] font-black flex items-center justify-center ${isActive ? 'bg-gray-950/20 text-gray-950' : 'bg-[#8CE600]/15 text-[#6aad00]'
+                          }`}>
                           {item.badge}
                         </span>
                       )}

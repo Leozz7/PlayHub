@@ -7,8 +7,8 @@ import {
   Activity, Users, Plus, CalendarCheck
 } from 'lucide-react';
 import { useAuthStore } from '@/data/useAuthStore';
-import { useManagementCourts } from '@/features/courts/hooks/useCourts';
 import { useReservations } from '@/features/reservations/hooks/useReservations';
+import { useDashboardStats, useDashboardTopCourts } from '@/features/dashboard/hooks/useDashboard';
 
 const STATUS_CONFIG = {
   2: { key: 'confirmed', icon: CheckCircle2, className: 'text-emerald-600 bg-emerald-50 dark:bg-emerald-950/40 dark:text-emerald-400' },
@@ -31,7 +31,7 @@ function formatValue(value: number, isCurrency: boolean, locale: string) {
   return value.toLocaleString(locale);
 }
 
-function StatCard({ stat, t, locale }: { stat: any, t: any, locale: string }) {
+function StatCard({ stat, t, locale }: { stat: { color: string; icon: React.ElementType; value: number; isCurrency: boolean; id: string }, t: (key: string) => string, locale: string }) {
   const col = COLOR_MAP[stat.color as keyof typeof COLOR_MAP];
 
   return (
@@ -52,7 +52,7 @@ function StatCard({ stat, t, locale }: { stat: any, t: any, locale: string }) {
   );
 }
 
-function ReservationRow({ r, t, locale }: { r: any, t: any, locale: string }) {
+function ReservationRow({ r, t, locale }: { r: { id: string; status: number; userName?: string; courtName?: string; startTime: string; endTime: string; totalPrice: number }, t: (key: string) => string, locale: string }) {
   const cfg = STATUS_CONFIG[r.status as keyof typeof STATUS_CONFIG] || STATUS_CONFIG[1];
   
   let statusLabel = t('admin.dashboard.resPending');
@@ -70,7 +70,7 @@ function ReservationRow({ r, t, locale }: { r: any, t: any, locale: string }) {
       </td>
       <td className="px-4 py-3">
         <div>
-          <p className="text-sm text-gray-700 dark:text-gray-300 font-medium">{r.courtName || t('gestor.dashboard.deletedCourt', 'Quadra Excluída')}</p>
+          <p className="text-sm text-gray-700 dark:text-gray-300 font-medium">{r.courtName || t('gestor.dashboard.deletedCourt')}</p>
         </div>
       </td>
       <td className="px-4 py-3">
@@ -91,7 +91,7 @@ function ReservationRow({ r, t, locale }: { r: any, t: any, locale: string }) {
   );
 }
 
-export default function GestorDashboard() {
+export default function ManagerDashboard() {
   const { user } = useAuthStore();
   const { t, i18n } = useTranslation();
   const locale = i18n.language === 'pt' ? 'pt-BR' : i18n.language === 'es' ? 'es-ES' : 'en-US';
@@ -104,53 +104,24 @@ export default function GestorDashboard() {
 
   const firstName = user?.name?.split(' ')[0] ?? 'Gestor';
 
-  const { data: courtsData } = useManagementCourts({ pageSize: 100 });
-  const courts = courtsData?.items || [];
+  const { data: statsData } = useDashboardStats();
+  const { data: topCourtsData } = useDashboardTopCourts();
   
-  const { data: reservationsData } = useReservations({ pageSize: 100 });
-  const reservations = reservationsData?.items || [];
+  const { data: recentResData } = useReservations({ pageSize: 6 });
+  const recentReservations = recentResData?.items || [];
 
-  const currentMonth = new Date().getMonth();
-  const currentYear = new Date().getFullYear();
+  const todayStr = new Date().toISOString().split('T')[0];
+  const { data: todayResData } = useReservations({ date: todayStr, pageSize: 50 });
+  const scheduleToday = todayResData?.items || [];
 
-  const currentMonthReservations = reservations.filter((r: any) => {
-      const d = new Date(r.startTime);
-      return d.getMonth() === currentMonth && d.getFullYear() === currentYear;
-  });
-
-  const uniqueClients = new Set(reservations.map((r: any) => r.userId)).size;
-  const revenue = reservations.filter((r: any) => r.status === 2).reduce((sum: number, r: any) => sum + r.totalPrice, 0);
+  const topCourts = topCourtsData || [];
 
   const stats = [
-    { id: 'managedCourts', value: courts.length, icon: Building2, color: 'green', isCurrency: false },
-    { id: 'reservationsMonth', value: currentMonthReservations.length, icon: CalendarDays, color: 'violet', isCurrency: false },
-    { id: 'uniqueClients', value: uniqueClients, icon: Users, color: 'blue', isCurrency: false },
-    { id: 'monthlyRevenue', value: revenue, icon: CreditCard, color: 'amber', isCurrency: true },
+    { id: 'managedCourts', value: statsData?.managedCourts || 0, icon: Building2, color: 'green', isCurrency: false },
+    { id: 'reservationsMonth', value: statsData?.reservationsMonth || 0, icon: CalendarDays, color: 'violet', isCurrency: false },
+    { id: 'uniqueClients', value: statsData?.uniqueClients || 0, icon: Users, color: 'blue', isCurrency: false },
+    { id: 'monthlyRevenue', value: statsData?.monthlyRevenue || 0, icon: CreditCard, color: 'amber', isCurrency: true },
   ];
-
-  const recentReservations = reservations.slice(0, 6);
-
-  const topCourts = useMemo(() => {
-    const courtStats: Record<string, { revenue: number, reservations: number }> = {};
-    reservations.forEach((r: any) => {
-      if (!courtStats[r.courtId]) courtStats[r.courtId] = { revenue: 0, reservations: 0 };
-      courtStats[r.courtId].reservations += 1;
-      if (r.status === 2) {
-        courtStats[r.courtId].revenue += r.totalPrice;
-      }
-    });
-
-    return courts.map((c: any) => ({
-      ...c,
-      revenue: courtStats[c.id]?.revenue || 0,
-      reservations: courtStats[c.id]?.reservations || 0,
-    })).sort((a: any, b: any) => b.revenue - a.revenue);
-  }, [courts, reservations]);
-
-  const scheduleToday = useMemo(() => {
-      const today = new Date().toDateString();
-      return reservations.filter((r: any) => new Date(r.startTime).toDateString() === today);
-  }, [reservations]);
 
 
   return (
@@ -167,7 +138,7 @@ export default function GestorDashboard() {
               <span className="w-1.5 h-1.5 bg-blue-500 rounded-full animate-pulse" />
               <span className="text-[10px] font-black uppercase tracking-widest text-blue-500">{t('gestor.dashboard.managerBadge')}</span>
             </div>
-            <Link to="/lz_gestor/courts/new"
+            <Link to="/manager/courts/new"
               className="flex items-center gap-1.5 px-3 py-1.5 bg-[#8CE600] text-gray-950 rounded-full text-xs font-black hover:bg-[#7bc400] transition-all shadow-md shadow-[#8CE600]/20">
               <Plus className="w-3.5 h-3.5" /> {t('gestor.dashboard.newCourt')}
             </Link>
@@ -210,8 +181,8 @@ export default function GestorDashboard() {
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-gray-100 dark:divide-white/[0.04]">
-                      {recentReservations.length > 0 ? recentReservations.map((r: any) => (
-                        <ReservationRow key={r.id} r={r} t={t} locale={locale} />
+                      {recentReservations.length > 0 ? recentReservations.map((r) => (
+                        <ReservationRow key={r.id} r={r as any} t={t} locale={locale} />
                       )) : (
                         <tr><td colSpan={6} className="text-center py-4 text-xs text-gray-500">{t('gestor.dashboard.table.noResults')}</td></tr>
                       )}
@@ -222,7 +193,7 @@ export default function GestorDashboard() {
 
               {activeTab === 'schedule' && (
                 <div className="divide-y divide-gray-100 dark:divide-white/[0.04]">
-                  {scheduleToday.length > 0 ? scheduleToday.map((item: any, i: number) => {
+                  {scheduleToday.length > 0 ? scheduleToday.map((item, i: number) => {
                     const cfg = STATUS_CONFIG[item.status as keyof typeof STATUS_CONFIG] || STATUS_CONFIG[1];
                     let statusLabel = t('admin.dashboard.resPending');
                     if (item.status === 2) statusLabel = t('admin.dashboard.resConfirmed');
@@ -250,7 +221,7 @@ export default function GestorDashboard() {
               )}
 
               <div className="p-4 border-t border-gray-100 dark:border-white/[0.06]">
-                <Link to="/lz_gestor/reservations" className="text-xs font-bold text-[#6aad00] dark:text-[#8CE600] hover:opacity-70 flex items-center gap-1 transition-opacity">
+                <Link to="/manager/reservations" className="text-xs font-bold text-[#6aad00] dark:text-[#8CE600] hover:opacity-70 flex items-center gap-1 transition-opacity">
                   {t('gestor.dashboard.viewAll')} <ArrowUpRight className="w-3 h-3" />
                 </Link>
               </div>
@@ -265,7 +236,7 @@ export default function GestorDashboard() {
                       <h3 className="text-sm font-black text-gray-900 dark:text-white">{t('gestor.dashboard.revenueByCourt')}</h3>
                     </div>
                     <div className="space-y-3">
-                      {topCourts.slice(0, 5).map((court: any) => {
+                      {topCourts.slice(0, 5).map((court) => {
                         const maxRev = topCourts[0]?.revenue || 1;
                         const pct = Math.round((court.revenue / maxRev) * 100);
                         return (
@@ -289,8 +260,8 @@ export default function GestorDashboard() {
                 <div className="space-y-3">
                   {[
                     { label: t('gestor.dashboard.todayStats.reservations'), value: scheduleToday.length, icon: CalendarDays },
-                    { label: t('gestor.dashboard.todayStats.revenue'), value: formatValue(scheduleToday.reduce((s: number, r: any) => s + r.totalPrice, 0), true, locale), icon: CreditCard },
-                    { label: t('gestor.dashboard.todayStats.clients'), value: new Set(scheduleToday.map((r: any) => r.userId)).size, icon: Users },
+                    { label: t('gestor.dashboard.todayStats.revenue'), value: formatValue(scheduleToday.reduce((s: number, r) => s + r.totalPrice, 0), true, locale), icon: CreditCard },
+                    { label: t('gestor.dashboard.todayStats.clients'), value: new Set(scheduleToday.map((r) => r.userId)).size, icon: Users },
                   ].map(item => (
                     <div key={item.label} className="flex items-center gap-3">
                       <div className="w-8 h-8 rounded-xl bg-[#8CE600]/10 border border-[#8CE600]/20 flex items-center justify-center shrink-0">
@@ -310,9 +281,9 @@ export default function GestorDashboard() {
                 <p className="text-[11px] text-gray-950/60 mb-3">{t('gestor.dashboard.quickActionsDesc')}</p>
                 <div className="space-y-2">
                   {[
-                    { label: t('gestor.dashboard.actions.blockTime'), href: '/lz_gestor/schedule' },
-                    { label: t('gestor.dashboard.actions.viewRequests'), href: '/lz_gestor/reservations' },
-                    { label: t('gestor.dashboard.actions.editCourt'), href: '/lz_gestor/courts' },
+                    { label: t('gestor.dashboard.actions.blockTime'), href: '/manager/schedule' },
+                    { label: t('gestor.dashboard.actions.viewRequests'), href: '/manager/reservations' },
+                    { label: t('gestor.dashboard.actions.editCourt'), href: '/manager/courts' },
                   ].map(a => (
                     <Link key={a.label} to={a.href}
                       className="flex items-center justify-between w-full px-3 py-2.5 bg-black/10 hover:bg-black/20 rounded-xl transition-all group">

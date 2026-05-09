@@ -17,17 +17,32 @@ public class GetReservationsHandler : IRequestHandler<GetReservationsQuery, Page
 {
     private readonly IApplicationDbContext _context;
     private readonly IEncryptionService _encryptionService;
+    private readonly ICurrentUserService _currentUserService;
 
-    public GetReservationsHandler(IApplicationDbContext context, IEncryptionService encryptionService)
+    public GetReservationsHandler(IApplicationDbContext context, IEncryptionService encryptionService, ICurrentUserService currentUserService)
     {
         _context = context;
         _encryptionService = encryptionService;
+        _currentUserService = currentUserService;
     }
 
     public async Task<PagedResult<ReservationDto>> Handle(GetReservationsQuery request, CancellationToken cancellationToken)
     {
         var filterBuilder = Builders<Domain.Entities.Reservation>.Filter;
         var filter = filterBuilder.Empty;
+
+        if (_currentUserService.IsManager && !_currentUserService.IsAdmin)
+        {
+            var managerCourtIds = _currentUserService.CourtIds;
+            if (managerCourtIds != null && managerCourtIds.Any())
+            {
+                filter &= filterBuilder.In(r => r.CourtId, managerCourtIds);
+            }
+            else
+            {
+                filter &= filterBuilder.Eq(r => r.CourtId, Guid.Empty);
+            }
+        }
 
         if (request.CourtId.HasValue)
         {
