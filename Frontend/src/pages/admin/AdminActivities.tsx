@@ -2,12 +2,12 @@ import { useMemo, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import { api } from '@/lib/api';
-import { 
-  Activity, 
-  UserPlus, 
-  CalendarCheck, 
-  CheckCircle2, 
-  XCircle, 
+import {
+  Activity,
+  UserPlus,
+  CalendarCheck,
+  CheckCircle2,
+  XCircle,
   Search,
   Filter,
   ArrowUpRight
@@ -81,7 +81,7 @@ export default function AdminActivities() {
           type: 'booking_confirmed',
           title: t('admin.activities.types.booking_confirmed'),
           user: r.userName || 'User',
-          date: r.created, 
+          date: r.created,
           details: `${r.courtName}`,
           link: `/lz_admin/bookings`
         });
@@ -99,11 +99,11 @@ export default function AdminActivities() {
     });
 
     const sorted = list.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
-    
+
     if (filterType !== 'all') {
       return sorted.filter(a => a.type === filterType);
     }
-    
+
     return sorted;
   }, [usersData, reservationsData, t, filterType]);
 
@@ -178,7 +178,7 @@ export default function AdminActivities() {
               </div>
             ) : (
               activities.map((item, idx) => (
-                <motion.div 
+                <motion.div
                   key={item.id}
                   initial={{ opacity: 0, x: -20 }}
                   animate={{ opacity: 1, x: 0 }}
@@ -188,7 +188,7 @@ export default function AdminActivities() {
                   <div className="absolute left-0 w-10 h-10 rounded-xl bg-white dark:bg-background border border-gray-100 dark:border-white/10 flex items-center justify-center shadow-sm group-hover:border-[#8CE600]/50 transition-colors z-10">
                     {getActivityIcon(item.type)}
                   </div>
-                  
+
                   <div className="flex-1">
                     <div className="flex items-center gap-2 mb-0.5">
                       <span className="text-sm font-black text-gray-900 dark:text-white">{item.title}</span>
@@ -203,7 +203,7 @@ export default function AdminActivities() {
                   </div>
 
                   {item.link && (
-                    <Link 
+                    <Link
                       to={item.link}
                       className="px-4 py-2 bg-gray-50 dark:bg-white/5 hover:bg-[#8CE600]/10 hover:text-[#8CE600] rounded-xl text-[10px] font-black uppercase tracking-widest transition-all opacity-0 group-hover:opacity-100 flex items-center gap-1.5"
                     >

@@ -53,13 +53,13 @@ export default function Register() {
         email: data.email,
         password: data.password
       };
-      
+
       const response = await api.post('/auth/register', payload);
-      
+
       if (response.data?.accessToken && response.data?.user) {
         setAuth(response.data.user, response.data.accessToken);
         phToast.registerSuccess();
-        
+
         if (response.data.user.role === 'Admin' || response.data.user.role === 'Manager') {
           navigate('/admin');
         } else {
@@ -90,7 +90,7 @@ export default function Register() {
           </p>
 
           <div className="mt-10 flex flex-col gap-4 text-left">
-            {(t('register.steps', { returnObjects: true }) as {n: string, label: string}[]).map(step => (
+            {(t('register.steps', { returnObjects: true }) as { n: string, label: string }[]).map(step => (
               <div key={step.n} className="flex items-center gap-4 bg-white/60 dark:bg-gray-800/60 backdrop-blur-sm rounded-2xl px-5 py-3.5 border border-gray-100 dark:border-gray-700/50">
                 <span className="text-xs font-black text-[#8CE600]">{step.n}</span>
                 <span className="text-sm font-semibold text-gray-700 dark:text-gray-300">{step.label}</span>

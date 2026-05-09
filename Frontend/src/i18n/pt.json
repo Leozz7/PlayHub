@@ -1,10 +1,14 @@
 {
   "common": {
+    "cover": "Capa",
+    "other": "Outro",
+    "user": "Usuário",
     "actions": {
       "login": "Entrar",
       "register": "Criar Conta",
       "save": "Salvar",
       "cancel": "Cancelar",
+      "processing": "Processando...",
       "delete": "Excluir",
       "edit": "Editar",
       "view": "Visualizar",
@@ -16,8 +20,6 @@
       "removeFavorite": "Remover dos favoritos",
       "currency": "R$",
       "perHour": "/h",
-      "cover": "Capa",
-      "other": "Outro",
       "days": {
         "sunday": "Domingo",
         "monday": "Segunda-feira",
@@ -268,7 +270,8 @@
       "currentPassRequired": "Informe sua senha atual.",
       "newPassLength": "A nova senha deve ter pelo menos 8 caracteres.",
       "passMismatch": "As senhas não coincidem.",
-      "passSuccess": "Senha alterada com sucesso!"
+      "passSuccess": "Senha alterada com sucesso!",
+      "cpfInvalid": "CPF inválido. Verifique os números informados."
     },
     "quickAccessItems": {
       "reservations": {
@@ -831,11 +834,8 @@
       "schedule": "Horário",
       "value": "Valor",
       "status": "Status",
-      "role": "Perfil",
       "joinedAt": "Cadastrado",
       "reservations": "reservas",
-      "athlete": "Atleta",
-      "manager": "Gestor",
       "noReservations": "Nenhuma reserva encontrada.",
       "noUsers": "Nenhum usuário encontrado.",
       "systemHealth": "Saúde do Sistema",
@@ -898,103 +898,187 @@
       "dashboard": {
         "viewAll": "Ver tudo",
         "resConfirmed": "Confirmada",
-        "resPending": "Pendente",
-        "role": {
-          "admin": "Admin",
-          "manager": "Gestor",
-          "athlete": "Atleta"
-        }
+        "resPending": "Pendente"
+      }
+    },
+    "roles": {
+      "admin": "Admin",
+      "manager": "Gestor",
+      "athlete": "Atleta"
+    },
+    "users": {
+      "title": "Gestão de Usuários",
+      "subtitle": "Gerencie perfis, permissões e associações de quadras na plataforma.",
+      "newUser": "Novo Usuário",
+      "searchPlaceholder": "Buscar por nome ou e-mail...",
+      "rolePlaceholder": "Papel",
+      "allRoles": "Todos os Papéis",
+      "noUsers": "Nenhum usuário encontrado",
+      "noUsersDesc": "Tente ajustar seus filtros ou crie um novo usuário.",
+      "noName": "Sem nome",
+      "stats": {
+        "total": "Total de Usuários",
+        "admins": "Administradores",
+        "managers": "Gestores de Arena",
+        "athletes": "Usuários Comuns"
       },
-      "users": {
-        "title": "Gestão de Usuários",
-        "subtitle": "Gerencie perfis, permissões e associações de quadras na plataforma.",
-        "newUser": "Novo Usuário",
-        "searchPlaceholder": "Buscar por nome ou e-mail...",
-        "rolePlaceholder": "Papel",
-        "allRoles": "Todos os Papéis",
-        "noUsers": "Nenhum usuário encontrado",
-        "noUsersDesc": "Tente ajustar seus filtros ou crie um novo usuário.",
-        "stats": {
-          "total": "Total de Usuários",
-          "admins": "Administradores",
-          "managers": "Gestores de Arena",
-          "athletes": "Usuários Comuns"
-        },
-        "table": {
-          "user": "Usuário",
-          "email": "E-mail",
-          "role": "Papel",
-          "courts": "Quadras Assoc.",
-          "joined": "Cadastro"
-        },
-        "modals": {
-          "errorTitle": "Erro",
-          "updateErrorMessage": "Ocorreu um problema ao tentar salvar as alterações do usuário.",
-          "createErrorMessage": "Ocorreu um problema ao tentar cadastrar o novo usuário.",
-          "deleteSuccessTitle": "Usuário Removido",
-          "deleteSuccessMessage": "O usuário foi excluído permanentemente da plataforma.",
-          "deleteErrorMessage": "Não foi possível remover este usuário no momento."
-        },
-        "toasts": {
-          "updateSuccess": "Usuário atualizado com sucesso!",
-          "updateError": "Erro ao atualizar usuário.",
-          "createSuccess": "Usuário criado com sucesso!",
-          "createError": "Erro ao criar usuário.",
-          "deleteSuccess": "Usuário excluído com sucesso!",
-          "deleteError": "Erro ao excluir usuário."
-        }
+      "table": {
+        "user": "Usuário",
+        "email": "E-mail",
+        "role": "Papel",
+        "courts": "Quadras Assoc.",
+        "joined": "Cadastro",
+        "courtsCount": "{{count}} quadras",
+        "actions": "Ações"
       },
-      "settings": {
-        "title": "Configurações do Sistema",
-        "subtitle": "Ajuste os parâmetros globais da plataforma e preferências do painel.",
-        "save": "Salvar Alterações",
-        "saving": "Salvando...",
-        "saveSuccess": "Configurações salvas com sucesso!",
-        "statusModal": {
-          "loadingTitle": "Salvando Configurações",
-          "loadingMsg": "Aguarde um instante enquanto aplicamos as novas diretrizes ao sistema.",
-          "successTitle": "Configurações Salvas",
-          "successMsg": "Tudo pronto! As alterações foram aplicadas com sucesso em toda a plataforma."
+      "actions": {
+        "edit": "Editar",
+        "delete": "Excluir"
+      },
+      "modals": {
+        "newUserTitle": "Novo Usuário",
+        "editUserTitle": "Editar Usuário",
+        "registration": "Cadastro",
+        "adjustments": "Ajustes",
+        "infoTab": "Informações",
+        "accessTab": "Papel e Acesso",
+        "security": "Segurança",
+        "protectedData": "Dados Protegidos",
+        "personalData": "Dados Pessoais",
+        "fullName": "Nome Completo",
+        "fullNamePlaceholder": "Ex: João Silva",
+        "emailAccess": "E-mail de Acesso",
+        "emailPlaceholder": "joao@playhub.com",
+        "phoneOptional": "Telefone (Opcional)",
+        "phonePlaceholder": "(11) 99999-9999",
+        "cpfOptional": "CPF (Opcional)",
+        "cpfPlaceholder": "000.000.000-00",
+        "password": "Senha",
+        "passwordHint": "Senha {{mode}}",
+        "passwordModeEdit": "(Deixe em branco para manter)",
+        "passwordModeCreate": "de Acesso",
+        "passwordPlaceholder": "••••••••",
+        "securityTip": "Dica de Segurança",
+        "securityTipDesc": "Recomendamos o uso de senhas fortes com no mínimo 8 caracteres, incluindo letras, números e símbolos.",
+        "roleOnPlatform": "Papel na Plataforma",
+        "roles": {
+          "user": "Usuário Comum",
+          "userDesc": "Reserva quadras e gerencia favoritos.",
+          "manager": "Gestor de Arena",
+          "managerDesc": "Gerencia as quadras associadas.",
+          "admin": "Administrador",
+          "adminDesc": "Acesso total a todas as funções."
         },
-        "sections": {
-          "general": {
-            "title": "Informações Básicas",
-            "subtitle": "Dados principais da plataforma",
-            "siteName": "Nome da Plataforma",
-            "currency": "Moeda Padrão",
-            "supportEmail": "E-mail de Suporte"
-          },
-          "notifications": {
-            "title": "Notificações",
-            "subtitle": "Alertas do sistema",
-            "email": "E-mails Transacionais",
-            "emailDesc": "Enviar confirmações de reserva e alertas por e-mail.",
-            "sms": "Alertas por SMS / WhatsApp",
-            "smsDesc": "Notificar os jogadores via celular. (Requer integração)."
-          },
-          "appearance": {
-            "title": "Aparência",
-            "subtitle": "Tema do painel",
-            "light": "Claro",
-            "dark": "Escuro"
-          },
-          "danger": {
-            "title": "Zona de Risco",
-            "subtitle": "Ações críticas",
-            "maintenance": "Modo de Manutenção",
-            "maintenanceDesc": "Bloqueia o acesso de usuários comuns. Apenas administradores poderão entrar no sistema.",
-            "clearCache": "Limpar Cache"
-          },
-          "profile": {
-            "title": "Meu Perfil (Admin)",
-            "subtitle": "Seus dados pessoais de acesso",
-            "phone": "Telefone",
-            "cpf": "CPF"
-          }
+        "courtAssociation": "Associação de Quadras",
+        "courtsSelected": "{{count}} selecionadas",
+        "searchCourts": "Buscar quadras...",
+        "registerBtn": "Cadastrar Usuário",
+        "saveBtn": "Salvar Alterações",
+        "deleteConfirmTitle": "Excluir Usuário?",
+        "deleteConfirmDesc": "Esta ação é irreversível. Todas as permissões e associações deste usuário serão perdidas.",
+        "errorTitle": "Erro",
+        "updateErrorMessage": "Ocorreu um problema ao tentar salvar as alterações do usuário.",
+        "createErrorMessage": "Ocorreu um problema ao tentar cadastrar o novo usuário.",
+        "deleteSuccessTitle": "Usuário Removido",
+        "deleteSuccessMessage": "O usuário foi excluído permanentemente da plataforma.",
+        "deleteErrorMessage": "Não foi possível remover este usuário no momento."
+      },
+      "toasts": {
+        "updateSuccess": "Usuário atualizado com sucesso!",
+        "updateError": "Erro ao atualizar usuário.",
+        "createSuccess": "Usuário criado com sucesso!",
+        "createError": "Erro ao criar usuário.",
+        "deleteSuccess": "Usuário excluído com sucesso!",
+        "deleteError": "Erro ao excluir usuário."
+      }
+    },
+    "settings": {
+      "title": "Configurações do Sistema",
+      "subtitle": "Ajuste os parâmetros globais da plataforma e preferências do painel.",
+      "save": "Salvar Alterações",
+      "saving": "Salvando...",
+      "saveSuccess": "Configurações salvas com sucesso!",
+      "statusModal": {
+        "loadingTitle": "Salvando Configurações",
+        "loadingMsg": "Aguarde um instante enquanto aplicamos as novas diretrizes ao sistema.",
+        "successTitle": "Configurações Salvas",
+        "successMsg": "Tudo pronto! As alterações foram aplicadas com sucesso em toda a plataforma."
+      },
+      "sections": {
+        "general": {
+          "title": "Informações Básicas",
+          "subtitle": "Dados principais da plataforma",
+          "siteName": "Nome da Plataforma",
+          "currency": "Moeda Padrão",
+          "supportEmail": "E-mail de Suporte"
+        },
+        "notifications": {
+          "title": "Notificações",
+          "subtitle": "Alertas do sistema",
+          "email": "E-mails Transacionais",
+          "emailDesc": "Enviar confirmações de reserva e alertas por e-mail.",
+          "sms": "Alertas por SMS / WhatsApp",
+          "smsDesc": "Notificar os jogadores via celular. (Requer integração)."
+        },
+        "appearance": {
+          "title": "Aparência",
+          "subtitle": "Tema do painel",
+          "light": "Claro",
+          "dark": "Escuro"
+        },
+        "danger": {
+          "title": "Zona de Risco",
+          "subtitle": "Ações críticas",
+          "maintenance": "Modo de Manutenção",
+          "maintenanceDesc": "Bloqueia o acesso de usuários comuns. Apenas administradores poderão entrar no sistema.",
+          "clearCache": "Limpar Cache"
+        },
+        "profile": {
+          "title": "Meu Perfil (Admin)",
+          "subtitle": "Seus dados pessoais de acesso",
+          "phone": "Telefone",
+          "cpf": "CPF"
+        }
+      }
+    },
+    "logs": {
+      "title": "Logs do Sistema",
+      "subtitle": "Auditoria em tempo real conectada ao MongoDB do backend.",
+      "sync": "Sincronizar",
+      "export": "Exportar",
+      "stats": {
+        "health": "Health Check",
+        "healthy": "Saudável",
+        "sink": "Log Sink",
+        "audit": "Auditoria",
+        "connected": "Conectado"
+      },
+      "searchPlaceholder": "Buscar por evento, detalhes ou usuário...",
+      "typePlaceholder": "Tipo de Log",
+      "allLevels": "Todos os Logs",
+      "levels": {
+        "info": "Info",
+        "warning": "Alerta",
+        "error": "Erro",
+        "critical": "Crítico",
+        "other": "Outro"
+      },
+      "table": {
+        "timestamp": "Timestamp",
+        "message": "Mensagem do Sistema",
+        "level": "Nível",
+        "identity": "Identidade",
+        "actions": "Ações"
+      },
+      "noLogs": "Nenhum log encontrado",
+      "noLogsDesc": "A consulta ao MongoDB não retornou registros.",
+      "pagination": {
+        "showing": "Mostrando {{count}} de {{total}} logs registrados",
+        "previous": "Anterior",
+        "next": "Próximo"
       }
     }
-  }
-},
+  },
   "gestor": {
     "sidebar": {
       "main": "Principal",
@@ -1017,7 +1101,7 @@
       "collapse": "Recolher barra lateral"
     },
     "dashboard": {
-      "greeting": "Painel do Gestor, {{name}} 🏟️",
+      "greeting": "Painel do Gestor, {{name}}",
       "managerBadge": "Gestor",
       "newCourt": "Nova Quadra",
       "stats": {
@@ -1050,7 +1134,8 @@
         "court": "Quadra",
         "time": "Horário",
         "value": "Valor",
-        "status": "Status"
+        "status": "Status",
+        "noResults": "Nenhuma reserva encontrada"
       },
       "viewAll": "Ver todas",
       "revenueByCourt": "Receita por Quadra",

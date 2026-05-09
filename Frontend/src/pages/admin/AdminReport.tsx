@@ -2,26 +2,26 @@ import { useState, useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import { api } from '@/lib/api';
-import { 
-  BarChart3, 
-  Download, 
-  Calendar, 
-  TrendingUp, 
-  Users, 
-  CreditCard, 
+import {
+  BarChart3,
+  Download,
+  Calendar,
+  TrendingUp,
+  Users,
+  CreditCard,
   Building2,
   FileText,
   ChevronDown,
   ArrowUpRight,
   CheckCircle2
 } from 'lucide-react';
-import { 
-  LineChart, 
-  Line, 
-  XAxis, 
-  YAxis, 
-  CartesianGrid, 
-  Tooltip, 
+import {
+  LineChart,
+  Line,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
   ResponsiveContainer,
   Cell,
   PieChart,
@@ -32,18 +32,18 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
 import {
-    DropdownMenu,
-    DropdownMenuContent,
-    DropdownMenuItem,
-    DropdownMenuTrigger,
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import {
-    Table,
-    TableBody,
-    TableCell,
-    TableHead,
-    TableHeader,
-    TableRow,
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
 } from '@/components/ui/table';
 import { StatusModal } from '@/components/ui/PremiumModal';
 import { Dialog, DialogContent } from '@/components/ui/dialog';
@@ -112,16 +112,16 @@ export default function AdminReport() {
     const days = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sab'];
     const data = [];
     const now = new Date();
-    
+
     for (let i = 6; i >= 0; i--) {
       const date = new Date(now);
       date.setDate(date.getDate() - i);
       const dayName = days[date.getDay()];
-      
+
       const dayRevenue = paymentsData
         ?.filter((p: any) => p.status === 2 && new Date(p.created).toDateString() === date.toDateString())
         .reduce((acc: number, p: any) => acc + p.amount, 0) || 0;
-        
+
       data.push({ name: dayName, revenue: dayRevenue });
     }
     return data;
@@ -151,15 +151,15 @@ export default function AdminReport() {
       title: 'Gerando Relatório',
       message: 'Aguarde enquanto preparamos seu documento PDF premium...'
     });
-    
+
     try {
       const filteredReservations = reservationsData?.filter((r: any) => selectedCourts.includes(r.courtId)) || [];
       // Also we need to recalculate stats based on selected courts if necessary.
       // But for simplicity and UI consistency, we will pass filtered reservations to the PDF.
       // Let's also recalculate the stats to be passed to the PDF.
-      
+
       const confirmedBookings = filteredReservations.filter((r: any) => r.status === 2).length;
-      const totalRevenue = paymentsData?.filter((p: any) => 
+      const totalRevenue = paymentsData?.filter((p: any) =>
         p.status === 2 && filteredReservations.some((r: any) => r.id === p.reservationId)
       ).reduce((acc: number, p: any) => acc + p.amount, 0) || 0;
 
@@ -172,7 +172,7 @@ export default function AdminReport() {
       };
 
       await exportAdminReportPDF({ stats: filteredStats, reservationsData: filteredReservations, t });
-      
+
       setStatusModal({
         isOpen: true,
         status: 'success',
@@ -216,7 +216,7 @@ export default function AdminReport() {
           </h1>
           <p className="text-gray-500 dark:text-gray-400">{t('admin.reports.subtitle')}</p>
         </div>
-        
+
         <div className="flex items-center gap-3">
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
@@ -233,7 +233,7 @@ export default function AdminReport() {
             </DropdownMenuContent>
           </DropdownMenu>
 
-          <Button 
+          <Button
             onClick={openExportModal}
             className="h-12 px-6 bg-[#8CE600] text-gray-950 hover:opacity-90 font-black rounded-2xl shadow-lg shadow-[#8CE600]/20 transition-all hover:scale-[1.02]"
           >
@@ -290,14 +290,14 @@ export default function AdminReport() {
                   <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f0f0f0" />
                   <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fontSize: 12, fontWeight: 700, fill: '#94a3b8' }} />
                   <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 12, fontWeight: 700, fill: '#94a3b8' }} />
-                  <Tooltip 
+                  <Tooltip
                     contentStyle={{ borderRadius: '1.25rem', border: 'none', boxShadow: '0 20px 25px -5px rgb(0 0 0 / 0.1)', padding: '1rem', fontWeight: 'bold' }}
                   />
-                  <Line 
-                    type="monotone" 
-                    dataKey="revenue" 
-                    stroke="#8CE600" 
-                    strokeWidth={5} 
+                  <Line
+                    type="monotone"
+                    dataKey="revenue"
+                    stroke="#8CE600"
+                    strokeWidth={5}
                     dot={{ r: 0 }}
                     activeDot={{ r: 8, fill: '#8CE600', stroke: '#fff', strokeWidth: 4 }}
                   />
@@ -332,7 +332,7 @@ export default function AdminReport() {
                       <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                     ))}
                   </Pie>
-                  <Tooltip 
+                  <Tooltip
                     contentStyle={{ borderRadius: '1rem', border: 'none', boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)' }}
                   />
                 </PieChart>
@@ -356,7 +356,7 @@ export default function AdminReport() {
       {/* Recent Activity Table (for the report context) */}
       <div className="bg-white dark:bg-card border border-gray-100 dark:border-white/10 rounded-[2.5rem] overflow-hidden shadow-xl shadow-black/5">
         <div className="p-8 border-b border-gray-100 dark:border-white/10 flex items-center justify-between bg-gray-50/50 dark:bg-white/[0.02]">
-           <h3 className="text-lg font-black text-gray-900 dark:text-white flex items-center gap-3">
+          <h3 className="text-lg font-black text-gray-900 dark:text-white flex items-center gap-3">
             <div className="p-2 rounded-xl bg-purple-500/10 text-purple-500">
               <FileText className="w-5 h-5" />
             </div>
@@ -366,7 +366,7 @@ export default function AdminReport() {
             {t('admin.dashboard.viewAll')}
           </Button>
         </div>
-        
+
         <div className="overflow-x-auto">
           <Table>
             <TableHeader>
@@ -407,9 +407,8 @@ export default function AdminReport() {
                     <span className="text-sm font-black text-[#8CE600]">R$ {r.totalPrice}</span>
                   </TableCell>
                   <TableCell className="px-8 py-5">
-                    <Badge className={`rounded-full text-[10px] font-black uppercase tracking-widest px-3 py-1 ${
-                      r.status === 2 ? 'bg-[#8CE600]/10 text-[#6aad00] dark:text-[#8CE600] border border-[#8CE600]/20' : 'bg-gray-100 text-gray-500'
-                    }`}>
+                    <Badge className={`rounded-full text-[10px] font-black uppercase tracking-widest px-3 py-1 ${r.status === 2 ? 'bg-[#8CE600]/10 text-[#6aad00] dark:text-[#8CE600] border border-[#8CE600]/20' : 'bg-gray-100 text-gray-500'
+                      }`}>
                       {r.status === 2 ? t('admin.dashboard.resConfirmed') : t('admin.dashboard.resPending')}
                     </Badge>
                   </TableCell>
@@ -418,11 +417,11 @@ export default function AdminReport() {
             </TableBody>
           </Table>
         </div>
-        
+
         <div className="p-6 bg-gray-50/30 dark:bg-white/[0.01] border-t border-gray-100 dark:border-white/10 flex justify-center">
-            <Button variant="ghost" className="text-xs font-black uppercase tracking-[0.2em] text-gray-400 hover:text-[#8CE600] transition-all">
-              {t('admin.activities.table.viewMore')} <ArrowUpRight className="w-3 h-3 ml-2" />
-            </Button>
+          <Button variant="ghost" className="text-xs font-black uppercase tracking-[0.2em] text-gray-400 hover:text-[#8CE600] transition-all">
+            {t('admin.activities.table.viewMore')} <ArrowUpRight className="w-3 h-3 ml-2" />
+          </Button>
         </div>
       </div>
 
@@ -447,7 +446,7 @@ export default function AdminReport() {
             </p>
 
             <div className="space-y-2 max-h-[300px] overflow-y-auto pr-2 mb-6 custom-scrollbar">
-              <div 
+              <div
                 className="flex items-center gap-3 p-3 rounded-xl hover:bg-gray-50 dark:hover:bg-white/5 cursor-pointer transition-colors border border-transparent hover:border-gray-100 dark:hover:border-white/10"
                 onClick={toggleAllCourts}
               >
@@ -456,10 +455,10 @@ export default function AdminReport() {
                 </div>
                 <span className="font-bold text-gray-900 dark:text-white">Selecionar Todas</span>
               </div>
-              
+
               {courtsData?.map((court: any) => (
-                <div 
-                  key={court.id} 
+                <div
+                  key={court.id}
                   className="flex items-center gap-3 p-3 rounded-xl hover:bg-gray-50 dark:hover:bg-white/5 cursor-pointer transition-colors border border-transparent hover:border-gray-100 dark:hover:border-white/10"
                   onClick={() => toggleCourt(court.id)}
                 >
@@ -472,7 +471,7 @@ export default function AdminReport() {
                   </div>
                 </div>
               ))}
-              
+
               {courtsData?.length === 0 && (
                 <p className="text-center text-gray-500 py-4 text-sm font-medium">Nenhuma quadra encontrada.</p>
               )}

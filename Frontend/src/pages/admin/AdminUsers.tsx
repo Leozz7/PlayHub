@@ -270,9 +270,9 @@ export default function AdminUsers() {
   };
 
   const getRoleBadge = (role: string) => {
-    if (role === 'Admin') return <Badge className="rounded-full font-black text-[10px] uppercase tracking-widest bg-red-500/10 text-red-500 border-red-500/20 px-3 py-1.5"><ShieldAlert className="w-3.5 h-3.5 mr-1.5" /> {t('admin.dashboard.role.admin')}</Badge>;
-    if (role === 'Manager') return <Badge className="rounded-full font-black text-[10px] uppercase tracking-widest bg-blue-500/10 text-blue-500 border-blue-500/20 px-3 py-1.5"><ShieldCheck className="w-3.5 h-3.5 mr-1.5" /> {t('admin.dashboard.role.manager')}</Badge>;
-    return <Badge className="rounded-full font-black text-[10px] uppercase tracking-widest bg-[#8CE600]/10 text-[#6aad00] dark:text-[#8CE600] border border-[#8CE600]/20 px-3 py-1.5"><UserIcon className="w-3.5 h-3.5 mr-1.5" /> {t('admin.dashboard.role.athlete')}</Badge>;
+    if (role === 'Admin') return <Badge className="rounded-full font-black text-[10px] uppercase tracking-widest bg-red-500/10 text-red-500 border-red-500/20 px-3 py-1.5"><ShieldAlert className="w-3.5 h-3.5 mr-1.5" /> {t('admin.roles.admin')}</Badge>;
+    if (role === 'Manager') return <Badge className="rounded-full font-black text-[10px] uppercase tracking-widest bg-blue-500/10 text-blue-500 border-blue-500/20 px-3 py-1.5"><ShieldCheck className="w-3.5 h-3.5 mr-1.5" /> {t('admin.roles.manager')}</Badge>;
+    return <Badge className="rounded-full font-black text-[10px] uppercase tracking-widest bg-[#8CE600]/10 text-[#6aad00] dark:text-[#8CE600] border border-[#8CE600]/20 px-3 py-1.5"><UserIcon className="w-3.5 h-3.5 mr-1.5" /> {t('admin.roles.athlete')}</Badge>;
   };
 
   return (
@@ -287,13 +287,13 @@ export default function AdminUsers() {
           </h1>
           <p className="text-gray-500 dark:text-gray-400">{t('admin.users.subtitle')}</p>
         </div>
-        <Button 
+        <button 
           onClick={handleCreateClick}
-          className="bg-[#8CE600] text-gray-950 hover:opacity-90 font-black px-6 py-6 rounded-2xl shadow-lg shadow-[#8CE600]/20"
+          className="bg-[#8CE600] text-gray-950 hover:opacity-90 font-black px-6 py-6 rounded-2xl shadow-lg shadow-[#8CE600]/20 flex items-center gap-2"
         >
-          <Plus className="w-5 h-5 mr-2" />
+          <Plus className="w-5 h-5" />
           {t('admin.users.newUser')}
-        </Button>
+        </button>
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -340,9 +340,9 @@ export default function AdminUsers() {
               </SelectTrigger>
               <SelectContent className="rounded-xl border-gray-100 dark:border-white/10">
                 <SelectItem value="all">{t('admin.users.allRoles')}</SelectItem>
-                <SelectItem value="Admin">{t('admin.dashboard.role.admin')}</SelectItem>
-                <SelectItem value="Manager">{t('admin.dashboard.role.manager')}</SelectItem>
-                <SelectItem value="User">{t('admin.dashboard.role.athlete')}</SelectItem>
+                <SelectItem value="Admin">{t('admin.roles.admin')}</SelectItem>
+                <SelectItem value="Manager">{t('admin.roles.manager')}</SelectItem>
+                <SelectItem value="User">{t('admin.roles.athlete')}</SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -403,7 +403,7 @@ export default function AdminUsers() {
                           }`}>
                             {(u.name || '?').charAt(0).toUpperCase()}
                           </div>
-                          <span className="text-sm font-bold text-gray-900 dark:text-white group-hover:text-[#8CE600] transition-colors">{u.name || 'Sem nome'}</span>
+                          <span className="text-sm font-bold text-gray-900 dark:text-white group-hover:text-[#8CE600] transition-colors">{u.name || t('admin.users.noName')}</span>
                         </div>
                       </TableCell>
                       <TableCell className="px-6 py-4">
@@ -415,7 +415,7 @@ export default function AdminUsers() {
                       <TableCell className="px-6 py-4">
                         {u.role === 'Manager' ? (
                           <Badge variant="outline" className="rounded-full border-gray-100 dark:border-white/10 text-[10px] font-bold">
-                            {u.coutsId?.length || 0} quadras
+                            {t('admin.users.table.courtsCount', { count: u.coutsId?.length || 0 })}
                           </Badge>
                         ) : (
                           <span className="text-xs text-gray-400">-</span>
@@ -434,9 +434,9 @@ export default function AdminUsers() {
                             </Button>
                           </DropdownMenuTrigger>
                           <DropdownMenuContent align="end" className="w-40 bg-white dark:bg-background border border-gray-100 dark:border-white/10 rounded-xl shadow-xl">
-                            <DropdownMenuLabel className="text-[10px] font-bold uppercase tracking-widest text-gray-400">Ações</DropdownMenuLabel>
+                            <DropdownMenuLabel className="text-[10px] font-bold uppercase tracking-widest text-gray-400">{t('admin.users.table.actions')}</DropdownMenuLabel>
                             <DropdownMenuItem onClick={() => handleEditClick(u)} className="flex items-center gap-2 text-xs font-bold py-2.5 rounded-lg cursor-pointer">
-                              <Edit2 className="w-3.5 h-3.5" /> Editar
+                              <Edit2 className="w-3.5 h-3.5" /> {t('admin.users.actions.edit')}
                             </DropdownMenuItem>
                             <DropdownMenuSeparator className="bg-gray-100 dark:bg-white/10" />
                             <DropdownMenuItem 
@@ -446,7 +446,7 @@ export default function AdminUsers() {
                               }}
                               className="flex items-center gap-2 text-xs font-bold text-red-500 py-2.5 rounded-lg cursor-pointer hover:bg-red-500/10!"
                             >
-                              <Trash2 className="w-3.5 h-3.5" /> Excluir
+                              <Trash2 className="w-3.5 h-3.5" /> {t('admin.users.actions.delete')}
                             </DropdownMenuItem>
                           </DropdownMenuContent>
                         </DropdownMenu>
@@ -462,7 +462,7 @@ export default function AdminUsers() {
         {pagedUsers && pagedUsers.totalPages > 1 && (
           <div className="p-6 border-t border-gray-100 dark:border-white/10 flex items-center justify-between">
             <p className="text-xs font-bold text-gray-500 dark:text-gray-400">
-              Mostrando <span className="text-gray-900 dark:text-white">{users.length}</span> de <span className="text-gray-900 dark:text-white">{pagedUsers.totalCount}</span> usuários
+              {t('admin.users.pagination.showing', { count: users.length, total: pagedUsers.totalCount })}
             </p>
             <div className="flex items-center gap-2">
               <Button
@@ -472,7 +472,7 @@ export default function AdminUsers() {
                 disabled={page === 1}
                 className="rounded-xl border-gray-100 dark:border-white/10 font-bold text-xs"
               >
-                Anterior
+                {t('admin.users.pagination.previous')}
               </Button>
               <div className="flex items-center gap-1">
                 {Array.from({ length: pagedUsers.totalPages }).map((_, i) => (
@@ -494,7 +494,7 @@ export default function AdminUsers() {
                 disabled={page === pagedUsers.totalPages}
                 className="rounded-xl border-gray-100 dark:border-white/10 font-bold text-xs"
               >
-                Próximo
+                {t('admin.users.pagination.next')}
               </Button>
             </div>
           </div>
@@ -510,14 +510,18 @@ export default function AdminUsers() {
                 <div className="w-10 h-10 bg-[#8CE600]/10 text-[#8CE600] rounded-xl flex items-center justify-center mb-4">
                   <UserIcon className="w-5 h-5" />
                 </div>
-                <h2 className="text-xl font-bold tracking-tight dark:text-white leading-none">{modalMode === 'create' ? 'Novo Usuário' : 'Editar Usuário'}</h2>
-                <p className="text-[10px] font-bold text-[#8CE600] uppercase tracking-[0.2em] mt-2">{modalMode === 'create' ? 'Cadastro' : 'Ajustes'}</p>
+                <h2 className="text-xl font-bold tracking-tight dark:text-white leading-none">
+                  {modalMode === 'create' ? t('admin.users.modals.newUserTitle') : t('admin.users.modals.editUserTitle')}
+                </h2>
+                <p className="text-[10px] font-bold text-[#8CE600] uppercase tracking-[0.2em] mt-2">
+                  {modalMode === 'create' ? t('admin.users.modals.registration') : t('admin.users.modals.adjustments')}
+                </p>
               </div>
 
               <nav className="flex-1 space-y-2">
                 {[
-                  { id: 'general', label: 'Informações', icon: UserIcon },
-                  { id: 'access', label: 'Papel e Acesso', icon: ShieldCheck },
+                  { id: 'general', label: t('admin.users.modals.infoTab'), icon: UserIcon },
+                  { id: 'access', label: t('admin.users.modals.accessTab'), icon: ShieldCheck },
                 ].map(item => (
                   <button
                     key={item.id}
@@ -540,8 +544,8 @@ export default function AdminUsers() {
                     <Activity className="w-4 h-4" />
                   </div>
                   <div className="min-w-0">
-                    <p className="text-[10px] font-bold text-gray-400 uppercase">Segurança</p>
-                    <p className="text-[11px] font-bold text-emerald-500 truncate">Dados Protegidos</p>
+                    <p className="text-[10px] font-bold text-gray-400 uppercase">{t('admin.users.modals.security')}</p>
+                    <p className="text-[11px] font-bold text-emerald-500 truncate">{t('admin.users.modals.protectedData')}</p>
                   </div>
                 </div>
               </div>
@@ -561,51 +565,51 @@ export default function AdminUsers() {
                       >
                         <div className="flex items-center gap-2 mb-2">
                           <div className="w-2 h-8 bg-[#8CE600] rounded-full" />
-                          <h3 className="text-xl font-bold">Dados Pessoais</h3>
+                          <h3 className="text-xl font-bold">{t('admin.users.modals.personalData')}</h3>
                         </div>
 
                         <div className="grid grid-cols-2 gap-6">
                           <div className="space-y-2 col-span-2 md:col-span-1">
-                            <Label className="text-[10px] font-bold uppercase tracking-[0.2em] text-gray-400 ml-1">Nome Completo</Label>
+                            <Label className="text-[10px] font-bold uppercase tracking-[0.2em] text-gray-400 ml-1">{t('admin.users.modals.fullName')}</Label>
                             <div className="relative">
                               <UserIcon className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
                               <Input 
                                 value={editName}
                                 onChange={e => setEditName(e.target.value)}
                                 className="h-12 pl-12 bg-gray-50 dark:bg-white/5 border-none rounded-xl text-base font-bold focus-visible:ring-[#8CE600]/50"
-                                placeholder="Ex: João Silva"
+                                placeholder={t('admin.users.modals.fullNamePlaceholder')}
                               />
                             </div>
                           </div>
 
                           <div className="space-y-2 col-span-2 md:col-span-1">
-                            <Label className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-400 ml-1">E-mail de Acesso</Label>
+                            <Label className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-400 ml-1">{t('admin.users.modals.emailAccess')}</Label>
                             <div className="relative">
                               <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
                               <Input 
                                 value={editEmail}
                                 onChange={e => setEditEmail(e.target.value)}
                                 className="h-12 pl-12 bg-gray-50 dark:bg-white/5 border-none rounded-xl text-base font-bold focus-visible:ring-[#8CE600]/50"
-                                placeholder="joao@playhub.com"
+                                placeholder={t('admin.users.modals.emailPlaceholder')}
                               />
                             </div>
                           </div>
 
                           <div className="space-y-2 col-span-2 md:col-span-1">
-                            <Label className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-400 ml-1">Telefone (Opcional)</Label>
+                            <Label className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-400 ml-1">{t('admin.users.modals.phoneOptional')}</Label>
                             <div className="relative">
                               <Phone className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
                               <Input 
                                 value={editPhone}
                                 onChange={e => setEditPhone(e.target.value)}
                                 className="h-12 pl-12 bg-gray-50 dark:bg-white/5 border-none rounded-xl text-base font-bold focus-visible:ring-[#8CE600]/50"
-                                placeholder="(11) 99999-9999"
+                                placeholder={t('admin.users.modals.phonePlaceholder')}
                               />
                             </div>
                           </div>
 
                           <div className="space-y-2 col-span-2 md:col-span-1">
-                            <Label className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-400 ml-1">CPF (Opcional)</Label>
+                            <Label className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-400 ml-1">{t('admin.users.modals.cpfOptional')}</Label>
                             <div className="relative">
                               <UserIcon className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
                               <Input 
@@ -619,7 +623,7 @@ export default function AdminUsers() {
                                   setEditCpf(formatted);
                                 }}
                                 className="h-12 pl-12 bg-gray-50 dark:bg-white/5 border-none rounded-xl text-base font-bold focus-visible:ring-[#8CE600]/50"
-                                placeholder="000.000.000-00"
+                                placeholder={t('admin.users.modals.cpfPlaceholder')}
                                 maxLength={14}
                               />
                             </div>
@@ -627,7 +631,9 @@ export default function AdminUsers() {
 
                           <div className="space-y-2 col-span-2">
                             <Label className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-400 ml-1">
-                              Senha {modalMode === 'edit' ? '(Deixe em branco para manter)' : 'de Acesso'}
+                              {t('admin.users.modals.passwordHint', { 
+                                mode: modalMode === 'edit' ? t('admin.users.modals.passwordModeEdit') : t('admin.users.modals.passwordModeCreate') 
+                              })}
                             </Label>
                             <div className="relative">
                               <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
@@ -636,7 +642,7 @@ export default function AdminUsers() {
                                 value={editPassword}
                                 onChange={e => setEditPassword(e.target.value)}
                                 className="h-12 pl-12 bg-gray-50 dark:bg-white/5 border-none rounded-xl text-base font-bold focus-visible:ring-[#8CE600]/50"
-                                placeholder="••••••••"
+                                placeholder={t('admin.users.modals.passwordPlaceholder')}
                               />
                             </div>
                           </div>
@@ -647,8 +653,8 @@ export default function AdminUsers() {
                             <Info className="w-6 h-6" />
                           </div>
                           <div>
-                            <p className="text-sm font-black uppercase tracking-widest mb-1 dark:text-white">Dica de Segurança</p>
-                            <p className="text-xs text-gray-500 font-medium leading-relaxed">Recomendamos o uso de senhas fortes com no mínimo 8 caracteres, incluindo letras, números e símbolos.</p>
+                            <p className="text-sm font-black uppercase tracking-widest mb-1 dark:text-white">{t('admin.users.modals.securityTip')}</p>
+                            <p className="text-xs text-gray-500 font-medium leading-relaxed">{t('admin.users.modals.securityTipDesc')}</p>
                           </div>
                         </div>
                       </motion.div>
@@ -664,17 +670,17 @@ export default function AdminUsers() {
                       >
                         <div className="flex items-center gap-2 mb-2">
                           <div className="w-2 h-8 bg-blue-500 rounded-full" />
-                          <h3 className="text-xl font-black">Papel e Permissões</h3>
+                          <h3 className="text-xl font-black">{t('admin.users.modals.roleOnPlatform')}</h3>
                         </div>
 
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                           <div className="space-y-4">
-                            <Label className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-400 ml-1">Papel na Plataforma</Label>
+                            <Label className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-400 ml-1">{t('admin.users.modals.roleOnPlatform')}</Label>
                             <div className="grid grid-cols-1 gap-3">
                               {[
-                                { value: 'User', label: 'Usuário Comum', icon: UserIcon, desc: 'Reserva quadras e gerencia favoritos.' },
-                                { value: 'Manager', label: 'Gestor de Arena', icon: ShieldCheck, desc: 'Gerencia as quadras associadas.' },
-                                { value: 'Admin', label: 'Administrador', icon: ShieldAlert, desc: 'Acesso total a todas as funções.' },
+                                { value: 'User', label: t('admin.users.modals.roles.user'), icon: UserIcon, desc: t('admin.users.modals.roles.userDesc') },
+                                { value: 'Manager', label: t('admin.users.modals.roles.manager'), icon: ShieldCheck, desc: t('admin.users.modals.roles.managerDesc') },
+                                { value: 'Admin', label: t('admin.users.modals.roles.admin'), icon: ShieldAlert, desc: t('admin.users.modals.roles.adminDesc') },
                               ].map(role => (
                                 <button
                                   key={role.value}
@@ -700,15 +706,15 @@ export default function AdminUsers() {
                           {editRole === 'Manager' && (
                             <div className="space-y-4 animate-in fade-in slide-in-from-right-8 duration-500">
                               <div className="flex items-center justify-between">
-                                <Label className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-400 ml-1">Associação de Quadras</Label>
-                                <span className="text-[10px] font-black bg-[#8CE600] text-gray-950 px-3 py-1 rounded-full">{editCourts.length} selecionadas</span>
+                                <Label className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-400 ml-1">{t('admin.users.modals.courtAssociation')}</Label>
+                                <span className="text-[10px] font-black bg-[#8CE600] text-gray-950 px-3 py-1 rounded-full">{t('admin.users.modals.courtsSelected', { count: editCourts.length })}</span>
                               </div>
                               
                               <div className="bg-gray-50 dark:bg-white/5 rounded-3xl p-6 border border-gray-100 dark:border-white/5 space-y-4">
                                 <div className="relative">
                                   <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
                                   <Input 
-                                    placeholder="Buscar quadras..." 
+                                    placeholder={t('admin.users.modals.searchCourts')} 
                                     value={courtSearch}
                                     onChange={e => setCourtSearch(e.target.value)}
                                     className="h-12 pl-12 bg-white dark:bg-card border-none rounded-xl text-sm font-bold"
@@ -755,15 +761,15 @@ export default function AdminUsers() {
               </ScrollArea>
 
               <div className="p-8 border-t border-gray-100 dark:border-white/10 bg-gray-50/30 dark:bg-white/[0.01] flex items-center justify-between">
-                <Button variant="ghost" onClick={() => setIsModalOpen(false)} className="rounded-xl font-bold text-xs uppercase tracking-widest px-8 h-12">Cancelar</Button>
+                <Button variant="ghost" onClick={() => setIsModalOpen(false)} className="rounded-xl font-bold text-xs uppercase tracking-widest px-8 h-12">{t('common.actions.cancel')}</Button>
                 <Button 
                   onClick={handleSave} 
                   disabled={updateMutation.isPending || createMutation.isPending}
                   className="h-12 px-12 text-xs font-bold bg-[#8CE600] hover:bg-[#7bc900] text-gray-950 rounded-xl uppercase tracking-[0.2em] transition-all active:scale-95"
                 >
                   {(updateMutation.isPending || createMutation.isPending) ? (
-                    <span className="flex items-center gap-2"><Activity className="w-4 h-4 animate-spin" /> Processando...</span>
-                  ) : modalMode === 'create' ? 'Cadastrar Usuário' : 'Salvar Alterações'}
+                    <span className="flex items-center gap-2"><Activity className="w-4 h-4 animate-spin" /> {t('common.actions.processing')}</span>
+                  ) : modalMode === 'create' ? t('admin.users.modals.registerBtn') : t('admin.users.modals.saveBtn')}
                 </Button>
               </div>
             </div>
@@ -776,8 +782,8 @@ export default function AdminUsers() {
         onClose={() => setDeleteModalOpen(false)}
         onConfirm={() => userToDelete && deleteMutation.mutate(userToDelete.id)}
         isLoading={deleteMutation.isPending}
-        title="Excluir Usuário?"
-        description="Esta ação é irreversível. Todas as permissões e associações deste usuário serão perdidas."
+        title={t('admin.users.modals.deleteConfirmTitle')}
+        description={t('admin.users.modals.deleteConfirmDesc')}
         itemName={userToDelete?.name}
       />
 

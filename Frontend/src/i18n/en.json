@@ -1,10 +1,14 @@
 {
   "common": {
+    "cover": "Cover",
+    "other": "Other",
+    "user": "User",
     "actions": {
       "login": "Login",
       "register": "Create Account",
       "save": "Save",
       "cancel": "Cancel",
+      "processing": "Processing...",
       "delete": "Delete",
       "edit": "Edit",
       "view": "View",
@@ -16,8 +20,6 @@
       "removeFavorite": "Remove from favorites",
       "currency": "$",
       "perHour": "/h",
-      "cover": "Cover",
-      "other": "Other",
       "days": {
         "sunday": "Sunday",
         "monday": "Monday",
@@ -268,7 +270,8 @@
       "currentPassRequired": "Enter your current password.",
       "newPassLength": "New password must be at least 8 characters.",
       "passMismatch": "Passwords do not match.",
-      "passSuccess": "Password changed successfully!"
+      "passSuccess": "Password changed successfully!",
+      "cpfInvalid": "Invalid CPF. Please check the numbers."
     },
     "quickAccessItems": {
       "reservations": {
@@ -831,11 +834,8 @@
       "schedule": "Schedule",
       "value": "Value",
       "status": "Status",
-      "role": "Role",
       "joinedAt": "Joined",
       "reservations": "bookings",
-      "athlete": "Athlete",
-      "manager": "Manager",
       "noReservations": "No reservations found.",
       "noUsers": "No users found.",
       "systemHealth": "System Health",
@@ -898,103 +898,187 @@
       "dashboard": {
         "viewAll": "View All",
         "resConfirmed": "Confirmed",
-        "resPending": "Pending",
-        "role": {
-          "admin": "Admin",
-          "manager": "Manager",
-          "athlete": "Athlete"
-        }
+        "resPending": "Pending"
+      }
+    },
+    "roles": {
+      "admin": "Admin",
+      "manager": "Manager",
+      "athlete": "Athlete"
+    },
+    "users": {
+      "title": "User Management",
+      "subtitle": "Manage profiles, permissions, and court associations on the platform.",
+      "newUser": "New User",
+      "searchPlaceholder": "Search by name or email...",
+      "rolePlaceholder": "Role",
+      "allRoles": "All Roles",
+      "noUsers": "No users found",
+      "noUsersDesc": "Try adjusting your filters or create a new user.",
+      "noName": "No name",
+      "stats": {
+        "total": "Total Users",
+        "admins": "Administrators",
+        "managers": "Arena Managers",
+        "athletes": "Common Users"
       },
-      "users": {
-        "title": "User Management",
-        "subtitle": "Manage profiles, permissions, and court associations on the platform.",
-        "newUser": "New User",
-        "searchPlaceholder": "Search by name or email...",
-        "rolePlaceholder": "Role",
-        "allRoles": "All Roles",
-        "noUsers": "No users found",
-        "noUsersDesc": "Try adjusting your filters or create a new user.",
-        "stats": {
-          "total": "Total Users",
-          "admins": "Administrators",
-          "managers": "Arena Managers",
-          "athletes": "Regular Users"
-        },
-        "table": {
-          "user": "User",
-          "email": "Email",
-          "role": "Role",
-          "courts": "Assoc. Courts",
-          "joined": "Joined"
-        },
-        "modals": {
-          "errorTitle": "Error",
-          "updateErrorMessage": "A problem occurred while trying to save user changes.",
-          "createErrorMessage": "A problem occurred while trying to register the new user.",
-          "deleteSuccessTitle": "User Removed",
-          "deleteSuccessMessage": "The user has been permanently deleted from the platform.",
-          "deleteErrorMessage": "Could not remove this user at this time."
-        },
-        "toasts": {
-          "updateSuccess": "User updated successfully!",
-          "updateError": "Error updating user.",
-          "createSuccess": "User created successfully!",
-          "createError": "Error creating user.",
-          "deleteSuccess": "User deleted successfully!",
-          "deleteError": "Error deleting user."
-        }
+      "table": {
+        "user": "User",
+        "email": "Email",
+        "role": "Role",
+        "courts": "Assoc. Courts",
+        "joined": "Joined",
+        "courtsCount": "{{count}} courts",
+        "actions": "Actions"
       },
-      "settings": {
-        "title": "System Settings",
-        "subtitle": "Adjust global platform parameters and dashboard preferences.",
-        "save": "Save Changes",
-        "saving": "Saving...",
-        "saveSuccess": "Settings saved successfully!",
-        "statusModal": {
-          "loadingTitle": "Saving Settings",
-          "loadingMsg": "Please wait a moment while we apply the new guidelines to the system.",
-          "successTitle": "Settings Saved",
-          "successMsg": "All set! The changes have been successfully applied across the platform."
+      "actions": {
+        "edit": "Edit",
+        "delete": "Delete"
+      },
+      "modals": {
+        "newUserTitle": "New User",
+        "editUserTitle": "Edit User",
+        "registration": "Registration",
+        "adjustments": "Adjustments",
+        "infoTab": "Information",
+        "accessTab": "Role & Access",
+        "security": "Security",
+        "protectedData": "Protected Data",
+        "personalData": "Personal Data",
+        "fullName": "Full Name",
+        "fullNamePlaceholder": "Ex: John Doe",
+        "emailAccess": "Access Email",
+        "emailPlaceholder": "john@playhub.com",
+        "phoneOptional": "Phone (Optional)",
+        "phonePlaceholder": "+1 (555) 000-0000",
+        "cpfOptional": "Tax ID / CPF (Optional)",
+        "cpfPlaceholder": "000.000.000-00",
+        "password": "Password",
+        "passwordHint": "Access {{mode}}",
+        "passwordModeEdit": "(Leave blank to keep current)",
+        "passwordModeCreate": "Password",
+        "passwordPlaceholder": "••••••••",
+        "securityTip": "Security Tip",
+        "securityTipDesc": "We recommend using strong passwords with at least 8 characters, including letters, numbers, and symbols.",
+        "roleOnPlatform": "Platform Role",
+        "roles": {
+          "user": "Common User",
+          "userDesc": "Book courts and manage favorites.",
+          "manager": "Arena Manager",
+          "managerDesc": "Manage associated courts.",
+          "admin": "Administrator",
+          "adminDesc": "Full access to all functions."
         },
-        "sections": {
-          "general": {
-            "title": "Basic Information",
-            "subtitle": "Main platform data",
-            "siteName": "Platform Name",
-            "currency": "Default Currency",
-            "supportEmail": "Support Email"
-          },
-          "notifications": {
-            "title": "Notifications",
-            "subtitle": "System alerts",
-            "email": "Transactional Emails",
-            "emailDesc": "Send booking confirmations and alerts by email.",
-            "sms": "SMS / WhatsApp Alerts",
-            "smsDesc": "Notify players via mobile. (Requires integration)."
-          },
-          "appearance": {
-            "title": "Appearance",
-            "subtitle": "Dashboard theme",
-            "light": "Light",
-            "dark": "Dark"
-          },
-          "danger": {
-            "title": "Risk Zone",
-            "subtitle": "Critical actions",
-            "maintenance": "Maintenance Mode",
-            "maintenanceDesc": "Blocks access for regular users. Only administrators can enter the system.",
-            "clearCache": "Clear Cache"
-          },
-          "profile": {
-            "title": "My Profile (Admin)",
-            "subtitle": "Your personal access data",
-            "phone": "Phone",
-            "cpf": "CPF"
-          }
+        "courtAssociation": "Court Association",
+        "courtsSelected": "{{count}} selected",
+        "searchCourts": "Search courts...",
+        "registerBtn": "Register User",
+        "saveBtn": "Save Changes",
+        "deleteConfirmTitle": "Delete User?",
+        "deleteConfirmDesc": "This action is irreversible. All permissions and associations for this user will be lost.",
+        "errorTitle": "Error",
+        "updateErrorMessage": "A problem occurred while trying to save user changes.",
+        "createErrorMessage": "A problem occurred while trying to register the new user.",
+        "deleteSuccessTitle": "User Removed",
+        "deleteSuccessMessage": "The user has been permanently deleted from the platform.",
+        "deleteErrorMessage": "Could not remove this user at this time."
+      },
+      "toasts": {
+        "updateSuccess": "User updated successfully!",
+        "updateError": "Error updating user.",
+        "createSuccess": "User created successfully!",
+        "createError": "Error creating user.",
+        "deleteSuccess": "User deleted successfully!",
+        "deleteError": "Error deleting user."
+      }
+    },
+    "settings": {
+      "title": "System Settings",
+      "subtitle": "Adjust global platform parameters and dashboard preferences.",
+      "save": "Save Changes",
+      "saving": "Saving...",
+      "saveSuccess": "Settings saved successfully!",
+      "statusModal": {
+        "loadingTitle": "Saving Settings",
+        "loadingMsg": "Please wait a moment while we apply the new guidelines to the system.",
+        "successTitle": "Settings Saved",
+        "successMsg": "All set! The changes have been successfully applied across the platform."
+      },
+      "sections": {
+        "general": {
+          "title": "Basic Information",
+          "subtitle": "Main platform data",
+          "siteName": "Platform Name",
+          "currency": "Default Currency",
+          "supportEmail": "Support Email"
+        },
+        "notifications": {
+          "title": "Notifications",
+          "subtitle": "System alerts",
+          "email": "Transactional Emails",
+          "emailDesc": "Send booking confirmations and alerts by email.",
+          "sms": "SMS / WhatsApp Alerts",
+          "smsDesc": "Notify players via mobile. (Requires integration)."
+        },
+        "appearance": {
+          "title": "Appearance",
+          "subtitle": "Dashboard theme",
+          "light": "Light",
+          "dark": "Dark"
+        },
+        "danger": {
+          "title": "Risk Zone",
+          "subtitle": "Critical actions",
+          "maintenance": "Maintenance Mode",
+          "maintenanceDesc": "Blocks access for regular users. Only administrators can enter the system.",
+          "clearCache": "Clear Cache"
+        },
+        "profile": {
+          "title": "My Profile (Admin)",
+          "subtitle": "Your personal access data",
+          "phone": "Phone",
+          "cpf": "CPF"
+        }
+      }
+    },
+    "logs": {
+      "title": "System Logs",
+      "subtitle": "Real-time audit connected to the backend MongoDB.",
+      "sync": "Sync",
+      "export": "Export",
+      "stats": {
+        "health": "Health Check",
+        "healthy": "Healthy",
+        "sink": "Log Sink",
+        "audit": "Audit",
+        "connected": "Connected"
+      },
+      "searchPlaceholder": "Search by event, details or user...",
+      "typePlaceholder": "Log Type",
+      "allLevels": "All Logs",
+      "levels": {
+        "info": "Info",
+        "warning": "Warning",
+        "error": "Error",
+        "critical": "Critical",
+        "other": "Other"
+      },
+      "table": {
+        "timestamp": "Timestamp",
+        "message": "System Message",
+        "level": "Level",
+        "identity": "Identity",
+        "actions": "Actions"
+      },
+      "noLogs": "No logs found",
+      "noLogsDesc": "MongoDB query returned no records.",
+      "pagination": {
+        "showing": "Showing {{count}} of {{total}} registered logs",
+        "previous": "Previous",
+        "next": "Next"
       }
     }
-  }
-},
+  },
   "gestor": {
     "sidebar": {
       "main": "Main",
@@ -1015,7 +1099,7 @@
       "logout": "Sign Out"
     },
     "dashboard": {
-      "greeting": "Manager Panel, {{name}} 🏟️",
+      "greeting": "Manager Panel, {{name}}",
       "managerBadge": "Manager",
       "newCourt": "New Court",
       "stats": {
@@ -1048,7 +1132,8 @@
         "court": "Court",
         "time": "Time",
         "value": "Value",
-        "status": "Status"
+        "status": "Status",
+        "noResults": "No bookings found"
       },
       "viewAll": "View all",
       "revenueByCourt": "Revenue by Court",
