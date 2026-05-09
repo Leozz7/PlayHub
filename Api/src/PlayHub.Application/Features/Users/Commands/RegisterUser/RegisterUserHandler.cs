@@ -3,10 +3,8 @@ using MongoDB.Driver;
 using PlayHub.Application.Common.Interfaces;
 using PlayHub.Application.Common.Security;
 using PlayHub.Application.Features.Users.Dtos;
+using PlayHub.Domain.Common.Exceptions;
 using PlayHub.Domain.Entities;
-using System;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace PlayHub.Application.Features.Users.Commands.RegisterUser;
 
@@ -32,7 +30,7 @@ public class RegisterUserHandler : IRequestHandler<RegisterUserCommand, UserDto>
             .AnyAsync(ct);
 
         if (exists)
-            throw new InvalidOperationException($"Email '{request.Email}' já está cadastrado.");
+            throw new ConflictException($"E-mail já está cadastrado.");
 
         var passwordHash = _hasher.Hash(request.Password);
         var encryptedEmail = _encryptionService.Encrypt(request.Email);

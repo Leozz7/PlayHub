@@ -46,7 +46,8 @@ public class ForgotPasswordHandler : IRequestHandler<ForgotPasswordCommand, bool
             cancellationToken: cancellationToken);
 
         var frontendUrl = _configuration["FrontendUrl"] ?? "http://localhost:5173";
-        var resetLink = $"{frontendUrl}/reset-password?token={token}&email={user.Email}";
+        var userEmail = _encryptionService.Decrypt(user.Email);
+        var resetLink = $"{frontendUrl}/reset-password?token={token}&email={userEmail}";
         
         var body = $@"
             <h1>Recuperação de Senha - PlayHub</h1>
@@ -57,7 +58,7 @@ public class ForgotPasswordHandler : IRequestHandler<ForgotPasswordCommand, bool
             <p>Este link expira em 1 hora.</p>
             <p>Se você não solicitou isso, ignore este e-mail.</p>";
 
-        await _emailService.SendEmailAsync(user.Email, "Recuperação de Senha - PlayHub", body);
+        await _emailService.SendEmailAsync(userEmail, "Recuperação de Senha - PlayHub", body);
 
         return true;
     }

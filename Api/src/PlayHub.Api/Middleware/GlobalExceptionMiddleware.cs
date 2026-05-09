@@ -1,5 +1,6 @@
 using PlayHub.Domain.Common;
 using PlayHub.Domain.Common.Exceptions;
+using PlayHub.Application.Common.Exceptions;
 using System.Text.Json;
 
 namespace PlayHub.Api.Middleware;

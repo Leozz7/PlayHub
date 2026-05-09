@@ -135,17 +135,9 @@ public class CourtsController : ControllerBase
         if (userId == Guid.Empty) return Unauthorized();
 
         var userName = _currentUserService.UserName ?? "Usuário";
-
-        try
-        {
-            var command = new SubmitReviewCommand(id, userId, userName, body.Rating, body.Text);
-            var result = await Mediator.Send(command);
-            return CreatedAtAction(nameof(GetReviews), new { id }, result);
-        }
-        catch (InvalidOperationException ex)
-        {
-            return Conflict(new { message = ex.Message });
-        }
+        var command = new SubmitReviewCommand(id, userId, userName, body.Rating, body.Text);
+        var result = await Mediator.Send(command);
+        return CreatedAtAction(nameof(GetReviews), new { id }, result);
     }
 }
 

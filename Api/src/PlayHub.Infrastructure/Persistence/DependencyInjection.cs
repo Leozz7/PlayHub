@@ -7,6 +7,7 @@ using PlayHub.Infrastructure.Identity;
 using PlayHub.Infrastructure.Persistence;
 using PlayHub.Infrastructure.Persistence.Repositories;
 using PlayHub.Infrastructure.Services;
+using Resend;
 
 
 namespace PlayHub.Infrastructure;

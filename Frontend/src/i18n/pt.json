@@ -42,10 +42,28 @@
     "datePlaceholder": "Quando?",
     "searchBtn": "Buscar agora",
     "months": {
-      "0": "Janeiro", "1": "Fevereiro", "2": "Março", "3": "Abril", "4": "Maio", "5": "Junho",
-      "6": "Julho", "7": "Agosto", "8": "Setembro", "9": "Outubro", "10": "Novembro", "11": "Dezembro"
+      "0": "Janeiro",
+      "1": "Fevereiro",
+      "2": "Março",
+      "3": "Abril",
+      "4": "Maio",
+      "5": "Junho",
+      "6": "Julho",
+      "7": "Agosto",
+      "8": "Setembro",
+      "9": "Outubro",
+      "10": "Novembro",
+      "11": "Dezembro"
     },
-    "weekDays": ["D", "S", "T", "Q", "Q", "S", "S"]
+    "weekDays": [
+      "D",
+      "S",
+      "T",
+      "Q",
+      "Q",
+      "S",
+      "S"
+    ]
   },
   "menu": {
     "profile": {
@@ -693,7 +711,27 @@
     "backToLogin": "Voltar para o login",
     "successMsg": "Se o e-mail existir, um link de redefinição foi enviado!",
     "brandingTitle": "Recupere o acesso\nà sua conta PlayHub.",
-    "brandingSubtitle": "É rápido, fácil e seguro. Retorne às quadras o quanto antes."
+    "brandingSubtitle": "É rápido, fácil e seguro. Retorne às quadras o quanto antes.",
+    "underDevelopment": {
+      "title": "Módulo em Desenvolvimento",
+      "description": "A funcionalidade de recuperação de e-mail está sendo finalizada. Em breve você poderá redefinir sua senha automaticamente!",
+      "close": "Entendido"
+    }
+  },
+  "resetPassword": {
+    "title": "Nova Senha",
+    "subtitle": "Crie uma senha forte e segura para sua conta.",
+    "passwordLabel": "NOVA SENHA",
+    "confirmPasswordLabel": "CONFIRMAR NOVA SENHA",
+    "submitBtn": "ATUALIZAR SENHA",
+    "updating": "ATUALIZANDO...",
+    "successMsg": "Senha alterada com sucesso! Você já pode fazer login.",
+    "backToLogin": "Ir para o login",
+    "underDevelopment": {
+      "title": "Redefinição em Manutenção",
+      "description": "Estamos finalizando a integração segura de troca de senhas. Por enquanto, esta ação está desabilitada para garantir a segurança da sua conta.",
+      "close": "Entendido"
+    }
   },
   "notFound": {
     "title": "404",
@@ -1412,7 +1450,6 @@
       "saveSuccess": "Configurações salvas com sucesso!"
     }
   },
-
   "privacy": {
     "title": "Política de Privacidade",
     "lastUpdate": "Última atualização: 30 de abril de 2026",

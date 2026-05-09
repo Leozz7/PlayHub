@@ -2,6 +2,7 @@ using MediatR;
 using MongoDB.Driver;
 using PlayHub.Application.Common.Interfaces;
 using PlayHub.Application.Features.Courts.Dtos;
+using PlayHub.Domain.Common.Exceptions;
 using PlayHub.Domain.Entities;
 
 namespace PlayHub.Application.Features.Courts.Commands.SubmitReview;
@@ -32,12 +33,12 @@ public class SubmitReviewHandler : IRequestHandler<SubmitReviewCommand, ReviewDt
 
         var existing = await _db.Reviews.Find(existingFilter).FirstOrDefaultAsync(cancellationToken);
         if (existing != null)
-            throw new InvalidOperationException("Você já avaliou esta quadra.");
+            throw new ConflictException("Você já avaliou esta quadra.");
 
         var courtFilter = Builders<Court>.Filter.Eq(c => c.Id, request.CourtId);
         var court = await _db.Courts.Find(courtFilter).FirstOrDefaultAsync(cancellationToken);
         if (court == null)
-            throw new InvalidOperationException("Quadra não encontrada.");
+            throw new NotFoundException(nameof(Court), request.CourtId);
 
         var review = new Review(request.CourtId, request.UserId, request.UserName, request.Rating, request.Text);
         await _db.Reviews.InsertOneAsync(review, cancellationToken: cancellationToken);

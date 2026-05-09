@@ -5,6 +5,7 @@ using MongoDB.Bson.Serialization.IdGenerators;
 using MongoDB.Bson.Serialization.Serializers;
 using PlayHub.Domain.Common;
 using PlayHub.Domain.Entities;
+using PlayHub.Domain.Enums;
 
 namespace PlayHub.Infrastructure.Persistence;
 
@@ -108,4 +109,39 @@ file sealed class GuidGenerator : IIdGenerator
 {
     public object GenerateId(object container, object document) => Guid.NewGuid();
     public bool IsEmpty(object id) => id is Guid g && g == Guid.Empty;
+}
+
+file sealed class LogLevelSerializer : SerializerBase<LogLevel>
+{
+    public override LogLevel Deserialize(BsonDeserializationContext context, BsonDeserializationArgs args)
+    {
+        var type = context.Reader.GetCurrentBsonType();
+        if (type == BsonType.Int32)
+            return (LogLevel)context.Reader.ReadInt32();
+            
+        if (type == BsonType.String)
+        {
+            var value = context.Reader.ReadString();
+            return value switch
+            {
+                "Verbose" => LogLevel.Info,
+                "Debug" => LogLevel.Info,
+                "Information" => LogLevel.Info,
+                "Warning" => LogLevel.Warning,
+                "Error" => LogLevel.Error,
+                "Fatal" => LogLevel.Critical,
+                "Info" => LogLevel.Info,
+                "Critical" => LogLevel.Critical,
+                _ => LogLevel.Info
+            };
+        }
+        
+        context.Reader.SkipValue();
+        return LogLevel.Info;
+    }
+
+    public override void Serialize(BsonSerializationContext context, BsonSerializationArgs args, LogLevel value)
+    {
+        context.Writer.WriteString(value.ToString());
+    }
 }

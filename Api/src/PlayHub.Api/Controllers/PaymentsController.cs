@@ -40,15 +40,8 @@ public class PaymentsController : ControllerBase
     [HttpPost]
     public async Task<ActionResult<PaymentDto>> Create(CreatePaymentCommand command)
     {
-        try
-        {
-            var result = await Mediator.Send(command);
-            return CreatedAtAction(nameof(GetById), new { id = result.Id }, result);
-        }
-        catch (Exception ex)
-        {
-            return BadRequest(new { Message = ex.Message });
-        }
+        var result = await Mediator.Send(command);
+        return CreatedAtAction(nameof(GetById), new { id = result.Id }, result);
     }
 
     [HttpPost("{id}/process")]

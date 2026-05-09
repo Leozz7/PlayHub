@@ -165,17 +165,17 @@ public class CourtRepository : ICourtRepository
 
         if (!string.IsNullOrEmpty(request.SortBy))
         {
-            var sortField = request.SortBy switch
+            var sort = (request.SortBy.ToLower(), request.IsDescending) switch
             {
-                "rating" => "Rating",
-                "price" => "HourlyRate",
-                "reviewCount" => "ReviewCount",
-                _ => "Name"
+                ("rating", true) => Builders<Court>.Sort.Descending(c => c.Rating),
+                ("rating", false) => Builders<Court>.Sort.Ascending(c => c.Rating),
+                ("price", true) => Builders<Court>.Sort.Descending(c => c.HourlyRate),
+                ("price", false) => Builders<Court>.Sort.Ascending(c => c.HourlyRate),
+                ("reviewcount", true) => Builders<Court>.Sort.Descending(c => c.ReviewCount),
+                ("reviewcount", false) => Builders<Court>.Sort.Ascending(c => c.ReviewCount),
+                (_, true) => Builders<Court>.Sort.Descending(c => c.Name),
+                (_, false) => Builders<Court>.Sort.Ascending(c => c.Name)
             };
-
-            var sort = request.IsDescending 
-                ? Builders<Court>.Sort.Descending(sortField) 
-                : Builders<Court>.Sort.Ascending(sortField);
             
             findFluent = findFluent.Sort(sort);
         }

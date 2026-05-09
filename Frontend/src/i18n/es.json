@@ -33,10 +33,28 @@
     "datePlaceholder": "¿Cuándo?",
     "searchBtn": "Buscar ahora",
     "months": {
-      "0": "Enero", "1": "Febrero", "2": "Marzo", "3": "Abril", "4": "Mayo", "5": "Junio",
-      "6": "Julio", "7": "Agosto", "8": "Septiembre", "9": "Octubre", "10": "Noviembre", "11": "Diciembre"
+      "0": "Enero",
+      "1": "Febrero",
+      "2": "Marzo",
+      "3": "Abril",
+      "4": "Mayo",
+      "5": "Junio",
+      "6": "Julio",
+      "7": "Agosto",
+      "8": "Septiembre",
+      "9": "Octubre",
+      "10": "Noviembre",
+      "11": "Diciembre"
     },
-    "weekDays": ["D", "L", "M", "M", "J", "V", "S"]
+    "weekDays": [
+      "D",
+      "L",
+      "M",
+      "M",
+      "J",
+      "V",
+      "S"
+    ]
   },
   "menu": {
     "profile": {
@@ -681,7 +699,27 @@
     "backToLogin": "Volver a iniciar sesión",
     "successMsg": "Si el correo existe, se ha enviado un enlace de recuperación.",
     "brandingTitle": "Recupera el acceso\na tu cuenta PlayHub.",
-    "brandingSubtitle": "Es rápido, fácil y seguro. Regresa a las canchas lo antes posible."
+    "brandingSubtitle": "Es rápido, fácil y seguro. Regresa a las canchas lo antes posible.",
+    "underDevelopment": {
+      "title": "Módulo en Desarrollo",
+      "description": "La funcionalidad de recuperación de correo electrónico se está finalizando. ¡Pronto podrás restablecer tu contraseña automáticamente!",
+      "close": "Entendido"
+    }
+  },
+  "resetPassword": {
+    "title": "Nueva Contraseña",
+    "subtitle": "Crea una contraseña fuerte y segura para tu cuenta.",
+    "passwordLabel": "NUEVA CONTRASEÑA",
+    "confirmPasswordLabel": "CONFIRMAR NUEVA CONTRASEÑA",
+    "submitBtn": "ACTUALIZAR CONTRASEÑA",
+    "updating": "ACTUALIZANDO...",
+    "successMsg": "¡Contraseña cambiada con éxito! Ya puedes iniciar sesión.",
+    "backToLogin": "Ir al inicio de sesión",
+    "underDevelopment": {
+      "title": "Restablecimiento en Mantenimiento",
+      "description": "Estamos finalizando la integración segura de cambio de contraseñas. Por ahora, esta acción está deshabilitada para garantizar la seguridad de su cuenta.",
+      "close": "Entendido"
+    }
   },
   "notFound": {
     "title": "404",
@@ -1299,28 +1337,28 @@
         "status": "Estado",
         "actions": "Acciones"
       }
+    },
+    "settings": {
+      "title": "Configuración de la Cuenta",
+      "subtitle": "Gestione su perfil y preferencias de notificación.",
+      "profile": {
+        "title": "Perfil",
+        "name": "Nombre Completo",
+        "email": "Correo electrónico",
+        "phone": "Teléfono",
+        "cpf": "CPF"
       },
-      "settings": {
-        "title": "Configuración de la Cuenta",
-        "subtitle": "Gestione su perfil y preferencias de notificación.",
-        "profile": {
-          "title": "Perfil",
-          "name": "Nombre Completo",
-          "email": "Correo electrónico",
-          "phone": "Teléfono",
-          "cpf": "CPF"
-        },
-        "preferences": {
-          "title": "Preferencias",
-          "emailNotif": "Notificaciones por Correo",
-          "emailNotifDesc": "Reciba actualizaciones sobre reservas en su correo",
-          "pushNotif": "Notificaciones Push",
-          "pushNotifDesc": "Alertas instantáneas en el navegador",
-          "theme": "Tema del Sistema"
-        },
-        "save": "Guardar Cambios",
-        "saving": "Guardando...",
-        "saveSuccess": "¡Configuraciones guardadas con éxito!"
+      "preferences": {
+        "title": "Preferencias",
+        "emailNotif": "Notificaciones por Correo",
+        "emailNotifDesc": "Reciba actualizaciones sobre reservas en su correo",
+        "pushNotif": "Notificaciones Push",
+        "pushNotifDesc": "Alertas instantáneas en el navegador",
+        "theme": "Tema del Sistema"
+      },
+      "save": "Guardar Cambios",
+      "saving": "Guardando...",
+      "saveSuccess": "¡Configuraciones guardadas con éxito!"
     }
   },
   "privacy": {

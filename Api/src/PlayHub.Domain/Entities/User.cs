@@ -116,4 +116,15 @@ public class User : BaseEntity
         RefreshToken = null;
         RefreshTokenExpiryTime = null;
     }
-}
+    public void SetResetPasswordToken(string token, DateTime expiryTime)
+    {
+        ResetPasswordToken = token;
+        ResetPasswordTokenExpiry = expiryTime;
+    }
+
+    public void ClearResetPasswordToken()
+    {
+        ResetPasswordToken = null;
+        ResetPasswordTokenExpiry = null;
+    }
+}

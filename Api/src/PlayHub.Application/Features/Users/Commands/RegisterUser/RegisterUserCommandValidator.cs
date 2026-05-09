@@ -15,8 +15,7 @@ public class RegisterUserCommandValidator : AbstractValidator<RegisterUserComman
             .NotEmpty().WithMessage("E-mail é obrigatório.")
             .EmailAddress().WithMessage("Formato de e-mail inválido.");
 
-        // Fail-Fast: valida senha ANTES do hash Argon2 (operação de CPU intensiva)
-        // Senhas fracas são rejeitadas aqui, sem desperdiçar ciclos de hashing.
+        // Fail-Fast: valida senha antes do Argon2
         RuleFor(x => x.Password)
             .NotEmpty().WithMessage("Senha é obrigatória.")
             .MinimumLength(8).WithMessage("Senha deve ter ao menos 8 caracteres.")

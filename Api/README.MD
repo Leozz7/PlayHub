@@ -7,51 +7,50 @@ Sistema backend desenvolvido como a base central e de controle da plataforma **P
 A API adere aos princípios da **Clean Architecture**, estabelecendo uma forte separação de domínios em anéis concêntricos. Aliado a isso, fluxos de requisição e resposta são orquestrados de maneira eficiente usando o padrão **CQRS** (Command Query Responsibility Segregation) através da biblioteca MediatR.
 
 - **Framework Web:** C# e .NET 10 (ASP.NET Core Web API).
-- **Banco de Dados (Persistência Principal):** MongoDB (NoSQL) integrado nativamente. Mapeamento inteligente usando convenções em CamelCase e serializadores dinâmicos BSON para otimizar o armazenamento.
-- **Padrões de Projeto Adotados:** Layered Clean Architecture, Mediator Pattern, Options Pattern e Repository Abstractions.
-- **Containerização e DevOps:** Empacotamento das aplicações através do Docker, com automação dos ambientes de desenvolvimento pelo Docker Compose.
+- **Banco de Dados:** MongoDB (NoSQL) integrado nativamente com mapeamento inteligente e serializadores dinâmicos BSON.
+- **Logging Estruturado:** **Serilog** configurado com *Sinks* para Console, MongoDB e **Seq**.
+- **Observabilidade:** Integração nativa com **Seq** para análise de logs em tempo real e monitoramento de performance.
+- **Diagnóstico e Saúde:** **ASP.NET Core Health Checks** para monitoramento proativo de dependências (MongoDB, Seq, etc).
+- **Padrões de Resposta:** Padronização de erros via **RFC 7807 (Problem Details)**, garantindo respostas de erro semânticas e consistentes.
 
 ## Domínio: Entidades e Agregados
 
-O núcleo vital de negócios contém entidades agnósticas a tecnologias, bancos de dados relacionais e frameworks web:
+O núcleo vital de negócios contém entidades agnósticas a tecnologias:
 
 1. **User (Usuário)**
    - Elemento central para controle de acesso. Detém atributos críticos que seguem rígidos padrões de proteção (LGPD).
-   - Utiliza campos encriptados e contém nativamente um índice de varredura opaca (Blind Indexing) sob o e-mail, gerado via HMAC-SHA256, garantindo segurança na validação de acessos paralelos sem exposição de dados pessoais nas pesquisas de banco.
-
-2. **Court (Quadra - Root Aggregate)**
-   - O núcleo gerador de receita do sistema. Agrupa informações estruturais (nome, esporte, capacidade, valor por hora).
-   - Gerencia de forma nativa a integridade do seu ciclo de vida (status de operação/manutenção) impedindo lógicas inconsistentes.
-   - Contém o registro de infraestrutura auxiliar através das comodidades (`CourtAmenity`).
-
+   - Utiliza campos encriptados e contém nativamente um índice de varredura opaca (Blind Indexing).
+2. **Court (Quadra)**
+   - O núcleo gerador de receita. Gerencia integridade do ciclo de vida e comodidades (`CourtAmenity`).
 3. **Reservation (Reserva)**
-   - Base transacional do agendamento.
-   - Sua validação no construtor bloqueia integralmente erros de coerência temporal (como choque de horário de término anterior ao início).
-   - Controlada por um ciclo reativo de status (Pendente, Confirmada, Cancelada).
-
+   - Base transacional com validações de coerência temporal e ciclo de status reativo.
 4. **Payment (Pagamento)**
-   - Validador transacional embutido para auditar a confirmação financeira ligada à reserva, servindo como aprovação de negócio.
-
+   - Validador financeiro para auditoria de confirmações ligadas às reservas.
 5. **SystemLog**
-   - Coleção apartada voltada à observabilidade do ambiente, garantindo auditoria estruturada sobre exceções críticas e eventos sistêmicos.
+   - Auditoria estruturada sobre eventos sistêmicos e exceções críticas.
 
-## Arquitetura de Cibersegurança e Defesas
+## Observabilidade e Robustez
 
-O sistema emprega conceitos rigorosos de *Hardening* em múltiplas camadas:
+### Logging Estruturado com Serilog
+A API utiliza o **Serilog** para garantir que cada evento seja uma fonte de dados rica e filtrável:
+- **Enriquecimento Dinâmico:** Logs incluem `CorrelationId`, `MachineName`, e metadados de requisição.
+- **PII Masking:** Políticas de segurança automáticas mascaram dados sensíveis (como e-mails e senhas) antes da persistência, garantindo conformidade com a LGPD.
+- **Múltiplos Sinks:** Sincronização em tempo real com o console de desenvolvimento, auditoria no MongoDB e telemetria avançada no **Seq**.
 
-- **Derivação Criptográfica Avançada (Argon2):** Hashes de senhas são persistidos sob a técnica do Argon2, protegendo de forma altamente robusta contra tentativas de força bruta.
-- **Criptografia Simétrica de Dados Pessoais (AES-256):** Dados sensíveis identificáveis (PII) entram no banco anonimizados através de interfaces criptográficas simétricas gerenciadas no projeto.
-- **Sessões via Refresh Tokens e Cookies Seguros:** A comunicação com o frontend é ancorada em JWT, utilizando validações rigorosas em Cookies `HttpOnly` com a propriedade `SameSite=None` para inviabilizar a extração direta de tokens por scripts maliciosos.
-- **Prevenção contra Sobrecarga (Rate Limiting):** Controladores sensíveis possuem defesas para impedir abusos mecanizados de login (DDoS em camada de aplicação).
+### Tratamento de Erros e Validação
+- **RFC 7807 (Problem Details):** Todas as falhas seguem o padrão internacional de mensagens de erro, facilitando a integração com o frontend.
+- **FluentValidation:** Validação "Fail-Fast" acoplada ao pipeline do MediatR, impedindo que dados inconsistentes atinjam a camada de domínio.
 
 ## Como Executar na Instância de Desenvolvimento (Docker)
 
 A configuração local do projeto baseia-se em provisionamento automático, eliminando a necessidade de configurar e gerenciar bancos de dados e serviços locais de forma isolada.
 
 1. Navegue até a raiz do diretório `Api`.
-2. Renomeie e preencha o arquivo protótipo de configurações: de `.env.example` para `.env`.
-3. Inicie a infraestrutura através do CLI:
+2. Configure os arquivos de parametrização:
+   - **Variáveis de Ambiente:** Renomeie `.env.example` para `.env`.
+   - **Configurações da Aplicação:** Em `src/PlayHub.Api/`, renomeie `appsettings.example.json` para `appsettings.json`.
 
+3. Inicie a infraestrutura:
 ```bash
 # Para compilar e executar todos os containers vinculados:
 docker compose up --build
@@ -62,21 +61,17 @@ docker compose up -d
 
 ### Links Úteis de Acesso Local
 
-- **Documentação da API (Swagger UI):**  
-  [http://localhost:5000/swagger](http://localhost:5000/swagger)
-
-- **Inspeção Visual do MongoDB (Mongo Express):**  
-  [http://localhost:8081](http://localhost:8081)
-
+- **Documentação (Swagger UI):** [http://localhost:5000/swagger](http://localhost:5000/swagger)
+- **Painel de Logs (Seq):** [http://localhost:8082](http://localhost:8082)
+- **Saúde do Sistema (Health Checks):** [http://localhost:5000/health](http://localhost:5000/health)
+- **Inspeção de Dados (Mongo Express):** [http://localhost:8081](http://localhost:8081)
 - **String de Conexão MongoDB Local (Acesso por DBeaver/Compass):**  
   `mongodb://${MONGO_USER}:${MONGO_PASS}@localhost:27017/playhub?authSource=admin`  
   *(Certifique-se de referenciar as credenciais configuradas no `.env`)*
 
-## Organização de Diretórios (Separação de Camadas)
+## Organização de Diretórios
 
-A solução C# respeita as barreiras de responsabilidade:
-
-- **`src/PlayHub.Api/` (Delivery/Apresentação):** Foco em roteamento HTTP, middleware de restrições de acesso e injeção de dependências global.
-- **`src/PlayHub.Application/` (Casos de Uso):** Carrega orquestração das requisições. Contém validadores (`FluentValidation`), contratos abstratos e DTOs mapeados.
-- **`src/PlayHub.Domain/` (Núcleo de Negócio):** Sem vínculo externo. Apenas Entidades, Exceções próprias e Objetos de Valor com pura lógica e comportamento de negócio.
-- **`src/PlayHub.Infrastructure/` (Provedores Externos):** Hospeda conectores do banco de dados (Contexto do MongoDB), provedores JWT e serviços dependentes de bibliotecas de terceiros.
+- **`src/PlayHub.Api/` (Apresentação):** Roteamento HTTP, Middlewares (Error Handling, Auth, Serilog) e Injeção de Dependência.
+- **`src/PlayHub.Application/` (Casos de Uso):** Orquestração, Comandos/Queries, Validadores e Mapeamentos.
+- **`src/PlayHub.Domain/` (Núcleo):** Entidades puras, Exceções de domínio e lógica de negócio.
+- **`src/PlayHub.Infrastructure/` (Infra):** Implementação de persistência (MongoDB), Criptografia, JWT e Logging Providers.

@@ -10,8 +10,16 @@ import { Label } from '@/components/ui/label';
 import { usePlayHubToast } from '@/hooks/usePlayHubToast';
 import { ArrowLeft, Lock } from 'lucide-react';
 import { HeroBackground } from '@/components/ui/HeroBackground';
-import { api } from '@/lib/api';
 import logo from '/assets/logo.png';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 const resetPasswordSchema = z.object({
   password: z.string().min(6, 'A senha deve ter pelo menos 6 caracteres'),
@@ -27,7 +35,7 @@ export default function ResetPassword() {
   const { t } = useTranslation();
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [showDevModal, setShowDevModal] = useState(false);
   const phToast = usePlayHubToast();
 
   const token = searchParams.get('token');
@@ -48,7 +56,9 @@ export default function ResetPassword() {
     resolver: zodResolver(resetPasswordSchema),
   });
 
-  const onSubmit = async (data: ResetPasswordFormValues) => {
+  const onSubmit = () => {
+    setShowDevModal(true);
+    /*
     setIsSubmitting(true);
     try {
       await api.post('/auth/reset-password', {
@@ -64,6 +74,7 @@ export default function ResetPassword() {
     } finally {
       setIsSubmitting(false);
     }
+    */
   };
 
   return (
@@ -73,10 +84,10 @@ export default function ResetPassword() {
         <div className="relative z-10 p-12 max-w-xl text-center">
           <img src={logo} alt="PlayHub" className="h-16 w-auto object-contain mx-auto mb-8" />
           <h2 className="text-4xl lg:text-5xl font-black tracking-tighter text-gray-900 dark:text-white mb-6 leading-tight whitespace-pre-line">
-            Crie sua nova senha
+            {t('resetPassword.title')}
           </h2>
           <p className="text-lg text-gray-600 dark:text-gray-400 font-light leading-relaxed">
-            Mantenha sua conta segura com uma senha forte e única.
+            {t('resetPassword.subtitle')}
           </p>
         </div>
       </div>
@@ -87,7 +98,7 @@ export default function ResetPassword() {
             <div className="w-10 h-10 rounded-full bg-gray-50 dark:bg-background flex items-center justify-center group-hover:bg-[#8CE600] group-hover:text-gray-950 transition-all border border-gray-100 dark:border-white/10 group-hover:border-transparent">
               <ArrowLeft className="w-4 h-4" />
             </div>
-            <span className="hidden sm:block">Voltar para Login</span>
+            <span className="hidden sm:block">{t('resetPassword.backToLogin')}</span>
           </Link>
         </div>
 
@@ -95,17 +106,17 @@ export default function ResetPassword() {
           <div className="w-full max-w-sm animate-in fade-in slide-in-from-bottom-8 duration-700">
             <div className="mb-8">
               <h1 className="text-3xl font-black tracking-tighter text-gray-900 dark:text-white mb-1.5">
-                Redefinir Senha
+                {t('resetPassword.title')}
               </h1>
               <p className="text-sm text-gray-500 dark:text-gray-400">
-                Digite sua nova senha abaixo.
+                {t('resetPassword.subtitle')}
               </p>
             </div>
 
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
               <div className="space-y-1.5">
-                <Label htmlFor="password" className="text-[10px] font-black uppercase tracking-widest text-gray-500 dark:text-gray-400">
-                  Nova Senha
+                <Label htmlFor="password" senior-id="password-label" className="text-[10px] font-black uppercase tracking-widest text-gray-500 dark:text-gray-400">
+                  {t('resetPassword.passwordLabel')}
                 </Label>
                 <div className="relative">
                   <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
@@ -120,8 +131,8 @@ export default function ResetPassword() {
               </div>
 
               <div className="space-y-1.5">
-                <Label htmlFor="confirmPassword" className="text-[10px] font-black uppercase tracking-widest text-gray-500 dark:text-gray-400">
-                  Confirmar Nova Senha
+                <Label htmlFor="confirmPassword" senior-id="confirm-password-label" className="text-[10px] font-black uppercase tracking-widest text-gray-500 dark:text-gray-400">
+                  {t('resetPassword.confirmPasswordLabel')}
                 </Label>
                 <div className="relative">
                   <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
@@ -138,16 +149,36 @@ export default function ResetPassword() {
               <div className="pt-2">
                 <Button
                   type="submit"
-                  disabled={isSubmitting}
                   className="w-full h-13 rounded-2xl bg-[#8CE600] hover:bg-[#7bc900] text-gray-950 font-black tracking-widest uppercase text-[11px] shadow-xl transition-all"
                 >
-                  {isSubmitting ? 'Redefinindo...' : 'Alterar Senha'}
+                  {t('resetPassword.submitBtn')}
                 </Button>
               </div>
             </form>
           </div>
         </div>
       </div>
+
+      <AlertDialog open={showDevModal} onOpenChange={setShowDevModal}>
+        <AlertDialogContent className="rounded-3xl border-gray-100 dark:border-white/10 shadow-2xl">
+          <AlertDialogHeader>
+            <AlertDialogTitle className="text-2xl font-black tracking-tighter text-gray-900 dark:text-white">
+              {t('resetPassword.underDevelopment.title')}
+            </AlertDialogTitle>
+            <AlertDialogDescription className="text-gray-500 dark:text-gray-400 font-medium leading-relaxed pt-2">
+              {t('resetPassword.underDevelopment.description')}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter className="mt-4">
+            <AlertDialogAction 
+              onClick={() => setShowDevModal(false)}
+              className="bg-[#8CE600] hover:bg-[#7bc900] text-gray-950 font-bold px-8 h-12 rounded-2xl transition-all shadow-lg shadow-[#8CE600]/20"
+            >
+              {t('resetPassword.underDevelopment.close')}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

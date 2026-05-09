@@ -13,10 +13,12 @@ namespace PlayHub.Application.Features.Courts.Commands.CreateCourt;
 public class CreateCourtHandler : IRequestHandler<CreateCourtCommand, CourtDto>
 {
     private readonly IApplicationDbContext _context;
+    private readonly ICurrentUserService _currentUserService;
 
-    public CreateCourtHandler(IApplicationDbContext context)
+    public CreateCourtHandler(IApplicationDbContext context, ICurrentUserService currentUserService)
     {
         _context = context;
+        _currentUserService = currentUserService;
     }
 
     public async Task<CourtDto> Handle(CreateCourtCommand request, CancellationToken cancellationToken)
@@ -80,6 +82,8 @@ public class CreateCourtHandler : IRequestHandler<CreateCourtCommand, CourtDto>
         }
 
         court.UpdateBinaryImages(mainImageBytes, imagesBytes);
+
+        court.CreatedBy = _currentUserService.UserId.ToString();
 
         await _context.Courts.InsertOneAsync(court, cancellationToken: cancellationToken);
 

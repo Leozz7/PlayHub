@@ -1,6 +1,6 @@
 using FluentValidation;
 using MediatR;
-using ValidationException = PlayHub.Domain.Common.Exceptions.ValidationException;
+using ValidationException = PlayHub.Application.Common.Exceptions.ValidationException;
 
 namespace PlayHub.Application.Common.Behaviours;
 
@@ -18,7 +18,7 @@ public class ValidationBehaviour<TRequest, TResponse>(
 
         var context = new ValidationContext<TRequest>(request);
 
-        // Executa todos os validators em paralelo para melhor performance
+        // Executa validadores
         var results = await Task.WhenAll(
             validators.Select(v => v.ValidateAsync(context, cancellationToken)));
 
