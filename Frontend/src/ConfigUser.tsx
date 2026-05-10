@@ -56,22 +56,20 @@ export function ConfigUser() {
               <div className="grid grid-cols-2 gap-4">
                 <button
                   onClick={() => setTheme('light')}
-                  className={`flex flex-col items-center justify-center gap-3 p-6 rounded-3xl border-2 transition-all duration-300 ${
-                    theme === 'light'
+                  className={`flex flex-col items-center justify-center gap-3 p-6 rounded-3xl border-2 transition-all duration-300 ${theme === 'light'
                       ? 'bg-[#8CE600]/5 border-[#8CE600] text-[#8CE600] ring-4 ring-[#8CE600]/10 shadow-lg shadow-[#8CE600]/10'
                       : 'bg-white dark:bg-background border-gray-100 dark:border-white/10 text-gray-500 hover:border-gray-300 dark:hover:border-gray-700'
-                  }`}
+                    }`}
                 >
                   <Sun className="w-8 h-8" strokeWidth={1.5} />
                   <span className="font-bold text-sm">{t('configUser.themeLight')}</span>
                 </button>
                 <button
                   onClick={() => setTheme('dark')}
-                  className={`flex flex-col items-center justify-center gap-3 p-6 rounded-3xl border-2 transition-all duration-300 ${
-                    theme === 'dark'
+                  className={`flex flex-col items-center justify-center gap-3 p-6 rounded-3xl border-2 transition-all duration-300 ${theme === 'dark'
                       ? 'bg-[#8CE600]/5 border-[#8CE600] text-[#8CE600] ring-4 ring-[#8CE600]/10 shadow-lg shadow-[#8CE600]/10'
                       : 'bg-white dark:bg-background border-gray-100 dark:border-white/10 text-gray-500 hover:border-gray-300 dark:hover:border-gray-700'
-                  }`}
+                    }`}
                 >
                   <Moon className="w-8 h-8" strokeWidth={1.5} />
                   <span className="font-bold text-sm">{t('configUser.themeDark')}</span>
@@ -98,11 +96,10 @@ export function ConfigUser() {
                   <button
                     key={lang.code}
                     onClick={() => i18n.changeLanguage(lang.code)}
-                    className={`flex items-center gap-3 p-4 rounded-2xl border-2 transition-all duration-300 ${
-                      i18n.language === lang.code
+                    className={`flex items-center gap-3 p-4 rounded-2xl border-2 transition-all duration-300 ${i18n.language === lang.code
                         ? 'bg-[#8CE600]/5 border-[#8CE600] text-[#8CE600]'
                         : 'bg-white dark:bg-background border-gray-100 dark:border-white/10 text-gray-600 dark:text-gray-400 hover:border-gray-300 dark:hover:border-gray-700'
-                    }`}
+                      }`}
                   >
                     <span className="text-xl">{lang.flag}</span>
                     <span className="font-bold text-sm">{lang.label}</span>

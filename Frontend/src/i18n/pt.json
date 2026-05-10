@@ -1,15 +1,69 @@
 {
   "common": {
+    "cover": "Capa",
+    "other": "Outro",
+    "user": "Usuário",
     "actions": {
       "login": "Entrar",
-      "enter": "Reservar Agora",
-      "logout": "Sair da conta"
-    },
-    "navigation": {
-      "dashboard": "Meu Painel",
-      "courts": "Quadras",
-      "leagues": "Esportes"
+      "register": "Criar Conta",
+      "save": "Salvar",
+      "cancel": "Cancelar",
+      "processing": "Processando...",
+      "delete": "Excluir",
+      "edit": "Editar",
+      "view": "Visualizar",
+      "enter": "Começar agora",
+      "logout": "Sair",
+      "favorite": "Favoritar",
+      "favorited": "Favoritado",
+      "addFavorite": "Adicionar aos favoritos",
+      "removeFavorite": "Remover dos favoritos",
+      "currency": "R$",
+      "perHour": "/h",
+      "days": {
+        "sunday": "Domingo",
+        "monday": "Segunda-feira",
+        "tuesday": "Terça-feira",
+        "wednesday": "Quarta-feira",
+        "thursday": "Quinta-feira",
+        "friday": "Sexta-feira",
+        "saturday": "Sábado"
+      }
     }
+  },
+  "searchWidget": {
+    "location": "Localização",
+    "locationPlaceholder": "Selecione a cidade",
+    "noCities": "Nenhuma cidade encontrada",
+    "sport": "Modalidade",
+    "sportPlaceholder": "O que jogar?",
+    "noSports": "Nenhuma modalidade encontrada",
+    "date": "Data",
+    "datePlaceholder": "Quando?",
+    "searchBtn": "Buscar agora",
+    "months": {
+      "0": "Janeiro",
+      "1": "Fevereiro",
+      "2": "Março",
+      "3": "Abril",
+      "4": "Maio",
+      "5": "Junho",
+      "6": "Julho",
+      "7": "Agosto",
+      "8": "Setembro",
+      "9": "Outubro",
+      "10": "Novembro",
+      "11": "Dezembro"
+    },
+    "weekDays": [
+      "D",
+      "S",
+      "T",
+      "Q",
+      "Q",
+      "S",
+      "S"
+    ]
   },
   "menu": {
     "profile": {
@@ -61,7 +115,8 @@
     "description": "A plataforma definitiva para reservas de quadras esportivas. Encontre, reserve e jogue sem complicação. Crie sua conta gratuitamente.",
     "navigation": {
       "title": "Plataforma",
-      "championships": "Quadras"
+      "courts": "Quadras",
+      "register": "Cadastrar Arena"
     },
     "institutional": {
       "title": "Suporte",
@@ -130,7 +185,241 @@
         "n": "03",
         "label": "Reserve e jogue sem burocracia"
       }
-    ]
+    ],
+    "validation": {
+      "nameMin": "O nome deve ter pelo menos 2 caracteres",
+      "lastNameMin": "O sobrenome deve ter pelo menos 2 caracteres",
+      "emailInvalid": "E-mail inválido",
+      "passwordMin": "A senha deve ter pelo menos 8 caracteres",
+      "passwordUpper": "A senha deve conter ao menos uma letra maiúscula",
+      "passwordNumber": "A senha deve conter ao menos um número",
+      "passwordMismatch": "As senhas não coincidem",
+      "genericError": "Ocorreu um erro ao criar a conta."
+    }
+  },
+  "userProfile": {
+    "back": "Voltar",
+    "idLabel": "ID do Sistema",
+    "role": {
+      "admin": "Administrador",
+      "manager": "Gestor de Quadra",
+      "athlete": "Atleta"
+    },
+    "sections": {
+      "info": {
+        "title": "Informações do Perfil",
+        "subtitle": "Atualize seu nome e endereço de e-mail"
+      },
+      "security": {
+        "title": "Segurança",
+        "subtitle": "Altere sua senha de acesso"
+      },
+      "notifications": {
+        "title": "Notificações",
+        "subtitle": "Escolha como deseja ser notificado"
+      },
+      "quickAccess": {
+        "title": "Acesso Rápido"
+      },
+      "danger": {
+        "title": "Zona de Perigo",
+        "subtitle": "Ações irreversíveis — prossiga com cuidado"
+      }
+    },
+    "labels": {
+      "fullName": "Nome completo",
+      "email": "E-mail",
+      "phone": "Telefone (Opcional)",
+      "phoneHint": "Apenas para contato se necessário.",
+      "cpf": "CPF (Opcional)",
+      "cpfHint": "Necessário para realizar reservas.",
+      "emailHint": "Alterar o e-mail pode exigir verificação.",
+      "currentPassword": "Senha atual",
+      "newPassword": "Nova senha",
+      "confirmPassword": "Confirmar nova senha",
+      "passwordMismatch": "⚠️ As senhas não coincidem.",
+      "deleteAccount": "Excluir conta",
+      "deleteAccountDesc": "Remove permanentemente sua conta e todos os dados associados."
+    },
+    "placeholders": {
+      "fullName": "Seu nome completo",
+      "email": "seu@email.com",
+      "phone": "(00) 00000-0000",
+      "cpf": "000.000.000-00"
+    },
+    "buttons": {
+      "save": "Salvar Alterações",
+      "saving": "Salvando…",
+      "changePassword": "Alterar Senha",
+      "changing": "Alterando…",
+      "delete": "Excluir minha conta"
+    },
+    "notifications": {
+      "email": {
+        "label": "E-mail de confirmação",
+        "desc": "Receba confirmações e lembretes de reservas por e-mail"
+      },
+      "sms": {
+        "label": "SMS",
+        "desc": "Alertas via SMS para sua próxima partida"
+      },
+      "promo": {
+        "label": "Promoções e novidades",
+        "desc": "Ofertas exclusivas e novidades do PlayHub"
+      }
+    },
+    "passwordStrength": {
+      "weak": "Fraca",
+      "fair": "Razoável",
+      "good": "Boa",
+      "strong": "Forte",
+      "checks": {
+        "length": "Mínimo 8 caracteres",
+        "upper": "Letra maiúscula",
+        "number": "Número",
+        "special": "Caractere especial"
+      }
+    },
+    "feedbacks": {
+      "nameEmpty": "O nome não pode estar vazio.",
+      "emailInvalid": "Insira um e-mail válido.",
+      "updateSuccess": "Perfil atualizado com sucesso!",
+      "updateError": "Erro ao atualizar perfil. Tente novamente.",
+      "currentPassRequired": "Informe sua senha atual.",
+      "newPassLength": "A nova senha deve ter pelo menos 8 caracteres.",
+      "passMismatch": "As senhas não coincidem.",
+      "passSuccess": "Senha alterada com sucesso!",
+      "cpfInvalid": "CPF inválido. Verifique os números informados."
+    },
+    "quickAccessItems": {
+      "reservations": {
+        "label": "Minhas Reservas",
+        "desc": "Ver histórico e próximas reservas"
+      },
+      "settings": {
+        "label": "Configurações",
+        "desc": "Tema, idioma e preferências"
+      }
+    }
+  },
+  "user": {
+    "dashboard": {
+      "title": "Minhas Reservas",
+      "welcome": "Olá, <0>{{name}}</0> — acompanhe e gerencie suas reservas de quadras.",
+      "stats": {
+        "totalReservations": "Total de Reservas",
+        "confirmed": "Confirmadas",
+        "sports": "Esportes",
+        "totalSpent": "Total Gasto"
+      },
+      "nextReservation": {
+        "badge": "Próxima Reserva",
+        "viewCourt": "Ver Quadra",
+        "cancel": "Cancelar"
+      },
+      "tabs": {
+        "all": "Todas",
+        "upcoming": "Próximas",
+        "completed": "Concluídas",
+        "cancelled": "Canceladas"
+      },
+      "searchPlaceholder": "Buscar quadra ou esporte…",
+      "noResults": "Nenhuma reserva encontrada",
+      "noResultsDesc": "Tente mudar o filtro ou buscar outro termo",
+      "findCourt": "Encontrar uma quadra",
+      "table": {
+        "deletedCourt": "Quadra Excluída",
+        "sport": "Esporte",
+        "locationNotAvailable": "Local não disponível",
+        "evaluate": "Avalie esta quadra",
+        "cancel": "Cancelar reserva",
+        "viewCourt": "Ver quadra",
+        "reservationsCount": "{{count}} reserva",
+        "reservationsCount_plural": "{{count}} reservas",
+        "makeNew": "Fazer nova reserva"
+      },
+      "status": {
+        "confirmed": "Confirmada",
+        "completed": "Concluída",
+        "cancelled": "Cancelada",
+        "pending": "Pendente"
+      },
+      "achievements": {
+        "title": "Conquistas",
+        "firstGame": {
+          "label": "Primeiro Jogo",
+          "desc": "1ª reserva realizada"
+        },
+        "regular": {
+          "label": "Frequentador",
+          "desc": "5 reservas confirmadas"
+        },
+        "reviewer": {
+          "label": "Avaliador",
+          "desc": "3 avaliações enviadas"
+        },
+        "dedicated": {
+          "label": "Dedicado",
+          "desc": "10 reservas no mês"
+        }
+      },
+      "cta": {
+        "title": "Explore mais quadras",
+        "desc": "Mais de 50 quadras premium em todo o Brasil esperando pela sua próxima partida.",
+        "button": "Ver Catálogo Completo"
+      }
+    },
+    "favorites": {
+      "collection": "Minha Coleção",
+      "title": "Quadras <span class=\"text-[#8CE600]\">Favoritas</span>",
+      "subtitle": {
+        "withItems": "Você selecionou {{count}} arena incrível para o seu próximo jogo.",
+        "withItems_plural": "Você selecionou {{count}} arenas incríveis para o seu próximo jogo.",
+        "empty": "Sua lista de desejos está pronta para ser preenchida com as melhores arenas da região."
+      },
+      "stats": {
+        "totalSaved": "Total Salvo"
+      },
+      "view": {
+        "grid": "Visualização em Grade",
+        "exploreMore": "Explorar Mais"
+      },
+      "empty": {
+        "title": "Sua coleção está vazia",
+        "desc": "Encontre as melhores quadras e arenas. Toque no coração para salvá-las aqui e facilitar sua próxima reserva.",
+        "button": "Explorar Catálogo"
+      },
+      "card": {
+        "status": {
+          "available": "Disponível",
+          "busy": "Ocupada",
+          "closed": "Fechada"
+        },
+        "priceLabel": "Valor Hora",
+        "book": "Reservar"
+      }
+    },
+    "sidebar": {
+      "sections": {
+        "general": "Geral",
+        "explore": "Explorar",
+        "account": "Conta"
+      },
+      "items": {
+        "dashboard": "Dashboard",
+        "myBookings": "Minhas Reservas",
+        "courts": "Quadras",
+        "favorites": "Favoritos",
+        "reviews": "Avaliações",
+        "profile": "Perfil",
+        "notifications": "Notificações",
+        "settings": "Configurações"
+      },
+      "role": "Atleta",
+      "logout": "Sair",
+      "expand": "Expandir barra lateral",
+      "collapse": "Recolher barra lateral"
+    }
   },
   "index": {
     "marquee": {
@@ -142,10 +431,15 @@
       "item6": "SUPORTE 24/7"
     },
     "sports": {
-      "title": "Modalidades em Destaque",
-      "subtitle": "Escolha seu esporte e veja as quadras disponíveis agora.",
-      "viewAll": "Ver todas",
-      "bookNow": "Reservar →",
+      "title": "Modalidades",
+      "subtitle": "Encontre o esporte perfeito para o seu próximo jogo.",
+      "viewAll": "Ver todas as modalidades"
+    },
+    "featuredCourts": {
+      "title": "Quadras em Destaque",
+      "subtitle": "Espaços premium selecionados com infraestrutura completa.",
+      "viewAll": "Ver todas as quadras",
+      "reserve": "Reservar →",
       "perHour": " / hora"
     },
     "hero": {
@@ -374,7 +668,13 @@
     "bookingSuccess": "Sua reserva em",
     "bookingSuccessSuffix": "foi realizada com sucesso. Você receberá um e-mail de confirmação em breve.",
     "goToHome": "Ir para o início",
-    "viewCatalog": "Ver catálogo"
+    "viewCatalog": "Ver catálogo",
+    "cpfModal": {
+      "title": "Ação Necessária",
+      "description": "Para garantir a segurança de todos, é obrigatório ter o CPF cadastrado para realizar uma reserva.",
+      "completeProfile": "Completar Perfil",
+      "cancel": "Cancelar"
+    }
   },
   "confirmation": {
     "eyebrow": "Quase lá!",
@@ -411,7 +711,27 @@
     "backToLogin": "Voltar para o login",
     "successMsg": "Se o e-mail existir, um link de redefinição foi enviado!",
     "brandingTitle": "Recupere o acesso\nà sua conta PlayHub.",
-    "brandingSubtitle": "É rápido, fácil e seguro. Retorne às quadras o quanto antes."
+    "brandingSubtitle": "É rápido, fácil e seguro. Retorne às quadras o quanto antes.",
+    "underDevelopment": {
+      "title": "Módulo em Desenvolvimento",
+      "description": "A funcionalidade de recuperação de e-mail está sendo finalizada. Em breve você poderá redefinir sua senha automaticamente!",
+      "close": "Entendido"
+    }
+  },
+  "resetPassword": {
+    "title": "Nova Senha",
+    "subtitle": "Crie uma senha forte e segura para sua conta.",
+    "passwordLabel": "NOVA SENHA",
+    "confirmPasswordLabel": "CONFIRMAR NOVA SENHA",
+    "submitBtn": "ATUALIZAR SENHA",
+    "updating": "ATUALIZANDO...",
+    "successMsg": "Senha alterada com sucesso! Você já pode fazer login.",
+    "backToLogin": "Ir para o login",
+    "underDevelopment": {
+      "title": "Redefinição em Manutenção",
+      "description": "Estamos finalizando a integração segura de troca de senhas. Por enquanto, esta ação está desabilitada para garantir a segurança da sua conta.",
+      "close": "Entendido"
+    }
   },
   "notFound": {
     "title": "404",
@@ -487,6 +807,81 @@
     }
   },
   "admin": {
+    "sidebar": {
+      "main": "Principal",
+      "management": "Gestão",
+      "system": "Sistema",
+      "dashboard": "Dashboard",
+      "reports": "Relatórios",
+      "activity": "Atividade",
+      "users": "Usuários",
+      "courts": "Quadras",
+      "bookings": "Reservas",
+      "payments": "Pagamentos",
+      "logs": "Logs",
+      "notifications": "Notificações",
+      "settings": "Configurações",
+      "role": "Administrador",
+      "logout": "Sair",
+      "lightTheme": "Mudar para tema claro",
+      "darkTheme": "Mudar para tema escuro",
+      "expand": "Expandir sidebar",
+      "collapse": "Recolher sidebar"
+    },
+    "dashboard": {
+      "greeting": "Olá, {{name}}",
+      "adminBadge": "Administrador",
+      "viewSite": "Ver site",
+      "kpi": {
+        "users": "Usuários Registrados",
+        "courts": "Quadras Cadastradas",
+        "reservations": "Total de Reservas",
+        "revenue": "Receita Total"
+      },
+      "alerts": {
+        "pendingPayments": "{{count}} pagamentos aguardando confirmação",
+        "pendingReservations": "{{count}} reservas aguardando aprovação",
+        "noAlerts": "Nenhum alerta ativo no momento"
+      },
+      "revenueChart": "Receita por Quadra",
+      "revenueDesc": "Desempenho financeiro acumulado",
+      "viewAllCourts": "Ver todas",
+      "paymentBreakdown": "Pagamentos por Status",
+      "paymentApproved": "Aprovados",
+      "paymentPending": "Pendentes",
+      "paymentFailed": "Falhas / Estornos",
+      "reservationStatus": "Reservas por Status",
+      "resConfirmed": "Confirmadas",
+      "resPending": "Pendentes",
+      "resCancelled": "Canceladas",
+      "resCompleted": "Concluídas",
+      "topCourts": "Top Quadras",
+      "topCourtsDesc": "Por receita gerada",
+      "recentActivity": "Atividade Recente",
+      "recentReservations": "Últimas Reservas",
+      "recentUsers": "Novos Usuários",
+      "viewAll": "Ver todos",
+      "quickActions": "Ações Rápidas",
+      "addCourt": "Adicionar Quadra",
+      "createManager": "Criar Gestor",
+      "generateReport": "Gerar Relatório",
+      "managePayments": "Gerir Pagamentos",
+      "id": "ID",
+      "user": "Usuário",
+      "court": "Quadra",
+      "schedule": "Horário",
+      "value": "Valor",
+      "status": "Status",
+      "joinedAt": "Cadastrado",
+      "reservations": "reservas",
+      "noReservations": "Nenhuma reserva encontrada.",
+      "noUsers": "Nenhum usuário encontrado.",
+      "systemHealth": "Saúde do Sistema",
+      "confirmedRate": "Taxa de Confirmação",
+      "paymentRate": "Taxa de Pagamento",
+      "avgTicket": "Ticket Médio",
+      "occupancyRate": "Taxa de Ocupação"
+    },
     "activities": {
       "title": "Atividades",
       "subtitle": "Histórico recente de ações e eventos na plataforma.",
@@ -537,7 +932,589 @@
         "status": "Status",
         "value": "Valor",
         "court": "Quadra"
+      },
+      "dashboard": {
+        "viewAll": "Ver tudo",
+        "resConfirmed": "Confirmada",
+        "resPending": "Pendente"
       }
+    },
+    "roles": {
+      "admin": "Admin",
+      "manager": "Gestor",
+      "athlete": "Atleta"
+    },
+    "users": {
+      "title": "Gestão de Usuários",
+      "subtitle": "Gerencie perfis, permissões e associações de quadras na plataforma.",
+      "newUser": "Novo Usuário",
+      "searchPlaceholder": "Buscar por nome ou e-mail...",
+      "rolePlaceholder": "Papel",
+      "allRoles": "Todos os Papéis",
+      "noUsers": "Nenhum usuário encontrado",
+      "noUsersDesc": "Tente ajustar seus filtros ou crie um novo usuário.",
+      "noName": "Sem nome",
+      "stats": {
+        "total": "Total de Usuários",
+        "admins": "Administradores",
+        "managers": "Gestores de Arena",
+        "athletes": "Usuários Comuns"
+      },
+      "table": {
+        "user": "Usuário",
+        "email": "E-mail",
+        "role": "Papel",
+        "courts": "Quadras Assoc.",
+        "joined": "Cadastro",
+        "courtsCount": "{{count}} quadras",
+        "actions": "Ações"
+      },
+      "actions": {
+        "edit": "Editar",
+        "delete": "Excluir"
+      },
+      "modals": {
+        "newUserTitle": "Novo Usuário",
+        "editUserTitle": "Editar Usuário",
+        "registration": "Cadastro",
+        "adjustments": "Ajustes",
+        "infoTab": "Informações",
+        "accessTab": "Papel e Acesso",
+        "security": "Segurança",
+        "protectedData": "Dados Protegidos",
+        "personalData": "Dados Pessoais",
+        "fullName": "Nome Completo",
+        "fullNamePlaceholder": "Ex: João Silva",
+        "emailAccess": "E-mail de Acesso",
+        "emailPlaceholder": "joao@playhub.com",
+        "phoneOptional": "Telefone (Opcional)",
+        "phonePlaceholder": "(11) 99999-9999",
+        "cpfOptional": "CPF (Opcional)",
+        "cpfPlaceholder": "000.000.000-00",
+        "password": "Senha",
+        "passwordHint": "Senha {{mode}}",
+        "passwordModeEdit": "(Deixe em branco para manter)",
+        "passwordModeCreate": "de Acesso",
+        "passwordPlaceholder": "••••••••",
+        "securityTip": "Dica de Segurança",
+        "securityTipDesc": "Recomendamos o uso de senhas fortes com no mínimo 8 caracteres, incluindo letras, números e símbolos.",
+        "roleOnPlatform": "Papel na Plataforma",
+        "roles": {
+          "user": "Usuário Comum",
+          "userDesc": "Reserva quadras e gerencia favoritos.",
+          "manager": "Gestor de Arena",
+          "managerDesc": "Gerencia as quadras associadas.",
+          "admin": "Administrador",
+          "adminDesc": "Acesso total a todas as funções."
+        },
+        "courtAssociation": "Associação de Quadras",
+        "courtsSelected": "{{count}} selecionadas",
+        "searchCourts": "Buscar quadras...",
+        "registerBtn": "Cadastrar Usuário",
+        "saveBtn": "Salvar Alterações",
+        "deleteConfirmTitle": "Excluir Usuário?",
+        "deleteConfirmDesc": "Esta ação é irreversível. Todas as permissões e associações deste usuário serão perdidas.",
+        "errorTitle": "Erro",
+        "updateErrorMessage": "Ocorreu um problema ao tentar salvar as alterações do usuário.",
+        "createErrorMessage": "Ocorreu um problema ao tentar cadastrar o novo usuário.",
+        "deleteSuccessTitle": "Usuário Removido",
+        "deleteSuccessMessage": "O usuário foi excluído permanentemente da plataforma.",
+        "deleteErrorMessage": "Não foi possível remover este usuário no momento."
+      },
+      "toasts": {
+        "updateSuccess": "Usuário atualizado com sucesso!",
+        "updateError": "Erro ao atualizar usuário.",
+        "createSuccess": "Usuário criado com sucesso!",
+        "createError": "Erro ao criar usuário.",
+        "deleteSuccess": "Usuário excluído com sucesso!",
+        "deleteError": "Erro ao excluir usuário."
+      }
+    },
+    "settings": {
+      "title": "Configurações do Sistema",
+      "subtitle": "Ajuste os parâmetros globais da plataforma e preferências do painel.",
+      "save": "Salvar Alterações",
+      "saving": "Salvando...",
+      "saveSuccess": "Configurações salvas com sucesso!",
+      "statusModal": {
+        "loadingTitle": "Salvando Configurações",
+        "loadingMsg": "Aguarde um instante enquanto aplicamos as novas diretrizes ao sistema.",
+        "successTitle": "Configurações Salvas",
+        "successMsg": "Tudo pronto! As alterações foram aplicadas com sucesso em toda a plataforma."
+      },
+      "sections": {
+        "general": {
+          "title": "Informações Básicas",
+          "subtitle": "Dados principais da plataforma",
+          "siteName": "Nome da Plataforma",
+          "currency": "Moeda Padrão",
+          "supportEmail": "E-mail de Suporte"
+        },
+        "notifications": {
+          "title": "Notificações",
+          "subtitle": "Alertas do sistema",
+          "email": "E-mails Transacionais",
+          "emailDesc": "Enviar confirmações de reserva e alertas por e-mail.",
+          "sms": "Alertas por SMS / WhatsApp",
+          "smsDesc": "Notificar os jogadores via celular. (Requer integração)."
+        },
+        "appearance": {
+          "title": "Aparência",
+          "subtitle": "Tema do painel",
+          "light": "Claro",
+          "dark": "Escuro"
+        },
+        "danger": {
+          "title": "Zona de Risco",
+          "subtitle": "Ações críticas",
+          "maintenance": "Modo de Manutenção",
+          "maintenanceDesc": "Bloqueia o acesso de usuários comuns. Apenas administradores poderão entrar no sistema.",
+          "clearCache": "Limpar Cache"
+        },
+        "profile": {
+          "title": "Meu Perfil (Admin)",
+          "subtitle": "Seus dados pessoais de acesso",
+          "phone": "Telefone",
+          "cpf": "CPF"
+        }
+      }
+    },
+    "logs": {
+      "title": "Logs do Sistema",
+      "subtitle": "Auditoria em tempo real conectada ao MongoDB do backend.",
+      "sync": "Sincronizar",
+      "export": "Exportar",
+      "stats": {
+        "health": "Health Check",
+        "healthy": "Saudável",
+        "sink": "Log Sink",
+        "audit": "Auditoria",
+        "connected": "Conectado"
+      },
+      "searchPlaceholder": "Buscar por evento, detalhes ou usuário...",
+      "typePlaceholder": "Tipo de Log",
+      "allLevels": "Todos os Logs",
+      "levels": {
+        "info": "Info",
+        "warning": "Alerta",
+        "error": "Erro",
+        "critical": "Crítico",
+        "other": "Outro"
+      },
+      "table": {
+        "timestamp": "Timestamp",
+        "message": "Mensagem do Sistema",
+        "level": "Nível",
+        "identity": "Identidade",
+        "actions": "Ações"
+      },
+      "noLogs": "Nenhum log encontrado",
+      "noLogsDesc": "A consulta ao MongoDB não retornou registros.",
+      "pagination": {
+        "showing": "Mostrando {{count}} de {{total}} logs registrados",
+        "previous": "Anterior",
+        "next": "Próximo"
+      }
+    }
+  },
+  "gestor": {
+    "sidebar": {
+      "main": "Principal",
+      "dashboard": "Dashboard",
+      "reports": "Relatórios",
+      "myCourts": "Minhas Quadras",
+      "courts": "Quadras",
+      "reservations": "Reservas",
+      "schedule": "Horários",
+      "clients": "Clientes",
+      "financial": "Financeiro",
+      "payments": "Pagamentos",
+      "notifications": "Notificações",
+      "settings": "Configurações",
+      "role": "Gestor de Quadra",
+      "lightTheme": "Tema claro",
+      "darkTheme": "Tema escuro",
+      "logout": "Sair",
+      "expand": "Expandir barra lateral",
+      "collapse": "Recolher barra lateral"
+    },
+    "dashboard": {
+      "greeting": "Painel do Gestor, {{name}}",
+      "managerBadge": "Gestor",
+      "newCourt": "Nova Quadra",
+      "stats": {
+        "managedCourts": "Quadras Gerenciadas",
+        "reservationsMonth": "Reservas este Mês",
+        "uniqueClients": "Clientes Únicos",
+        "monthlyRevenue": "Receita Mensal"
+      },
+      "myCourts": "Minhas Quadras",
+      "manage": "Gerenciar",
+      "courtStatus": {
+        "active": "Ativa",
+        "maintenance": "Manutenção",
+        "inactive": "Inativa"
+      },
+      "actions": {
+        "blockTime": "Bloquear horário",
+        "viewRequests": "Ver solicitações",
+        "editCourt": "Editar quadra"
+      },
+      "reservationsPerMonth": "Reservas/mês",
+      "revenue": "Receita",
+      "tabs": {
+        "recentReservations": "Reservas Recentes",
+        "todaysSchedule": "Agenda de Hoje"
+      },
+      "table": {
+        "id": "ID",
+        "client": "Cliente",
+        "court": "Quadra",
+        "time": "Horário",
+        "value": "Valor",
+        "status": "Status",
+        "noResults": "Nenhuma reserva encontrada"
+      },
+      "viewAll": "Ver todas",
+      "revenueByCourt": "Receita por Quadra",
+      "todaySummary": "Resumo de Hoje",
+      "todayStats": {
+        "reservations": "Reservas hoje",
+        "revenue": "Receita hoje",
+        "clients": "Clientes hoje"
+      },
+      "quickActions": "Ações Rápidas",
+      "quickActionsDesc": "Gerencie suas quadras com agilidade"
+    },
+    "schedule": {
+      "title": "Agenda das Quadras",
+      "subtitle": "Visualize ocupações, confirme reservas pendentes e realize bloqueios estratégicos para manutenção ou uso interno.",
+      "management": "Gestão de Disponibilidade",
+      "searchPlaceholder": "Buscar quadra ou esporte...",
+      "loading": "Carregando horários...",
+      "noCourts": "Nenhuma quadra encontrada",
+      "noCourtsDesc": "Tente ajustar sua busca ou você ainda não possui quadras vinculadas.",
+      "card": {
+        "time": "Horário",
+        "price": "Preço/h",
+        "manageSchedule": "Gerenciar Agenda"
+      },
+      "modal": {
+        "officialSchedule": "Agenda Oficial",
+        "manageAvailability": "Gerencie a disponibilidade e visualize as reservas em tempo real.",
+        "modality": "Modalidade",
+        "selectedDay": "Dia Selecionado",
+        "status": {
+          "free": "Livre",
+          "occupied": "Ocupado",
+          "blocked": "Bloqueado"
+        },
+        "blockConfirm": {
+          "title": "Bloquear Horário",
+          "desc": "Você deseja bloquear o horário das {{start}}:00 às {{end}}:00 para manutenção ou uso interno?",
+          "confirm": "Confirmar Bloqueio"
+        },
+        "details": {
+          "blockedTitle": "Horário Bloqueado",
+          "reservedTitle": "Detalhes da Reserva",
+          "opInfo": "Informações Operacionais",
+          "time": "Horário",
+          "status": "Status",
+          "client": "Cliente",
+          "internalUse": "Uso Interno",
+          "responsible": "Responsável pela ocupação",
+          "reservationId": "ID da Reserva:",
+          "totalValue": "Valor Total:",
+          "close": "Fechar Detalhes",
+          "release": "Liberar Horário"
+        },
+        "releaseConfirm": {
+          "title": "Liberar Horário",
+          "desc": "Você deseja liberar este horário? Ele voltará a ficar disponível para reserva por qualquer cliente.",
+          "confirm": "Confirmar Liberação"
+        },
+        "warning": "Alterações na agenda são permanentes. Bloqueios impedem que novos clientes reservem estes horários."
+      }
+    },
+    "courts": {
+      "title": "Gestão de Quadras",
+      "subtitle": "Crie, edite e acompanhe o desempenho das suas quadras.",
+      "management": "Minhas Quadras",
+      "searchPlaceholder": "Buscar quadra...",
+      "addCourt": "Nova Quadra",
+      "noCourts": "Nenhuma quadra encontrada",
+      "noCourtsDesc": "Você ainda não possui quadras ou a busca não encontrou resultados.",
+      "table": {
+        "court": "Quadra",
+        "location": "Localização",
+        "sport": "Modalidade",
+        "price": "Preço/h",
+        "status": "Status",
+        "actions": "Ações"
+      },
+      "stats": {
+        "total": "Total de Quadras",
+        "active": "Quadras Ativas",
+        "occupancy": "Taxa de Ocupação",
+        "maintenance": "Em Manutenção"
+      },
+      "form": {
+        "newTitle": "Nova Quadra",
+        "newSubtitle": "Preencha os detalhes para cadastrar uma nova quadra",
+        "editTitle": "Editar Quadra",
+        "editSubtitle": "Altere as configurações da quadra selecionada",
+        "tabs": {
+          "general": "Informações",
+          "location": "Localização",
+          "features": "Esportes e Extras",
+          "media": "Mídia e Galeria",
+          "availability": "Disponibilidade"
+        },
+        "name": "Nome da Arena",
+        "type": "Modalidade Principal",
+        "price": "Preço por Hora (R$)",
+        "capacity": "Capacidade (Jogadores)",
+        "description": "Descrição Detalhada",
+        "descPlaceholder": "Descreva os diferenciais da sua quadra...",
+        "badge": "Destaque / Badge",
+        "status": "Status da Quadra",
+        "location": "Endereço Completo",
+        "neighborhood": "Bairro",
+        "city": "Cidade",
+        "state": "Estado",
+        "features": "Selecione as comodidades oferecidas",
+        "sportsTitle": "Modalidades e Esportes",
+        "extrasTitle": "Comodidades (Extras)",
+        "newAmenity": "Nova comodidade...",
+        "galleryTitle": "Galeria de Imagens",
+        "upload": "Upload",
+        "noImages": "Nenhuma imagem carregada ainda.",
+        "hoursTitle": "Horários de Funcionamento",
+        "default8": "Padrão 08h-22h",
+        "total6": "Total 06h-23h",
+        "closedState": "Fechado",
+        "openState": "Aberto",
+        "openingPrefix": "Abertura:",
+        "closingPrefix": "Fechamento:",
+        "uploadImage": "Fazer Upload de Imagem",
+        "uploadHint": "Formatos suportados: JPG, PNG. Máx 5MB.",
+        "openingHour": "Abertura (Hora)",
+        "closingHour": "Fechamento (Hora)",
+        "discard": "Descartar",
+        "saveChanges": "Salvar Alterações",
+        "createCourt": "Criar Arena",
+        "saving": "Salvando...",
+        "namePlaceholder": "Ex: Arena Prime Society",
+        "neighborhoodPlaceholder": "Ex: Vila Olímpia",
+        "cityPlaceholder": "Ex: São Paulo",
+        "statePlaceholder": "Ex: SP",
+        "addressPlaceholder": "Ex: Rua das Olimpíadas, 205",
+        "badgePlaceholder": "Ex: Promoção de Verão",
+        "amenities": {
+          "lockerRoom": "Vestiário",
+          "parking": "Estacionamento",
+          "lighting": "Iluminação",
+          "wifi": "Wifi",
+          "snackBar": "Lanchonete",
+          "shower": "Ducha",
+          "gym": "Academia",
+          "pool": "Piscina",
+          "bleachers": "Arquibancada"
+        }
+      },
+      "toasts": {
+        "createSuccess": "Quadra criada com sucesso!",
+        "createError": "Erro ao criar quadra.",
+        "updateSuccess": "Quadra atualizada com sucesso!",
+        "updateError": "Erro ao atualizar quadra.",
+        "deleteSuccess": "Quadra excluída com sucesso!",
+        "deleteError": "Erro ao excluir quadra."
+      },
+      "deleteConfirm": {
+        "title": "Excluir Quadra",
+        "desc": "Tem certeza que deseja excluir esta quadra? Esta ação não pode ser desfeita e todas as reservas futuras serão afetadas.",
+        "confirm": "Excluir Permanentemente",
+        "cancel": "Cancelar"
+      },
+      "allTypes": "Todos os Tipos",
+      "allStatuses": "Todos os Status",
+      "type": "Tipo",
+      "active": "Ativa",
+      "maintenance": "Manutenção",
+      "closed": "Fechada",
+      "edit": "Editar",
+      "delete": "Excluir",
+      "noResults": "Nenhuma quadra encontrada"
+    },
+    "reservations": {
+      "title": "Gestão de Reservas",
+      "subtitle": "Visualize e gerencie todos os agendamentos das suas quadras.",
+      "searchPlaceholder": "Buscar por cliente, quadra ou ID...",
+      "allCourts": "Todas as Quadras",
+      "allStatuses": "Todos os Status",
+      "table": {
+        "id": "ID",
+        "client": "Cliente",
+        "court": "Quadra",
+        "date": "Data e Hora",
+        "price": "Valor",
+        "status": "Status",
+        "actions": "Ações"
+      },
+      "noResults": "Nenhuma reserva encontrada",
+      "viewDetails": "Ver Detalhes",
+      "cancelReservation": "Cancelar Reserva",
+      "cancelConfirm": {
+        "title": "Cancelar Reserva",
+        "desc": "Tem certeza que deseja cancelar esta reserva? O horário voltará a ficar disponível.",
+        "confirm": "Sim, Cancelar",
+        "cancel": "Voltar"
+      }
+    },
+    "reports": {
+      "title": "Relatórios e Análises",
+      "subtitle": "Acompanhe o desempenho financeiro e a ocupação das suas quadras.",
+      "exportPdf": "Exportar PDF",
+      "revenue": "Receita Total",
+      "occupancy": "Taxa de Ocupação",
+      "totalReservations": "Total de Reservas",
+      "uniqueClients": "Clientes Ativos",
+      "revenueByCourt": "Receita por Quadra",
+      "reservationsByDay": "Reservas por Dia",
+      "courtPerformance": "Desempenho por Quadra",
+      "generatingPdf": "Gerando PDF..."
+    },
+    "clients": {
+      "title": "Meus Clientes",
+      "subtitle": "Visualize os clientes que utilizam suas quadras e seu histórico.",
+      "searchPlaceholder": "Buscar por nome ou email...",
+      "table": {
+        "name": "Cliente",
+        "contact": "Contato",
+        "totalReservations": "Total de Reservas",
+        "totalSpent": "Total Gasto",
+        "lastVisit": "Última Visita"
+      },
+      "noResults": "Nenhum cliente encontrado",
+      "deletedUser": "Usuário Excluído",
+      "notInformed": "Não informado"
+    },
+    "payments": {
+      "title": "Controle Financeiro",
+      "subtitle": "Acompanhe os pagamentos e recebíveis das suas quadras.",
+      "searchPlaceholder": "Buscar por ID da transação ou cliente...",
+      "allMethods": "Todos os Métodos",
+      "table": {
+        "id": "ID da Transação",
+        "reservationId": "ID Reserva",
+        "client": "Cliente",
+        "amount": "Valor",
+        "method": "Método",
+        "status": "Status",
+        "date": "Data"
+      },
+      "noResults": "Nenhum pagamento encontrado"
+    },
+    "notifications": {
+      "title": "Central de Notificações",
+      "subtitle": "Acompanhe os alertas e atualizações importantes do sistema.",
+      "markAllRead": "Marcar todas como lidas",
+      "empty": "Nenhuma notificação no momento",
+      "timeAgo": "há pouco",
+      "types": {
+        "reservation": "Nova Reserva",
+        "cancellation": "Cancelamento",
+        "payment": "Pagamento"
+      }
+    },
+    "settings": {
+      "title": "Configurações da Conta",
+      "subtitle": "Gerencie seu perfil e preferências de notificação.",
+      "profile": {
+        "title": "Perfil",
+        "name": "Nome Completo",
+        "email": "Email",
+        "phone": "Telefone",
+        "cpf": "CPF"
+      },
+      "preferences": {
+        "title": "Preferências",
+        "emailNotif": "Notificações por Email",
+        "emailNotifDesc": "Receba atualizações sobre reservas no seu email",
+        "pushNotif": "Notificações Push",
+        "pushNotifDesc": "Alertas instantâneos no navegador",
+        "theme": "Tema do Sistema"
+      },
+      "save": "Salvar Alterações",
+      "saving": "Salvando...",
+      "saveSuccess": "Configurações salvas com sucesso!"
+    }
+  },
+  "privacy": {
+    "title": "Política de Privacidade",
+    "lastUpdate": "Última atualização: 30 de abril de 2026",
+    "sections": {
+      "collection": {
+        "title": "1. Coleta de Informações",
+        "text": "Coletamos informações que você nos fornece diretamente, como quando cria uma conta, atualiza seu perfil, usa os recursos interativos dos nossos serviços ou se comunica conosco. Os tipos de informações que podemos coletar incluem seu nome, endereço de e-mail, número de telefone e informações de pagamento."
+      },
+      "usage": {
+        "title": "2. Uso das Informações",
+        "text": "Utilizamos as informações que coletamos para fornecer, manter e melhorar nossos serviços, processar transações, enviar avisos técnicos, atualizações, alertas de segurança e mensagens administrativas, bem como para responder a seus comentários e perguntas."
+      },
+      "sharing": {
+        "title": "3. Compartilhamento de Informações",
+        "text": "Podemos compartilhar suas informações com parceiros que administram as quadras para facilitar suas reservas. Não vendemos, alugamos ou compartilhamos suas informações pessoais com terceiros para fins de marketing sem o seu consentimento explícito."
+      },
+      "security": {
+        "title": "4. Segurança",
+        "text": "Tomamos medidas razoáveis para ajudar a proteger informações sobre você contra perda, roubo, uso indevido, acesso não autorizado, divulgação, alteração e destruição. No entanto, lembre-se de que nenhum sistema de transmissão ou armazenamento de dados na internet é 100% seguro."
+      }
+    }
+  },
+  "terms": {
+    "title": "Termos de Uso",
+    "lastUpdate": "Última atualização: 30 de abril de 2026",
+    "sections": {
+      "acceptance": {
+        "title": "1. Aceitação dos Termos",
+        "text": "Ao acessar e usar a plataforma PlayHub, você concorda em cumprir e ficar vinculado a estes Termos de Uso. Se você não concordar com qualquer parte destes termos, não deverá usar nossos serviços."
+      },
+      "usage": {
+        "title": "2. Uso da Plataforma",
+        "text": "Você concorda em usar a plataforma apenas para fins legais e de maneira que não infrinja os direitos de terceiros ou restrinja o uso da plataforma por qualquer outra pessoa."
+      },
+      "bookings": {
+        "title": "3. Reservas e Cancelamentos",
+        "text": "As políticas de reserva e cancelamento são definidas por cada administrador de quadra esportiva. O PlayHub atua apenas como intermediário na reserva."
+      },
+      "liability": {
+        "title": "4. Limitação de Responsabilidade",
+        "text": "O PlayHub não se responsabiliza por danos diretos, indiretos, incidentais ou consequentes resultantes do uso ou da incapacidade de usar nossos serviços."
+      }
+    }
+  },
+  "errorBoundary": {
+    "title": "Ops! Algo deu errado.",
+    "description": "Encontramos um erro inesperado ao carregar a aplicação. Nossa equipe já foi notificada.",
+    "retry": "Tentar novamente"
+  },
+  "sports": {
+    "soccerSociety": "Futebol Society",
+    "beachTennis": "Beach Tennis",
+    "beachVolleyball": "Vôlei de Praia",
+    "basketball": "Basquete",
+    "futsal": "Futsal",
+    "padel": "Padel",
+    "tennis": "Tênis",
+    "handball": "Handebol",
+    "volleyball": "Vôlei de Quadra",
+    "footvolley": "Futevôlei",
+    "tags": {
+      "popular": "Mais Popular",
+      "trending": "Em Alta",
+      "classic": "Clássico",
+      "featured": "Destaque"
     }
   }
 }

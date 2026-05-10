@@ -9,10 +9,14 @@ namespace PlayHub.Application.Features.Courts.Commands.UpdateCourt;
 public class UpdateCourtHandler : IRequestHandler<UpdateCourtCommand, bool>
 {
     private readonly IApplicationDbContext _context;
+    private readonly ICurrentUserService _currentUserService;
+    private readonly Microsoft.Extensions.Logging.ILogger<UpdateCourtHandler> _logger;
 
-    public UpdateCourtHandler(IApplicationDbContext context)
+    public UpdateCourtHandler(IApplicationDbContext context, ICurrentUserService currentUserService, Microsoft.Extensions.Logging.ILogger<UpdateCourtHandler> logger)
     {
         _context = context;
+        _currentUserService = currentUserService;
+        _logger = logger;
     }
 
     public async Task<bool> Handle(UpdateCourtCommand request, CancellationToken cancellationToken)
@@ -94,6 +98,9 @@ public class UpdateCourtHandler : IRequestHandler<UpdateCourtCommand, bool>
                     break;
             }
         }
+
+        court.LastModified = DateTime.UtcNow;
+        court.LastModifiedBy = _currentUserService.UserId.ToString();
 
         var result = await _context.Courts.ReplaceOneAsync(
             c => c.Id == court.Id, 

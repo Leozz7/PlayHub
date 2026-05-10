@@ -11,9 +11,14 @@ public class User : BaseEntity
     public List<Guid> CoutsId { get; private set; } = new List<Guid>();
     public List<Guid> FavoriteCourtIds { get; private set; } = new List<Guid>();
     public string Role { get; private set; } = "User";
+    public string? Phone { get; private set; }
+    public string? Cpf { get; private set; }
 
     public string? RefreshToken { get; private set; }
     public DateTime? RefreshTokenExpiryTime { get; private set; }
+
+    public string? ResetPasswordToken { get; private set; }
+    public DateTime? ResetPasswordTokenExpiry { get; private set; }
 
     private User() { }
 
@@ -53,6 +58,16 @@ public class User : BaseEntity
         Email = email;
         EmailIndex = emailIndex;
         Role = role;
+    }
+
+    public void UpdatePhone(string? phone)
+    {
+        Phone = phone;
+    }
+
+    public void UpdateCpf(string? cpf)
+    {
+        Cpf = cpf;
     }
 
     public void SetNewPasswordHash(string newPasswordHash)
@@ -101,4 +116,15 @@ public class User : BaseEntity
         RefreshToken = null;
         RefreshTokenExpiryTime = null;
     }
-}
+    public void SetResetPasswordToken(string token, DateTime expiryTime)
+    {
+        ResetPasswordToken = token;
+        ResetPasswordTokenExpiry = expiryTime;
+    }
+
+    public void ClearResetPasswordToken()
+    {
+        ResetPasswordToken = null;
+        ResetPasswordTokenExpiry = null;
+    }
+}

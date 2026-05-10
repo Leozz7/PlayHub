@@ -1,5 +1,4 @@
 name: playhub
-version: "3.9"
 
 services:
 
@@ -20,6 +19,7 @@ services:
       - Jwt__Issuer=${JWT_ISSUER}
       - Jwt__Audience=${JWT_AUDIENCE}
       - ENCRYPTION_KEY=${ENCRYPTION_KEY}
+      - Serilog__WriteTo__2__Args__databaseUrl=mongodb://${MONGO_USER}:${MONGO_PASS}@mongo:27017/${MONGO_DB}?authSource=admin
     depends_on:
       mongo:
         condition: service_healthy
@@ -69,19 +69,37 @@ services:
     environment:
       ME_CONFIG_MONGODB_ADMINUSERNAME: ${MONGO_USER}
       ME_CONFIG_MONGODB_ADMINPASSWORD: ${MONGO_PASS}
-      ME_CONFIG_MONGODB_URL: mongodb://${MONGO_USER}:${MONGO_PASS}@mongo:27017/
-      ME_CONFIG_BASICAUTH: false
+      ME_CONFIG_MONGODB_URL: mongodb://${MONGO_USER}:${MONGO_PASS}@mongo:27017/?authSource=admin
+      ME_CONFIG_BASICAUTH: "false"
     depends_on:
       mongo:
         condition: service_healthy
     networks:
       - playhub_net
 
-# ── Volumes ────────────────────────────────────────────────────────────────
+  # ── Seq (Structured Logs UI) ───────────────────────────────────────────────
+  seq:
+    image: datalust/seq:2024.1
+    container_name: playhub_seq
+    restart: unless-stopped
+    ports:
+      - "8082:80"
+      - "5341:5341"
+    environment:
+      ACCEPT_EULA: "Y"
+      SEQ_FIRSTRUN_NOAUTHENTICATION: "true"
+
+    volumes:
+      - seq_data:/data
+    networks:
+      - playhub_net
+  # ── Volumes ────────────────────────────────────────────────────────────────
 volumes:
   mongo_data:
     driver: local
   mongo_config:
+    driver: local
+  seq_data:
     driver: local
 
 # ── Networks ───────────────────────────────────────────────────────────────

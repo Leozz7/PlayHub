@@ -109,7 +109,12 @@ export function Index() {
                 <div className="relative z-40 w-full max-w-5xl mx-auto px-6 flex flex-col items-center text-center">
                     <Reveal>
                         <h1 className="text-5xl md:text-6xl lg:text-7xl font-black tracking-tighter text-gray-900 dark:text-white mb-3 pt-6 md:pt-10 leading-tight transition-colors">
-                            {t('index.hero.titleLine1')}<br />{t('index.hero.titleLine2')}
+                            {(() => {
+                                const words = t('index.hero.titleLine1').split(' ');
+                                const lastWord = words.pop();
+                                return <>{words.join(' ')} <span className="text-[#8CE600]">{lastWord}</span></>;
+                            })()}
+                            <br />{t('index.hero.titleLine2')}
                         </h1>
                     </Reveal>
                     

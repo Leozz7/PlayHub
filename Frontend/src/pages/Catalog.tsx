@@ -12,8 +12,8 @@ import { SPORTS_LIST as HARDCODED_SPORTS, CITIES as HARDCODED_CITIES, type Court
 import { useCourts, useCourtsFilters } from '@/features/courts/hooks/useCourts';
 import { SPORT_ICONS } from '@/components/SportIcons';
 import { FavoriteButton } from '@/components/FavoriteButton';
+import { CourtCard, CourtRow } from '@/components/CourtCard';
 
-// Componentes de ícones
 import { 
     Search, 
     Filter, 
@@ -25,7 +25,6 @@ import {
     ChevronDown
 } from 'lucide-react';
 
-// Componentes de ícones
 const SearchIcon = () => <Search className="w-4 h-4" strokeWidth={1.5} />;
 const FilterIcon = () => <Filter className="w-4 h-4" strokeWidth={1.5} />;
 const LocationIcon = () => <MapPin className="w-3.5 h-3.5" strokeWidth={1.5} />;
@@ -37,127 +36,6 @@ const ChevronIcon = ({ open }: { open: boolean }) => (
     <ChevronDown className={`w-4 h-4 transition-transform duration-300 ${open ? 'rotate-180' : ''}`} strokeWidth={1.5} />
 );
 
-// Sub-componentes do catálogo
-function StatusPill({ status }: { status: any }) {
-    const { t } = useTranslation();
-    
-    // Normalize status - backend sometimes sends integers or camelCase
-    const normalizedStatus = String(status).toLowerCase();
-    
-    const map: Record<string, { label: string; cls: string }> = {
-        available: { label: t('catalog.statusLabels.available'), cls: 'bg-emerald-500/10 text-emerald-500 border-emerald-500/20' },
-        busy:      { label: t('catalog.statusLabels.busy'),      cls: 'bg-amber-500/10  text-amber-500  border-amber-500/20' },
-        closed:    { label: t('catalog.statusLabels.closed'),    cls: 'bg-red-500/10    text-red-500    border-red-500/20' },
-    };
-    
-    // Fallback logic for numeric status if needed
-    let finalStatus = normalizedStatus;
-    if (normalizedStatus === '1') finalStatus = 'available';
-    else if (normalizedStatus === '2') finalStatus = 'closed';
-    else if (normalizedStatus === '3') finalStatus = 'busy';
-
-    const config = map[finalStatus] || map.available;
-    
-    return (
-        <span className={`inline-flex items-center gap-1 text-[10px] font-bold uppercase tracking-widest px-2 py-0.5 rounded-full border ${config.cls}`}>
-            <span className="w-1.5 h-1.5 rounded-full bg-current" />
-            {config.label}
-        </span>
-    );
-}
-
-function AmenityChip({ label }: { label: string }) {
-    return <span className="text-[10px] font-semibold text-gray-500 dark:text-gray-400 bg-gray-50 dark:bg-white/5 px-2 py-0.5 rounded-full border border-gray-100 dark:border-white/5">{label}</span>;
-}
-
-const CourtCard = memo(function CourtCard({ court }: { court: Court }) {
-    return (
-        <Link to={`/courts/${court.id}`} className="group block bg-white dark:bg-background rounded-3xl border border-gray-100 dark:border-white/10 overflow-hidden hover:-translate-y-1 hover:shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:hover:shadow-[0_8px_30px_rgb(140,230,0,0.05)] transition-all duration-500 transform-gpu isolation-isolate">
-            {/* Image */}
-            <div className="relative h-52 overflow-hidden">
-                <img src={court.img} alt={court.name} loading="lazy" className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent" />
-                {court.badge && (
-                    <div className="absolute top-3 left-3 bg-[#8CE600] text-gray-950 text-[10px] font-black uppercase tracking-widest px-2.5 py-1 rounded-full shadow-lg">
-                        {court.badge}
-                    </div>
-                )}
-                <div className="absolute bottom-3 right-3"><StatusPill status={court.frontendStatus || court.status} /></div>
-                {/* Favorite button */}
-                <div className="absolute top-3 right-3" onClick={e => e.preventDefault()}>
-                    <FavoriteButton courtId={String(court.id)} size="sm" />
-                </div>
-            </div>
-
-            {/* Body */}
-            <div className="p-5">
-                <div className="flex items-start justify-between gap-2 mb-1">
-                    <h3 className="font-black text-base tracking-tight text-gray-900 dark:text-white group-hover:text-[#8CE600] transition-colors leading-tight">{court.name}</h3>
-                    <div className="flex items-center gap-1 shrink-0">
-                        <Stars rating={court.rating} />
-                    </div>
-                </div>
-
-                <p className="flex items-center gap-1 text-xs text-gray-500 dark:text-gray-400 mb-3">
-                    <LocationIcon /> {court.location}
-                </p>
-
-                <div className="flex flex-wrap gap-1 mb-4">
-                    {court.sports.map(s => (
-                        <span key={s} className="text-[10px] font-bold text-[#8CE600] bg-[#8CE600]/10 px-2 py-0.5 rounded-full">{s}</span>
-                    ))}
-                </div>
-
-                <div className="flex flex-wrap gap-1 mb-4">
-                    {court.amenities.slice(0, 3).map(a => <AmenityChip key={a} label={a} />)}
-                    {court.amenities.length > 3 && <AmenityChip label={`+${court.amenities.length - 3}`} />}
-                </div>
-
-                <div className="flex items-center justify-between pt-3 border-t border-gray-100 dark:border-white/10">
-                    <div>
-                        {court.oldPrice && <p className="text-[10px] text-gray-400 line-through">R$ {court.oldPrice}/h</p>}
-                        <p className="font-black text-lg text-gray-900 dark:text-white">
-                            R$ {court.price}<span className="text-xs font-normal text-gray-500">/h</span>
-                        </p>
-                    </div>
-                    <div className="flex items-center gap-1.5 text-[10px] text-gray-500 dark:text-gray-400">
-                        <ClockIcon />
-                        {court.openingHour}h–{court.closingHour}h
-                    </div>
-                </div>
-            </div>
-        </Link>
-    );
-});
-
-const CourtRow = memo(function CourtRow({ court }: { court: Court }) {
-    return (
-        <Link to={`/courts/${court.id}`} className="group flex gap-4 bg-white dark:bg-background rounded-2xl border border-gray-100 dark:border-white/10 overflow-hidden hover:shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:hover:shadow-[0_8px_30px_rgb(140,230,0,0.05)] transition-all duration-500 p-4 transform-gpu isolation-isolate">
-            <div className="relative w-28 h-24 rounded-2xl overflow-hidden shrink-0 transform-gpu isolation-isolate">
-                <img src={court.img} alt={court.name} loading="lazy" className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" />
-                {court.badge && <div className="absolute top-1.5 left-1.5 bg-[#8CE600] text-gray-950 text-[9px] font-black px-1.5 py-0.5 rounded-full">{court.badge}</div>}
-            </div>
-            {/* Lista de resultados */}
-            <div className="flex-1 min-w-0">
-                <div className="flex items-start justify-between gap-2">
-                    <h3 className="font-black text-sm text-gray-900 dark:text-white group-hover:text-[#8CE600] transition-colors">{court.name}</h3>
-                    <div className="flex items-center gap-1.5" onClick={e => e.preventDefault()}>
-                        <StatusPill status={court.frontendStatus || court.status} />
-                        <FavoriteButton courtId={String(court.id)} size="sm" />
-                    </div>
-                </div>
-                <p className="flex items-center gap-1 text-xs text-gray-500 dark:text-gray-400 mt-0.5 mb-2"><LocationIcon />{court.location}</p>
-                <div className="flex flex-wrap gap-1 mb-2">
-                    {court.sports.map(s => <span key={s} className="text-[9px] font-bold text-[#8CE600] bg-[#8CE600]/10 px-1.5 py-0.5 rounded-full">{s}</span>)}
-                </div>
-                <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-1"><Stars rating={court.rating} /><span className="text-xs font-bold text-gray-700 dark:text-gray-300">({court.reviewCount})</span></div>
-                    <p className="font-black text-base text-gray-900 dark:text-white">R$ {court.price}<span className="text-[10px] font-normal text-gray-400">/h</span></p>
-                </div>
-            </div>
-        </Link>
-    );
-});
 
 function FilterSection({ title, children }: { title: string; children: React.ReactNode }) {
     const [open, setOpen] = useState(true);
@@ -171,18 +49,17 @@ function FilterSection({ title, children }: { title: string; children: React.Rea
     );
 }
 
-// Pill chip 
 function PillFilter({ label, checked, onChange }: { label: string; checked: boolean; onChange: () => void }) {
     return (
         <button
             onClick={onChange}
-            className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold border transition-all duration-200 cursor-pointer ${
+            className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold border transition-all duration-300 cursor-pointer ${
                 checked
-                    ? 'bg-[#8CE600] text-gray-950 border-[#8CE600] shadow-md shadow-[#8CE600]/30'
-                    : 'bg-transparent text-gray-500 dark:text-gray-400 border-gray-200 dark:border-white/10 hover:border-[#8CE600]/60 hover:text-gray-900 dark:hover:text-white'
+                    ? 'bg-gray-50/80 dark:bg-white/5 text-[#8CE600] border-[#8CE600]/30 shadow-[0_2px_10px_-3px_rgba(140,230,0,0.15)]'
+                    : 'bg-transparent text-gray-500 dark:text-gray-400 border-gray-200 dark:border-white/10 hover:bg-gray-50 dark:hover:bg-white/5 hover:text-gray-900 dark:hover:text-white'
             }`}
         >
-            {checked && <span className="w-1.5 h-1.5 rounded-full bg-gray-950 shrink-0" />}
+            {checked && <span className="w-1.5 h-1.5 rounded-full bg-[#8CE600] shrink-0 animate-pulse shadow-[0_0_8px_rgba(140,230,0,0.4)]" />}
             {label}
         </button>
     );
@@ -238,22 +115,18 @@ function SortDropdown({ value, onChange }: { value: SortKey; onChange: (v: SortK
     );
 }
 
-// Componente principal do Catálogo
 export default function Catalog() {
     const { t } = useTranslation();
     const location = useLocation();
     const [searchParams, setSearchParams] = useSearchParams();
     
-    // Fetch dynamic filters
     const { data: filtersData } = useCourtsFilters();
     const dynamicSports = filtersData?.sports || [];
     const dynamicCities = filtersData?.cities || [];
     
-    // Fallback to hardcoded if loading or empty for better UX
     const sportsList = dynamicSports.length > 0 ? dynamicSports : HARDCODED_SPORTS;
     const citiesList = dynamicCities.length > 0 ? dynamicCities : HARDCODED_CITIES;
     
-    // Initial states from searchParams
     const [search, setSearch] = useState(searchParams.get('q') || '');
     const [sportQuery, setSportQuery] = useState('');
     const [cityQuery, setCityQuery] = useState('');
@@ -276,7 +149,6 @@ export default function Catalog() {
     const [pageNumber, setPageNumber] = useState(Number(searchParams.get('page')) || 1);
     const pageSize = 25;
 
-    // Sync state to URL
     useEffect(() => {
         const params = new URLSearchParams();
         if (search) params.set('q', search);
@@ -356,7 +228,6 @@ export default function Catalog() {
         <div className="min-h-screen bg-white dark:bg-background text-gray-900 dark:text-gray-100 font-sans antialiased transition-colors duration-500 flex flex-col">
             <Header />
 
-            {/* Cabeçalho e busca */}
             <section className="relative pt-28 pb-10 border-b border-gray-100 dark:border-white/5 bg-gray-50/50 dark:bg-background overflow-hidden">
                 {(() => {
                     const Icon1 = SPORT_ICONS[0];
@@ -387,7 +258,6 @@ export default function Catalog() {
 
 
 
-                    {/* Search bar */}
                     <div className="relative mt-8 max-w-xl">
                         <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"><SearchIcon /></span>
                         <Input
@@ -405,7 +275,6 @@ export default function Catalog() {
 
             <div className="max-w-7xl mx-auto px-6 py-10 flex gap-8 w-full flex-1">
 
-                {/* Filtros laterais */}
                 <aside
                     style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
                     className={`shrink-0 transition-all duration-500 sticky top-24 self-start h-[calc(100vh-6rem)] overflow-y-auto [&::-webkit-scrollbar]:hidden ${filtersOpen ? 'w-72 opacity-100' : 'w-0 opacity-0 overflow-hidden'}`}
@@ -418,20 +287,18 @@ export default function Catalog() {
                             )}
                         </div>
 
-                        {/* Active filter chips */}
                         {activeFilters.length > 0 && (
                             <div className="flex flex-wrap gap-1.5 mb-5">
                                 {activeFilters.map(f => (
-                                    <span key={f} className="flex items-center gap-1 text-[10px] font-bold bg-[#8CE600]/10 text-[#8CE600] border border-[#8CE600]/20 px-2 py-0.5 rounded-full">
+                                    <span key={f} className="flex items-center gap-1.5 text-[10px] font-semibold bg-gray-50/80 dark:bg-white/5 text-gray-700 dark:text-gray-200 border border-gray-200 dark:border-white/10 px-2 py-1 rounded-full shadow-sm">
+                                        <span className="w-1 h-1 rounded-full bg-[#8CE600] shrink-0" />
                                         {f}
                                     </span>
                                 ))}
                             </div>
                         )}
 
-                        {/* Availability */}
                         <FilterSection title={t('catalog.availability')}>
-                            {/* Date picker */}
                             <div className="space-y-2">
                                 <p className="text-[10px] text-gray-500 dark:text-gray-400">{t('catalog.selectDate')}</p>
                                 <DatePicker
@@ -446,7 +313,6 @@ export default function Catalog() {
                                     )}
                             </div>
 
-                            {/* Hour selector */}
                             <div className="space-y-2 mt-4">
                                 <p className="text-[10px] text-gray-500 dark:text-gray-400">{t('catalog.selectHour', 'Selecione o horário')}</p>
                                 <div className="flex flex-wrap gap-1.5">
@@ -454,10 +320,10 @@ export default function Catalog() {
                                         <button
                                             key={h}
                                             onClick={() => setSelectedHour(selectedHour === h ? null : h)}
-                                            className={`px-2.5 py-1.5 rounded-lg text-[10px] font-bold border transition-all ${
+                                            className={`px-3 py-1.5 rounded-xl text-[10px] font-bold border transition-all duration-300 ${
                                                 selectedHour === h
-                                                    ? 'bg-[#8CE600] text-gray-950 border-[#8CE600] shadow-md shadow-[#8CE600]/20'
-                                                    : 'bg-white dark:bg-background text-gray-500 border-gray-100 dark:border-white/10 hover:border-[#8CE600]/50'
+                                                    ? 'bg-gray-50/80 dark:bg-white/5 text-[#8CE600] border-[#8CE600]/30 shadow-[0_2px_10px_-3px_rgba(140,230,0,0.15)]'
+                                                    : 'bg-transparent text-gray-500 border-gray-200 dark:border-white/10 hover:bg-gray-50 dark:hover:bg-white/5'
                                             }`}
                                         >
                                             {h}h
@@ -467,7 +333,6 @@ export default function Catalog() {
                             </div>
                         </FilterSection>
 
-                        {/* Sport */}
                         <FilterSection title={t('catalog.sport')}>
                             <div className="relative mb-3 group">
                                 <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-[#8CE600] transition-colors"><SearchIcon /></span>
@@ -494,7 +359,6 @@ export default function Catalog() {
                             </div>
                         </FilterSection>
 
-                        {/* City */}
                         <FilterSection title={t('catalog.city')}>
                             <div className="relative mb-3 group">
                                 <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-[#8CE600] transition-colors"><SearchIcon /></span>
@@ -521,7 +385,6 @@ export default function Catalog() {
                             </div>
                         </FilterSection>
 
-                        {/* Status */}
                         <FilterSection title={t('catalog.status')}>
                             <div className="flex flex-wrap gap-1.5">
                                 {(['available', 'busy', 'closed'] as const).map(s => {
@@ -531,7 +394,6 @@ export default function Catalog() {
                             </div>
                         </FilterSection>
 
-                        {/* Rating */}
                         <FilterSection title={t('catalog.minRating')}>
                             {[4.5, 4, 3.5, 0].map(r => (
                                 <label key={r} className="flex items-center gap-2.5 cursor-pointer group">
@@ -543,7 +405,6 @@ export default function Catalog() {
                             ))}
                         </FilterSection>
 
-                        {/* Price */}
                         <FilterSection title={t('catalog.maxPrice')}>
                             <div className="px-1">
                                 <div className="flex items-center justify-between mb-3">
@@ -590,9 +451,7 @@ export default function Catalog() {
                     </div>
                 </aside>
 
-                {/* Main content */}
                 <div className="flex-1 min-w-0">
-                    {/* Toolbar */}
                     <div className="flex items-center justify-between mb-6 gap-4">
                         <div className="flex items-center gap-3">
                             <button
@@ -610,10 +469,8 @@ export default function Catalog() {
                         </div>
 
                         <div className="flex items-center gap-3">
-                            {/* Sort */}
                             <SortDropdown value={sortBy} onChange={setSortBy} />
 
-                            {/* View toggle */}
                             <div className="flex items-center bg-white dark:bg-background border border-gray-200 dark:border-white/10 rounded-xl overflow-hidden shadow-[0_8px_30px_rgb(0,0,0,0.04)]">
                                 <button onClick={() => setViewMode('grid')} className={`p-2 transition-all ${viewMode === 'grid' ? 'bg-[#8CE600] text-gray-950' : 'text-gray-500 hover:text-gray-900 dark:hover:text-white'}`}><GridIcon /></button>
                                 <button onClick={() => setViewMode('list')} className={`p-2 transition-all ${viewMode === 'list' ? 'bg-[#8CE600] text-gray-950' : 'text-gray-500 hover:text-gray-900 dark:hover:text-white'}`}><ListIcon /></button>
@@ -621,7 +478,6 @@ export default function Catalog() {
                         </div>
                     </div>
 
-                    {/* Results */}
                     {isLoading ? (
                         <div className="flex flex-col items-center justify-center py-28 gap-4">
                             <div className="w-12 h-12 border-4 border-[#8CE600]/20 border-t-[#8CE600] rounded-full animate-spin" />
@@ -656,7 +512,6 @@ export default function Catalog() {
                         </div>
                     )}
 
-                    {/* Pagination */}
                     {pagedData && pagedData.totalPages > 1 && (
                         <div className="mt-20 mb-10 flex flex-col items-center gap-6">
                             <div className="h-px w-24 bg-gradient-to-r from-transparent via-gray-200 dark:via-white/10 to-transparent" />

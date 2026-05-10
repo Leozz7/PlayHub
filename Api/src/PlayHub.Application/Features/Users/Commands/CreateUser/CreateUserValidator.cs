@@ -1,4 +1,5 @@
 using FluentValidation;
+using PlayHub.Application.Common.Extensions;
 
 namespace PlayHub.Application.Features.Users.Commands.CreateUser;
 
@@ -26,5 +27,9 @@ public class CreateUserValidator : AbstractValidator<CreateUserCommand>
             .NotEmpty().WithMessage("O perfil de acesso é obrigatório.")
             .Must(r => ValidRoles.Contains(r))
             .WithMessage($"Perfil inválido. Valores aceitos: {string.Join(", ", ValidRoles)}");
-        }
+
+        RuleFor(x => x.Cpf)
+            .Must(x => string.IsNullOrWhiteSpace(x) || x.IsValidCpf())
+            .WithMessage("O CPF informado é inválido.");
+    }
 }

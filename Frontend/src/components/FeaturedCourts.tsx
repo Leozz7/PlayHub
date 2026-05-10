@@ -29,17 +29,17 @@ export function FeaturedCourts() {
                     <div className="flex items-end justify-between mb-12">
                         <div>
                             <h2 className="text-3xl font-black tracking-tighter text-gray-900 dark:text-white transition-colors">
-                                {t('index.sports.title', 'Quadras em Destaque')}
+                                {t('index.featuredCourts.title')}
                             </h2>
                             <p className="text-gray-600 dark:text-gray-400 text-sm mt-2 transition-colors">
-                                {t('index.sports.subtitle', 'Espaços premium selecionados com infraestrutura completa.')}
+                                {t('index.featuredCourts.subtitle')}
                             </p>
                         </div>
                         <Link
                             to="/catalog"
                             className="hidden sm:flex items-center gap-1 text-xs font-bold uppercase tracking-widest text-gray-600 hover:text-[#8CE600] dark:text-gray-400 dark:hover:text-[#8CE600] transition-colors"
                         >
-                            {t('index.sports.viewAll', 'Ver todas')}
+                            {t('index.featuredCourts.viewAll')}
                             <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24">
                                 <path d="M5 12h14M12 5l7 7-7 7" />
                             </svg>
@@ -59,14 +59,19 @@ export function FeaturedCourts() {
                     </div>
                 ) : isError ? (
                     <div className="text-center py-10">
-                        <p className="text-gray-500">{t('catalog.errorLoadingDesc', 'Não foi possível carregar as quadras em destaque.')}</p>
+                        <p className="text-gray-500">{t('catalog.errorLoadingDesc')}</p>
                     </div>
                 ) : (
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                         {courts.map((court, i) => {
                             return (
                                 <Reveal key={court.id} delay={i * 100}>
-                                    <Link to={`/courts/${court.id}`} className="group cursor-pointer block">
+                                    <div className="group relative block cursor-pointer">
+                                        {/* Action Link (Overlay) */}
+                                        <Link to={`/courts/${court.id}`} className="absolute inset-0 z-10" aria-label={court.name}>
+                                            <span className="sr-only">{t('catalog.viewDetails')}</span>
+                                        </Link>
+
                                         <div className="relative w-full h-72 mb-4 transition-transform duration-300 group-hover:-translate-y-1">
                                             <div className="absolute inset-0 rounded-3xl transition-shadow duration-300 group-hover:shadow-xl group-hover:shadow-gray-200/40 dark:group-hover:shadow-black/40 pointer-events-none" />
                                             <div
@@ -85,10 +90,10 @@ export function FeaturedCourts() {
                                                 </div>
                                                 {court.badge && (
                                                     <div className="absolute bottom-4 right-4 bg-[#8CE600] text-gray-950 px-3 py-1 rounded-lg text-[9px] font-black uppercase tracking-widest shadow-lg shadow-[#8CE600]/20">
-                                                        {court.badge}
+                                                        {t(court.badge)}
                                                     </div>
                                                 )}
-                                                <div className="absolute top-4 right-4" onClick={e => e.preventDefault()}>
+                                                <div className="absolute top-4 right-4 z-20">
                                                     <FavoriteButton courtId={String(court.id)} size="sm" />
                                                 </div>
                                             </div>
@@ -111,17 +116,17 @@ export function FeaturedCourts() {
                                             <div className="flex items-baseline gap-2">
                                                 <p className="text-sm">
                                                     <span className="font-bold text-gray-900 dark:text-white">R$ {court.price}</span>
-                                                    <span className="text-gray-600 dark:text-gray-400"> / hora</span>
+                                                    <span className="text-gray-600 dark:text-gray-400"> {t('index.featuredCourts.perHour')}</span>
                                                 </p>
                                                 {court.oldPrice && (
                                                     <p className="text-[10px] text-gray-400 dark:text-gray-500 line-through">R$ {court.oldPrice}</p>
                                                 )}
                                             </div>
                                             <span className="text-[10px] font-bold uppercase tracking-widest text-[#8CE600] opacity-0 group-hover:opacity-100 transition-all translate-x-2 group-hover:translate-x-0">
-                                                Reservar →
+                                                {t('index.featuredCourts.reserve')}
                                             </span>
                                         </div>
-                                    </Link>
+                                    </div>
                                 </Reveal>
                             );
                         })}

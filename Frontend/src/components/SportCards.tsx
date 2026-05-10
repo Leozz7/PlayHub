@@ -63,12 +63,12 @@ export function SportCards() {
                                             style={{ willChange: 'transform' }}
                                         />
                                         <div className="absolute top-4 left-4 bg-white/90 dark:bg-background/90 backdrop-blur-sm px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest border border-gray-100 dark:border-white/10 text-gray-900 dark:text-gray-100 shadow-sm">
-                                            {sport.tag}
+                                            {t(sport.tag)}
                                         </div>
                                     </div>
                                 </div>
                                 <div className="flex flex-col mt-3 px-1">
-                                    <h3 className="text-xl font-black tracking-tight text-gray-900 dark:text-white transition-colors group-hover:text-[#8CE600] mb-1">{sport.name}</h3>
+                                    <h3 className="text-xl font-black tracking-tight text-gray-900 dark:text-white transition-colors group-hover:text-[#8CE600] mb-1">{t(sport.name)}</h3>
                                     <div className="flex items-center justify-between">
                                         <p className="text-sm font-medium text-gray-600 dark:text-gray-400">
                                             {sport.courts} {t('index.hero.stats.courts')}

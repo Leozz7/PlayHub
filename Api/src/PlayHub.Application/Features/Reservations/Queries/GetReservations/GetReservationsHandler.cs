@@ -16,16 +16,33 @@ namespace PlayHub.Application.Features.Reservations.Queries.GetReservations;
 public class GetReservationsHandler : IRequestHandler<GetReservationsQuery, PagedResult<ReservationDto>>
 {
     private readonly IApplicationDbContext _context;
+    private readonly IEncryptionService _encryptionService;
+    private readonly ICurrentUserService _currentUserService;
 
-    public GetReservationsHandler(IApplicationDbContext context)
+    public GetReservationsHandler(IApplicationDbContext context, IEncryptionService encryptionService, ICurrentUserService currentUserService)
     {
         _context = context;
+        _encryptionService = encryptionService;
+        _currentUserService = currentUserService;
     }
 
     public async Task<PagedResult<ReservationDto>> Handle(GetReservationsQuery request, CancellationToken cancellationToken)
     {
         var filterBuilder = Builders<Domain.Entities.Reservation>.Filter;
         var filter = filterBuilder.Empty;
+
+        if (_currentUserService.IsManager && !_currentUserService.IsAdmin)
+        {
+            var managerCourtIds = _currentUserService.CourtIds;
+            if (managerCourtIds != null && managerCourtIds.Any())
+            {
+                filter &= filterBuilder.In(r => r.CourtId, managerCourtIds);
+            }
+            else
+            {
+                filter &= filterBuilder.Eq(r => r.CourtId, Guid.Empty);
+            }
+        }
 
         if (request.CourtId.HasValue)
         {
@@ -69,9 +86,12 @@ public class GetReservationsHandler : IRequestHandler<GetReservationsQuery, Page
             Id = reservation.Id,
             CourtId = reservation.CourtId,
             CourtName = courts.FirstOrDefault(c => c.Id == reservation.CourtId)?.Name,
-            CourtSport = courts.FirstOrDefault(c => c.Id == reservation.CourtId)?.Type.ToFriendlyString(),
+            CourtSport = courts.FirstOrDefault(c => c.Id == reservation.CourtId)?.ToFriendlySportString(),
             UserId = reservation.UserId,
             UserName = users.FirstOrDefault(u => u.Id == reservation.UserId)?.Name,
+            UserEmail = users.FirstOrDefault(u => u.Id == reservation.UserId)?.Email != null ? _encryptionService.Decrypt(users.FirstOrDefault(u => u.Id == reservation.UserId)!.Email) : null,
+            UserPhone = users.FirstOrDefault(u => u.Id == reservation.UserId)?.Phone != null ? _encryptionService.Decrypt(users.FirstOrDefault(u => u.Id == reservation.UserId)!.Phone!) : null,
+            UserCpf = users.FirstOrDefault(u => u.Id == reservation.UserId)?.Cpf != null ? _encryptionService.Decrypt(users.FirstOrDefault(u => u.Id == reservation.UserId)!.Cpf!) : null,
             StartTime = reservation.StartTime,
             EndTime = reservation.EndTime,
             Status = reservation.Status,

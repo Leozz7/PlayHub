@@ -5,6 +5,10 @@ using PlayHub.Application.Common.Interfaces;
 using PlayHub.Application.Common.Security;
 using PlayHub.Infrastructure.Identity;
 using PlayHub.Infrastructure.Persistence;
+using PlayHub.Infrastructure.Persistence.Repositories;
+using PlayHub.Infrastructure.Services;
+using Resend;
+
 
 namespace PlayHub.Infrastructure;
 
@@ -35,6 +39,16 @@ public static class DependencyInjection
 
         services.AddScoped<IJwtTokenService, JwtTokenService>();
         services.AddScoped<IEncryptionService, Security.EncryptionService>();
+        services.AddScoped<INotificationService, NotificationService>();
+        services.AddScoped<ICourtRepository, CourtRepository>();
+        
+        services.AddHttpContextAccessor();
+        services.AddScoped<ICurrentUserService, CurrentUserService>();
+
+        var resendApiKey = config["Resend:ApiKey"] ?? "re_xxxxxxxxx";
+        services.AddHttpClient();
+        services.AddSingleton<IResend>(ResendClient.Create(resendApiKey));
+        services.AddScoped<IEmailService, EmailService>();
 
         return services;
     }

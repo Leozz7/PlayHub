@@ -3,6 +3,8 @@ export interface User {
   name: string;
   email: string;
   role: string;
+  phone?: string;
+  cpf?: string;
 }
 
 export interface LoginCredentials {

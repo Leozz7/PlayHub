@@ -9,7 +9,7 @@ using PlayHub.Application.Features.Courts.Queries.GetCourts;
 using PlayHub.Application.Features.Users.Dtos;
 using Microsoft.AspNetCore.Authorization;
 using PlayHub.Domain.Constants;
-using System.Security.Claims;
+using PlayHub.Application.Common.Interfaces;
 
 namespace PlayHub.Api.Controllers;
 
@@ -21,13 +21,12 @@ public class UsersController : ControllerBase
     private ISender? _mediator;
     protected ISender Mediator => _mediator ??= HttpContext.RequestServices.GetRequiredService<ISender>();
 
-    // Extrai o UserId do JWT (claim "sub" ou "nameid")
-    private Guid CurrentUserId =>
-        Guid.TryParse(
-            User.FindFirstValue(ClaimTypes.NameIdentifier) ?? User.FindFirstValue("sub"),
-            out var id)
-        ? id
-        : throw new UnauthorizedAccessException("Token inválido: UserId não encontrado.");
+    private readonly ICurrentUserService _currentUserService;
+
+    public UsersController(ICurrentUserService currentUserService)
+    {
+        _currentUserService = currentUserService;
+    }
 
     [HttpGet]
     [Authorize(Roles = AppRoles.AdminOrManager)]
@@ -63,7 +62,8 @@ public class UsersController : ControllerBase
     [HttpPut("my-profile")]
     public async Task<ActionResult> UpdateMyProfile(UpdateMyProfileCommand command)
     {
-        var result = await Mediator.Send(command);
+        var enhancedCommand = command with { UserId = _currentUserService.UserId };
+        var result = await Mediator.Send(enhancedCommand);
 
         if (!result) return NotFound();
 

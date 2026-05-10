@@ -35,6 +35,16 @@ public class CreateUserHandler : IRequestHandler<CreateUserCommand, UserDto>
         var encryptedEmail = _encryptionService.Encrypt(request.Email);
 
         var user = new User(request.Name, encryptedEmail, emailIndex, passwordHash, request.Role);
+        
+        if (!string.IsNullOrWhiteSpace(request.Phone))
+        {
+            user.UpdatePhone(_encryptionService.Encrypt(request.Phone));
+        }
+
+        if (!string.IsNullOrWhiteSpace(request.Cpf))
+        {
+            user.UpdateCpf(_encryptionService.Encrypt(request.Cpf));
+        }
 
         await _db.Users.InsertOneAsync(user, cancellationToken: ct);
 

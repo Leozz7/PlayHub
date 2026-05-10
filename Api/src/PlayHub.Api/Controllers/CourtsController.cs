@@ -8,49 +8,26 @@ using PlayHub.Application.Features.Courts.Queries.GetCourts;
 using PlayHub.Application.Features.Courts.Queries.GetCourtById;
 using PlayHub.Application.Features.Courts.Queries.GetCourtAvailability;
 using PlayHub.Application.Features.Courts.Queries.GetCourtReviews;
+using PlayHub.Application.Common.Interfaces;
 using PlayHub.Application.Features.Courts.Dtos;
 using System.Collections.Generic;
 using Microsoft.AspNetCore.Authorization;
 using PlayHub.Domain.Constants;
-using System.Security.Claims;
-using System.IdentityModel.Tokens.Jwt;
 
 namespace PlayHub.Api.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
 public class CourtsController : ControllerBase
-
 {
     private ISender? _mediator;
     protected ISender Mediator => _mediator ??= HttpContext.RequestServices.GetRequiredService<ISender>();
 
-    private Guid GetCurrentUserId()
-    {
-        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier) 
-                  ?? User.FindFirstValue(JwtRegisteredClaimNames.Sub) 
-                  ?? User.FindFirst(ClaimTypes.NameIdentifier)?.Value
-                  ?? User.FindFirst("id")?.Value;
-                  
-        return Guid.TryParse(userId, out var parsedId) ? parsedId : Guid.Empty;
-    }
+    private readonly ICurrentUserService _currentUserService;
 
-    private List<Guid> GetCourtIdsFromClaims()
+    public CourtsController(ICurrentUserService currentUserService)
     {
-        var claim = User.FindFirstValue("CourtIds");
-        if (string.IsNullOrWhiteSpace(claim)) return new List<Guid>();
-        return claim.Split(',').Select(Guid.Parse).ToList();
-    }
-
-    private bool IsManagerNotAuthorizedForCourt(Guid courtId)
-    {
-        var role = User.FindFirstValue(ClaimTypes.Role) ?? User.FindFirst("role")?.Value;
-        if (string.Equals(role, AppRoles.Manager, StringComparison.OrdinalIgnoreCase))
-        {
-            var allowedCourts = GetCourtIdsFromClaims();
-            return !allowedCourts.Contains(courtId);
-        }
-        return false;
+        _currentUserService = currentUserService;
     }
 
     [HttpGet]
@@ -71,25 +48,21 @@ public class CourtsController : ControllerBase
     [Authorize(Roles = AppRoles.AdminOrManager)]
     public async Task<ActionResult<PagedResult<CourtDto>>> GetManagement([FromQuery] GetCourtsQuery query)
     {
-        var role = User.FindFirstValue(ClaimTypes.Role) ?? User.FindFirst("role")?.Value;
-        
         var enhancedQuery = query with 
         { 
-            CurrentUserId = GetCurrentUserId(),
-            CurrentUserRole = role,
-            UserCourtIds = GetCourtIdsFromClaims() 
+            CurrentUserId = _currentUserService.UserId,
+            CurrentUserRole = _currentUserService.UserRole,
+            UserCourtIds = _currentUserService.CourtIds 
         };
 
         return await Mediator.Send(enhancedQuery);
     }
 
-
-
     [HttpGet("{id}")]
     [AllowAnonymous]
     public async Task<ActionResult<CourtDto>> GetById(Guid id)
     {
-        if (IsManagerNotAuthorizedForCourt(id)) return Forbid();
+        if (!_currentUserService.IsAuthorizedForCourt(id)) return Forbid();
 
         var result = await Mediator.Send(new GetCourtByIdQuery(id));
         if (result == null) return NotFound();
@@ -102,8 +75,8 @@ public class CourtsController : ControllerBase
     {
         var enhancedCommand = command with 
         { 
-            CurrentUserId = GetCurrentUserId(),
-            CurrentUserRole = User.FindFirstValue(ClaimTypes.Role) 
+            CurrentUserId = _currentUserService.UserId,
+            CurrentUserRole = _currentUserService.UserRole 
         };
         var result = await Mediator.Send(enhancedCommand);
         return CreatedAtAction(nameof(GetById), new { id = result.Id }, result);
@@ -118,7 +91,7 @@ public class CourtsController : ControllerBase
             return BadRequest("ID de rota não coincide com o ID do comando.");
         }
 
-        if (IsManagerNotAuthorizedForCourt(id)) return Forbid();
+        if (!_currentUserService.IsAuthorizedForCourt(id)) return Forbid();
 
         var result = await Mediator.Send(command);
         if (!result) return NotFound();
@@ -129,7 +102,7 @@ public class CourtsController : ControllerBase
     [Authorize(Roles = AppRoles.AdminOrManager)]
     public async Task<ActionResult> Delete(Guid id)
     {
-        if (IsManagerNotAuthorizedForCourt(id)) return Forbid();
+        if (!_currentUserService.IsAuthorizedForCourt(id)) return Forbid();
 
         var result = await Mediator.Send(new DeleteCourtCommand(id));
         if (!result) return NotFound();
@@ -140,7 +113,7 @@ public class CourtsController : ControllerBase
     [AllowAnonymous]
     public async Task<ActionResult<CourtAvailabilityDto>> GetAvailability(Guid id, [FromQuery] DateTime date)
     {
-        if (IsManagerNotAuthorizedForCourt(id)) return Forbid();
+        if (!_currentUserService.IsAuthorizedForCourt(id)) return Forbid();
 
         var query = new GetCourtAvailabilityQuery(id, date);
         return await Mediator.Send(query);
@@ -158,24 +131,13 @@ public class CourtsController : ControllerBase
     [Authorize]
     public async Task<ActionResult<ReviewDto>> SubmitReview(Guid id, [FromBody] SubmitReviewRequest body)
     {
-        var userId = GetCurrentUserId();
+        var userId = _currentUserService.UserId;
         if (userId == Guid.Empty) return Unauthorized();
 
-        var userName = User.FindFirstValue(ClaimTypes.Name)
-                    ?? User.FindFirstValue(JwtRegisteredClaimNames.Name)
-                    ?? User.FindFirstValue("name")
-                    ?? "Usuário";
-
-        try
-        {
-            var command = new SubmitReviewCommand(id, userId, userName, body.Rating, body.Text);
-            var result = await Mediator.Send(command);
-            return CreatedAtAction(nameof(GetReviews), new { id }, result);
-        }
-        catch (InvalidOperationException ex)
-        {
-            return Conflict(new { message = ex.Message });
-        }
+        var userName = _currentUserService.UserName ?? "Usuário";
+        var command = new SubmitReviewCommand(id, userId, userName, body.Rating, body.Text);
+        var result = await Mediator.Send(command);
+        return CreatedAtAction(nameof(GetReviews), new { id }, result);
     }
 }
 

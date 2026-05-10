@@ -18,7 +18,6 @@ import { usePlayHubToast } from '@/hooks/usePlayHubToast';
 import { useFavoritesStore } from '@/data/useFavoritesStore';
 import { useMyFavorites } from '@/features/favorites/hooks/useFavorites';
 
-// ─── Favorites Popover
 
 function FavoritesPopover() {
   const navigate = useNavigate();
@@ -38,12 +37,11 @@ function FavoritesPopover() {
         )}
       </DropdownMenuTrigger>
 
-      <DropdownMenuContent 
-        align="end" 
+      <DropdownMenuContent
+        align="end"
         sideOffset={12}
         className="z-[200] w-[340px] rounded-[1.5rem] p-0 bg-white/90 dark:bg-background/90 backdrop-blur-2xl border border-white/40 dark:border-white/10 shadow-[0_16px_40px_-12px_rgba(0,0,0,0.1)] dark:shadow-[0_16px_40px_-12px_rgba(0,0,0,0.5)] overflow-hidden ring-1 ring-black/5 dark:ring-white/5"
       >
-        {/* Header do popover */}
         <div className="flex items-center justify-between px-5 py-4 border-b border-gray-100 dark:border-white/5 bg-white/50 dark:bg-white/[0.02]">
           <div className="flex items-center gap-3">
             <div className="p-2 bg-red-50 dark:bg-red-500/10 rounded-xl">
@@ -58,7 +56,6 @@ function FavoritesPopover() {
           )}
         </div>
 
-        {/* Conteúdo */}
         <div className="max-h-[320px] overflow-y-auto" style={{ scrollbarWidth: 'none' }}>
           {isLoading ? (
             <div className="flex items-center justify-center py-12">
@@ -80,7 +77,6 @@ function FavoritesPopover() {
                   onClick={() => { navigate(`/courts/${court.id}`); setOpen(false); }}
                   className="w-full flex items-center gap-4 px-5 py-3 hover:bg-gray-50/80 dark:hover:bg-white/[0.03] cursor-pointer transition-all duration-300 text-left group rounded-none outline-none"
                 >
-                  {/* Thumb */}
                   <div className="w-14 h-14 rounded-2xl overflow-hidden shrink-0 bg-gray-100 dark:bg-gray-900 relative shadow-inner">
                     {court.img ? (
                       <img src={court.img} alt={court.name} className="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-700 ease-out" loading="lazy" />
@@ -89,7 +85,6 @@ function FavoritesPopover() {
                     )}
                     <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors duration-300" />
                   </div>
-                  {/* Info */}
                   <div className="flex-1 min-w-0 flex flex-col justify-center">
                     <p className="text-sm font-bold text-gray-900 dark:text-gray-100 truncate group-hover:text-[#8CE600] transition-colors">{court.name}</p>
                     <p className="text-[11px] font-medium text-gray-500 dark:text-gray-400 mt-1">
@@ -105,7 +100,6 @@ function FavoritesPopover() {
           )}
         </div>
 
-        {/* Footer */}
         <div className="p-4 border-t border-gray-100 dark:border-white/5 bg-white/50 dark:bg-white/[0.01] backdrop-blur-md">
           <DropdownMenuItem
             onClick={() => { navigate('/lz_user/favorites'); setOpen(false); }}
@@ -134,7 +128,7 @@ function DesktopUserMenu({ user, logout }: { user: any, logout: () => void }) {
   const favCount = useFavoritesStore(s => s.count);
   // Sincroniza favoritos com a API ao montar o menu
   useMyFavorites();
-  
+
   const handleLogout = () => {
     logout();
     phToast.logoutSuccess();
@@ -151,10 +145,10 @@ function DesktopUserMenu({ user, logout }: { user: any, logout: () => void }) {
           <AvatarFallback className="bg-[#8CE600] text-gray-950 font-black text-sm tracking-widest">{initials}</AvatarFallback>
         </Avatar>
         <div className="hidden lg:flex flex-col items-start text-left ml-1">
-           <span className="text-sm font-bold text-gray-900 dark:text-white leading-none">{user?.name?.split(' ')[0]}</span>
-           <span className="text-[10px] text-gray-500 uppercase tracking-widest font-bold mt-1">
-             {isAdmin ? t('header.userMenu.roles.admin', 'Admin') : isManager ? t('header.userMenu.roles.manager', 'Gestor') : t('header.userMenu.roles.athlete', 'Atleta')}
-           </span>
+          <span className="text-sm font-bold text-gray-900 dark:text-white leading-none">{user?.name?.split(' ')[0]}</span>
+          <span className="text-[10px] text-gray-500 uppercase tracking-widest font-bold mt-1">
+            {isAdmin ? t('header.userMenu.roles.admin', 'Admin') : isManager ? t('header.userMenu.roles.manager', 'Gestor') : t('header.userMenu.roles.athlete', 'Atleta')}
+          </span>
         </div>
         <ChevronDown className="w-4 h-4 text-gray-400 group-hover:text-[#8CE600] transition-transform group-data-[state=open]:rotate-180 ml-1" strokeWidth={1.5} />
       </DropdownMenuTrigger>
@@ -166,19 +160,19 @@ function DesktopUserMenu({ user, logout }: { user: any, logout: () => void }) {
           </div>
         </DropdownMenuLabel>
         <DropdownMenuSeparator className="bg-gray-100 dark:bg-gray-800/50" />
-        
+
         <div className="p-1 space-y-1">
-            <DropdownMenuItem onClick={() => navigate('/lz_user/profile')} className="cursor-pointer rounded-xl hover:bg-gray-50 dark:hover:bg-gray-900 p-3 text-sm font-medium transition-colors">
+          <DropdownMenuItem onClick={() => navigate('/lz_user/profile')} className="cursor-pointer rounded-xl hover:bg-gray-50 dark:hover:bg-gray-900 p-3 text-sm font-medium transition-colors">
             <UserIcon className="mr-3 h-4 w-4 text-gray-500" />
             <span>{t('menu.profile.btnProfile')}</span>
-            </DropdownMenuItem>
+          </DropdownMenuItem>
 
-            <DropdownMenuItem onClick={() => navigate('/my-bookings')} className="cursor-pointer rounded-xl hover:bg-gray-50 dark:hover:bg-gray-900 p-3 text-sm font-medium transition-colors">
+          <DropdownMenuItem onClick={() => navigate('/my-bookings')} className="cursor-pointer rounded-xl hover:bg-gray-50 dark:hover:bg-gray-900 p-3 text-sm font-medium transition-colors">
             <CalendarDays className="mr-3 h-4 w-4 text-gray-500" />
             <span>{t('header.userMenu.myReservations', 'Minhas Reservas')}</span>
-            </DropdownMenuItem>
+          </DropdownMenuItem>
 
-            <DropdownMenuItem onClick={() => navigate('/lz_user/favorites')} className="cursor-pointer rounded-xl hover:bg-gray-50 dark:hover:bg-gray-900 p-3 text-sm font-medium transition-colors">
+          <DropdownMenuItem onClick={() => navigate('/lz_user/favorites')} className="cursor-pointer rounded-xl hover:bg-gray-50 dark:hover:bg-gray-900 p-3 text-sm font-medium transition-colors">
             <Heart className="mr-3 h-4 w-4 text-red-400" />
             <span className="flex-1">{t('header.userMenu.favoriteCourts', 'Quadras Favoritas')}</span>
             {favCount > 0 && (
@@ -186,34 +180,34 @@ function DesktopUserMenu({ user, logout }: { user: any, logout: () => void }) {
                 {favCount}
               </span>
             )}
-            </DropdownMenuItem>
+          </DropdownMenuItem>
 
-            {isManager && (
+          {isManager && (
             <DropdownMenuItem onClick={() => navigate('/lz_gestor/dashboard')} className="cursor-pointer rounded-xl hover:bg-gray-50 dark:hover:bg-gray-900 p-3 text-sm font-medium transition-colors">
-                <LayoutDashboard className="mr-3 h-4 w-4 text-[#8CE600]" />
-                <span>{t('header.userMenu.managerPanel')}</span>
+              <LayoutDashboard className="mr-3 h-4 w-4 text-[#8CE600]" />
+              <span>{t('header.userMenu.managerPanel')}</span>
             </DropdownMenuItem>
-            )}
+          )}
 
-            {isAdmin && (
+          {isAdmin && (
             <DropdownMenuItem onClick={() => navigate('/lz_admin/dashboard')} className="cursor-pointer rounded-xl hover:bg-gray-50 dark:hover:bg-gray-900 p-3 text-sm font-medium transition-colors">
-                <LayoutDashboard className="mr-3 h-4 w-4 text-[#8CE600]" />
-                <span>{t('header.userMenu.generalAdmin')}</span>
+              <LayoutDashboard className="mr-3 h-4 w-4 text-[#8CE600]" />
+              <span>{t('header.userMenu.generalAdmin')}</span>
             </DropdownMenuItem>
-            )}
+          )}
 
-            <DropdownMenuItem onClick={() => navigate('/config')} className="cursor-pointer rounded-xl hover:bg-gray-50 dark:hover:bg-gray-900 p-3 text-sm font-medium transition-colors">
+          <DropdownMenuItem onClick={() => navigate('/config')} className="cursor-pointer rounded-xl hover:bg-gray-50 dark:hover:bg-gray-900 p-3 text-sm font-medium transition-colors">
             <Settings className="mr-3 h-4 w-4 text-gray-500" />
             <span>{t('header.userMenu.generalSettings', 'Configurações Gerais')}</span>
-            </DropdownMenuItem>
+          </DropdownMenuItem>
         </div>
 
         <DropdownMenuSeparator className="bg-gray-100 dark:bg-gray-800/50" />
         <div className="p-1">
-            <DropdownMenuItem onClick={handleLogout} className="cursor-pointer rounded-xl text-red-600 focus:text-red-600 hover:bg-red-50 dark:hover:bg-red-950/30 focus:bg-red-50 dark:focus:bg-red-950/30 p-3 text-sm font-bold transition-colors">
+          <DropdownMenuItem onClick={handleLogout} className="cursor-pointer rounded-xl text-red-600 focus:text-red-600 hover:bg-red-50 dark:hover:bg-red-950/30 focus:bg-red-50 dark:focus:bg-red-950/30 p-3 text-sm font-bold transition-colors">
             <LogOut className="mr-3 h-4 w-4" />
             <span>{t('common.actions.logout')}</span>
-            </DropdownMenuItem>
+          </DropdownMenuItem>
         </div>
       </DropdownMenuContent>
     </DropdownMenu>
@@ -228,11 +222,11 @@ export function Header() {
   const { theme, setTheme } = useTheme();
   const { t } = useTranslation();
   const phToast = usePlayHubToast();
-  
+
   const { isAuthenticated, user, logout } = useAuthStore();
 
   const NAV_LINKS = [
-    { label: t('footer.navigation.championships'), href: '/catalog' },
+    { label: t('footer.navigation.courts'), href: '/catalog' },
     { label: t('footer.institutional.about'), href: '/about' },
     { label: t('footer.bottom.contactUs'), href: '/contact' },
   ];
@@ -252,21 +246,19 @@ export function Header() {
   return (
     <div className="fixed top-0 left-0 right-0 z-[100] flex justify-center w-full pointer-events-none pt-4 md:pt-6 px-4 transition-all duration-500">
       <header
-        className={`w-full max-w-6xl pointer-events-auto transition-all duration-700 ease-in-out ${
-          scrolled || mobileOpen
+        className={`w-full max-w-6xl pointer-events-auto transition-all duration-700 ease-in-out ${scrolled || mobileOpen
             ? 'bg-white/80 dark:bg-background/80 backdrop-blur-2xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-none border border-gray-100 dark:border-white/10 rounded-3xl'
             : 'bg-white/40 dark:bg-background/20 backdrop-blur-md shadow-xl shadow-gray-100/10 dark:shadow-black/5 border border-white/40 dark:border-white/5 rounded-[2rem]'
-        }`}
+          }`}
       >
         <div className="px-4 sm:px-6 lg:px-8">
           <div className={`flex items-center justify-between transition-all duration-500 ${scrolled ? 'h-16' : 'h-20'}`}>
-            
-            {/* LOGO */}
+
             <Link to="/" className="flex items-center gap-3 group" id="header-logo">
-              <img 
-                src={logoUrl} 
-                alt="PlayHub Logo" 
-                className={`w-auto transition-all duration-500 group-hover:scale-105 ${scrolled ? 'h-8' : 'h-9'}`} 
+              <img
+                src={logoUrl}
+                alt="PlayHub Logo"
+                className={`w-auto transition-all duration-500 group-hover:scale-105 ${scrolled ? 'h-8' : 'h-9'}`}
               />
               <span className={`font-black tracking-tighter transition-all duration-500 ${scrolled ? 'text-xl' : 'text-2xl'}`}>
                 <span className="text-[#8CE600]">PLAY</span>
@@ -274,7 +266,6 @@ export function Header() {
               </span>
             </Link>
 
-            {/* DESKTOP NAV */}
             <nav className="hidden md:flex items-center gap-8" aria-label="Navegação principal">
               {NAV_LINKS.map((link) => (
                 <a
@@ -288,7 +279,6 @@ export function Header() {
               ))}
             </nav>
 
-            {/* DESKTOP ACTIONS */}
             <div className="hidden md:flex items-center gap-5">
               <button
                 onClick={toggleTheme}
@@ -300,7 +290,7 @@ export function Header() {
 
               {/* Favoritos — popover estilo carrinho */}
               {isAuthenticated && <FavoritesPopover />}
-              
+
               <div className="w-[1px] h-6 bg-gray-200 dark:bg-gray-800 mx-1"></div>
 
               {isAuthenticated ? (
@@ -325,7 +315,6 @@ export function Header() {
               )}
             </div>
 
-            {/* MOBILE MENU BUTTON */}
             <div className="flex items-center gap-3 md:hidden">
               <button
                 onClick={toggleTheme}
@@ -334,11 +323,11 @@ export function Header() {
               >
                 {theme === 'dark' ? <Sun className="h-5 w-5" strokeWidth={1.5} /> : <Moon className="h-5 w-5" strokeWidth={1.5} />}
               </button>
-              
+
               {isAuthenticated && (
-                 <div className="w-8 h-8 rounded-full bg-[#8CE600] text-gray-950 flex items-center justify-center font-black text-xs shadow-sm">
-                   {getInitials(user?.name)}
-                 </div>
+                <div className="w-8 h-8 rounded-full bg-[#8CE600] text-gray-950 flex items-center justify-center font-black text-xs shadow-sm">
+                  {getInitials(user?.name)}
+                </div>
               )}
 
               <button
@@ -358,11 +347,9 @@ export function Header() {
           </div>
         </div>
 
-        {/* MOBILE NAV */}
         <div
-          className={`md:hidden overflow-hidden transition-all duration-500 ease-in-out bg-white/40 dark:bg-background/40 backdrop-blur-md ${
-            mobileOpen ? 'max-h-[500px] opacity-100 border-t border-gray-200/50 dark:border-white/10/50' : 'max-h-0 opacity-0'
-          }`}
+          className={`md:hidden overflow-hidden transition-all duration-500 ease-in-out bg-white/40 dark:bg-background/40 backdrop-blur-md ${mobileOpen ? 'max-h-[500px] opacity-100 border-t border-gray-200/50 dark:border-white/10/50' : 'max-h-0 opacity-0'
+            }`}
         >
           <div className="px-6 pb-6 pt-4 flex flex-col gap-2">
             {NAV_LINKS.map((link) => (

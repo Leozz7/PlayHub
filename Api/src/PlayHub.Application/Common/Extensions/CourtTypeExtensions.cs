@@ -1,4 +1,7 @@
 using PlayHub.Domain.Enums;
+using PlayHub.Domain.Entities;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace PlayHub.Application.Common.Extensions;
 
@@ -20,5 +23,18 @@ public static class CourtTypeExtensions
             CourtType.Other => "Outro",
             _ => "Outro"
         };
+    }
+
+    public static string ToFriendlySportString(this Court court)
+    {
+        if (court.Sports != null && court.Sports.Any())
+        {
+            if (court.Sports.Count > 1 || court.Type == CourtType.Other)
+            {
+                return string.Join(", ", court.Sports);
+            }
+        }
+
+        return court.Type.ToFriendlyString();
     }
 }

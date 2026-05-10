@@ -99,13 +99,13 @@ export function Footer() {
               <ul className="space-y-4">
                 <li>
                   <Link to="/catalog" className="text-sm font-semibold text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors relative group w-fit flex">
-                    {t('footer.navigation.championships')}
+                    {t('footer.navigation.courts')}
                     <span className="absolute -bottom-1 left-0 w-0 h-[2px] bg-[#8CE600] transition-all duration-300 group-hover:w-full rounded-full"></span>
                   </Link>
                 </li>
                 <li>
                   <Link to="/register" className="text-sm font-semibold text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors relative group w-fit flex">
-                    {t('common.navigation.leagues')}
+                    {t('footer.navigation.register')}
                     <span className="absolute -bottom-1 left-0 w-0 h-[2px] bg-[#8CE600] transition-all duration-300 group-hover:w-full rounded-full"></span>
                   </Link>
                 </li>

@@ -1,15 +1,69 @@
 {
   "common": {
+    "cover": "Cover",
+    "other": "Other",
+    "user": "User",
     "actions": {
-      "login": "Log in",
-      "enter": "Book Now",
-      "logout": "Log out"
-    },
-    "navigation": {
-      "dashboard": "My Dashboard",
-      "courts": "Courts",
-      "leagues": "Sports"
+      "login": "Login",
+      "register": "Create Account",
+      "save": "Save",
+      "cancel": "Cancel",
+      "processing": "Processing...",
+      "delete": "Delete",
+      "edit": "Edit",
+      "view": "View",
+      "enter": "Start now",
+      "logout": "Logout",
+      "favorite": "Favorite",
+      "favorited": "Favorited",
+      "addFavorite": "Add to favorites",
+      "removeFavorite": "Remove from favorites",
+      "currency": "$",
+      "perHour": "/h",
+      "days": {
+        "sunday": "Sunday",
+        "monday": "Monday",
+        "tuesday": "Tuesday",
+        "wednesday": "Wednesday",
+        "thursday": "Thursday",
+        "friday": "Friday",
+        "saturday": "Saturday"
+      }
     }
+  },
+  "searchWidget": {
+    "location": "Location",
+    "locationPlaceholder": "Select city",
+    "noCities": "No cities found",
+    "sport": "Sport",
+    "sportPlaceholder": "What to play?",
+    "noSports": "No sports found",
+    "date": "Date",
+    "datePlaceholder": "When?",
+    "searchBtn": "Search now",
+    "months": {
+      "0": "January",
+      "1": "February",
+      "2": "March",
+      "3": "April",
+      "4": "May",
+      "5": "June",
+      "6": "July",
+      "7": "August",
+      "8": "September",
+      "9": "October",
+      "10": "November",
+      "11": "December"
+    },
+    "weekDays": [
+      "S",
+      "M",
+      "T",
+      "W",
+      "T",
+      "F",
+      "S"
+    ]
   },
   "menu": {
     "profile": {
@@ -61,7 +115,8 @@
     "description": "The definitive platform for booking sports courts. Find, book, and play without complications. Create your account for free.",
     "navigation": {
       "title": "Platform",
-      "championships": "Courts"
+      "courts": "Courts",
+      "register": "Register Arena"
     },
     "institutional": {
       "title": "Support",
@@ -130,7 +185,241 @@
         "n": "03",
         "label": "Book and play without bureaucracy"
       }
-    ]
+    ],
+    "validation": {
+      "nameMin": "Name must be at least 2 characters",
+      "lastNameMin": "Last name must be at least 2 characters",
+      "emailInvalid": "Invalid email",
+      "passwordMin": "Password must be at least 8 characters",
+      "passwordUpper": "Password must contain at least one uppercase letter",
+      "passwordNumber": "Password must contain at least one number",
+      "passwordMismatch": "Passwords do not match",
+      "genericError": "An error occurred while creating the account."
+    }
+  },
+  "userProfile": {
+    "back": "Back",
+    "idLabel": "System ID",
+    "role": {
+      "admin": "Administrator",
+      "manager": "Court Manager",
+      "athlete": "Athlete"
+    },
+    "sections": {
+      "info": {
+        "title": "Profile Information",
+        "subtitle": "Update your name and email address"
+      },
+      "security": {
+        "title": "Security",
+        "subtitle": "Change your access password"
+      },
+      "notifications": {
+        "title": "Notifications",
+        "subtitle": "Choose how you want to be notified"
+      },
+      "quickAccess": {
+        "title": "Quick Access"
+      },
+      "danger": {
+        "title": "Danger Zone",
+        "subtitle": "Irreversible actions — proceed with caution"
+      }
+    },
+    "labels": {
+      "fullName": "Full name",
+      "email": "Email",
+      "phone": "Phone (Optional)",
+      "phoneHint": "Only for contact if necessary.",
+      "cpf": "CPF (Optional)",
+      "cpfHint": "Required to make bookings.",
+      "emailHint": "Changing email may require verification.",
+      "currentPassword": "Current password",
+      "newPassword": "New password",
+      "confirmPassword": "Confirm new password",
+      "passwordMismatch": "⚠️ Passwords do not match.",
+      "deleteAccount": "Delete account",
+      "deleteAccountDesc": "Permanently removes your account and all associated data."
+    },
+    "placeholders": {
+      "fullName": "Your full name",
+      "email": "your@email.com",
+      "phone": "(00) 00000-0000",
+      "cpf": "000.000.000-00"
+    },
+    "buttons": {
+      "save": "Save Changes",
+      "saving": "Saving…",
+      "changePassword": "Change Password",
+      "changing": "Changing…",
+      "delete": "Delete my account"
+    },
+    "notifications": {
+      "email": {
+        "label": "Confirmation email",
+        "desc": "Receive booking confirmations and reminders by email"
+      },
+      "sms": {
+        "label": "SMS",
+        "desc": "SMS alerts for your next match"
+      },
+      "promo": {
+        "label": "Promotions and news",
+        "desc": "Exclusive offers and news from PlayHub"
+      }
+    },
+    "passwordStrength": {
+      "weak": "Weak",
+      "fair": "Fair",
+      "good": "Good",
+      "strong": "Strong",
+      "checks": {
+        "length": "Min 8 characters",
+        "upper": "Uppercase letter",
+        "number": "Number",
+        "special": "Special character"
+      }
+    },
+    "feedbacks": {
+      "nameEmpty": "Name cannot be empty.",
+      "emailInvalid": "Enter a valid email.",
+      "updateSuccess": "Profile updated successfully!",
+      "updateError": "Error updating profile. Try again.",
+      "currentPassRequired": "Enter your current password.",
+      "newPassLength": "New password must be at least 8 characters.",
+      "passMismatch": "Passwords do not match.",
+      "passSuccess": "Password changed successfully!",
+      "cpfInvalid": "Invalid CPF. Please check the numbers."
+    },
+    "quickAccessItems": {
+      "reservations": {
+        "label": "My Bookings",
+        "desc": "View history and upcoming bookings"
+      },
+      "settings": {
+        "label": "Settings",
+        "desc": "Theme, language and preferences"
+      }
+    }
+  },
+  "user": {
+    "dashboard": {
+      "title": "My Bookings",
+      "welcome": "Hello, <0>{{name}}</0> — track and manage your court bookings.",
+      "stats": {
+        "totalReservations": "Total Bookings",
+        "confirmed": "Confirmed",
+        "sports": "Sports",
+        "totalSpent": "Total Spent"
+      },
+      "nextReservation": {
+        "badge": "Next Booking",
+        "viewCourt": "View Court",
+        "cancel": "Cancel"
+      },
+      "tabs": {
+        "all": "All",
+        "upcoming": "Upcoming",
+        "completed": "Completed",
+        "cancelled": "Cancelled"
+      },
+      "searchPlaceholder": "Search court or sport…",
+      "noResults": "No bookings found",
+      "noResultsDesc": "Try changing the filter or searching for another term",
+      "findCourt": "Find a court",
+      "table": {
+        "deletedCourt": "Deleted Court",
+        "sport": "Sport",
+        "locationNotAvailable": "Location not available",
+        "evaluate": "Rate this court",
+        "cancel": "Cancel booking",
+        "viewCourt": "View court",
+        "reservationsCount": "{{count}} booking",
+        "reservationsCount_plural": "{{count}} bookings",
+        "makeNew": "Make new booking"
+      },
+      "status": {
+        "confirmed": "Confirmed",
+        "completed": "Completed",
+        "cancelled": "Cancelled",
+        "pending": "Pending"
+      },
+      "achievements": {
+        "title": "Achievements",
+        "firstGame": {
+          "label": "First Game",
+          "desc": "1st booking completed"
+        },
+        "regular": {
+          "label": "Regular",
+          "desc": "5 confirmed bookings"
+        },
+        "reviewer": {
+          "label": "Reviewer",
+          "desc": "3 reviews submitted"
+        },
+        "dedicated": {
+          "label": "Dedicated",
+          "desc": "10 bookings in a month"
+        }
+      },
+      "cta": {
+        "title": "Explore more courts",
+        "desc": "Over 50 premium courts across the country waiting for your next match.",
+        "button": "View Full Catalog"
+      }
+    },
+    "favorites": {
+      "collection": "My Collection",
+      "title": "Favorite <span class=\"text-[#8CE600]\">Courts</span>",
+      "subtitle": {
+        "withItems": "You have selected {{count}} amazing arena for your next game.",
+        "withItems_plural": "You have selected {{count}} amazing arenas for your next game.",
+        "empty": "Your wishlist is ready to be filled with the best arenas in the region."
+      },
+      "stats": {
+        "totalSaved": "Total Saved"
+      },
+      "view": {
+        "grid": "Grid View",
+        "exploreMore": "Explore More"
+      },
+      "empty": {
+        "title": "Your collection is empty",
+        "desc": "Find the best courts and arenas. Tap the heart to save them here and make your next booking easier.",
+        "button": "Explore Catalog"
+      },
+      "card": {
+        "status": {
+          "available": "Available",
+          "busy": "Busy",
+          "closed": "Closed"
+        },
+        "priceLabel": "Hourly Rate",
+        "book": "Book Now"
+      }
+    },
+    "sidebar": {
+      "sections": {
+        "general": "General",
+        "explore": "Explore",
+        "account": "Account"
+      },
+      "items": {
+        "dashboard": "Dashboard",
+        "myBookings": "My Bookings",
+        "courts": "Courts",
+        "favorites": "Favorites",
+        "reviews": "Reviews",
+        "profile": "Profile",
+        "notifications": "Notifications",
+        "settings": "Settings"
+      },
+      "role": "Athlete",
+      "logout": "Logout",
+      "expand": "Expand sidebar",
+      "collapse": "Collapse sidebar"
+    }
   },
   "index": {
     "marquee": {
@@ -142,10 +431,15 @@
       "item6": "24/7 SUPPORT"
     },
     "sports": {
-      "title": "Featured Sports",
-      "subtitle": "Choose your sport and see available courts now.",
-      "viewAll": "View all",
-      "bookNow": "Book Now →",
+      "title": "Sports",
+      "subtitle": "Find the perfect sport for your next match.",
+      "viewAll": "View all sports"
+    },
+    "featuredCourts": {
+      "title": "Featured Courts",
+      "subtitle": "Premium spaces selected with full infrastructure.",
+      "viewAll": "View all courts",
+      "reserve": "Book Now →",
       "perHour": " / hour"
     },
     "hero": {
@@ -374,7 +668,13 @@
     "bookingSuccess": "Your booking at",
     "bookingSuccessSuffix": "was successfully made. You will receive a confirmation email shortly.",
     "goToHome": "Go to home",
-    "viewCatalog": "View catalog"
+    "viewCatalog": "View catalog",
+    "cpfModal": {
+      "title": "Action Required",
+      "description": "To ensure everyone's safety, it is mandatory to have a registered CPF to make a booking.",
+      "completeProfile": "Complete Profile",
+      "cancel": "Cancel"
+    }
   },
   "confirmation": {
     "eyebrow": "Almost there!",
@@ -411,7 +711,27 @@
     "backToLogin": "Back to login",
     "successMsg": "If the email exists, a reset link has been sent!",
     "brandingTitle": "Regain access\nto your PlayHub account.",
-    "brandingSubtitle": "It's fast, easy, and secure. Get back to the courts as soon as possible."
+    "brandingSubtitle": "It's fast, easy, and secure. Get back to the courts as soon as possible.",
+    "underDevelopment": {
+      "title": "Module Under Development",
+      "description": "The email recovery functionality is being finalized. Soon you will be able to reset your password automatically!",
+      "close": "Understood"
+    }
+  },
+  "resetPassword": {
+    "title": "New Password",
+    "subtitle": "Create a strong and secure password for your account.",
+    "passwordLabel": "NEW PASSWORD",
+    "confirmPasswordLabel": "CONFIRM NEW PASSWORD",
+    "submitBtn": "UPDATE PASSWORD",
+    "updating": "UPDATING...",
+    "successMsg": "Password changed successfully! You can now log in.",
+    "backToLogin": "Go to login",
+    "underDevelopment": {
+      "title": "Reset Under Maintenance",
+      "description": "We are finalizing the secure password change integration. For now, this action is disabled to ensure your account security.",
+      "close": "Understood"
+    }
   },
   "notFound": {
     "title": "404",
@@ -487,6 +807,81 @@
     }
   },
   "admin": {
+    "sidebar": {
+      "main": "Main",
+      "management": "Management",
+      "system": "System",
+      "dashboard": "Dashboard",
+      "reports": "Reports",
+      "activity": "Activity",
+      "users": "Users",
+      "courts": "Courts",
+      "bookings": "Bookings",
+      "payments": "Payments",
+      "logs": "Logs",
+      "notifications": "Notifications",
+      "settings": "Settings",
+      "role": "Administrator",
+      "logout": "Sign Out",
+      "lightTheme": "Switch to light theme",
+      "darkTheme": "Switch to dark theme",
+      "expand": "Expand sidebar",
+      "collapse": "Collapse sidebar"
+    },
+    "dashboard": {
+      "greeting": "Hello, {{name}}",
+      "adminBadge": "Administrator",
+      "viewSite": "View site",
+      "kpi": {
+        "users": "Registered Users",
+        "courts": "Registered Courts",
+        "reservations": "Total Bookings",
+        "revenue": "Total Revenue"
+      },
+      "alerts": {
+        "pendingPayments": "{{count}} payments awaiting confirmation",
+        "pendingReservations": "{{count}} reservations awaiting approval",
+        "noAlerts": "No active alerts at the moment"
+      },
+      "revenueChart": "Revenue by Court",
+      "revenueDesc": "Accumulated financial performance",
+      "viewAllCourts": "View all",
+      "paymentBreakdown": "Payments by Status",
+      "paymentApproved": "Approved",
+      "paymentPending": "Pending",
+      "paymentFailed": "Failed / Reversed",
+      "reservationStatus": "Bookings by Status",
+      "resConfirmed": "Confirmed",
+      "resPending": "Pending",
+      "resCancelled": "Cancelled",
+      "resCompleted": "Completed",
+      "topCourts": "Top Courts",
+      "topCourtsDesc": "By revenue generated",
+      "recentActivity": "Recent Activity",
+      "recentReservations": "Latest Bookings",
+      "recentUsers": "New Users",
+      "viewAll": "View all",
+      "quickActions": "Quick Actions",
+      "addCourt": "Add Court",
+      "createManager": "Create Manager",
+      "generateReport": "Generate Report",
+      "managePayments": "Manage Payments",
+      "id": "ID",
+      "user": "User",
+      "court": "Court",
+      "schedule": "Schedule",
+      "value": "Value",
+      "status": "Status",
+      "joinedAt": "Joined",
+      "reservations": "bookings",
+      "noReservations": "No reservations found.",
+      "noUsers": "No users found.",
+      "systemHealth": "System Health",
+      "confirmedRate": "Confirmation Rate",
+      "paymentRate": "Payment Rate",
+      "avgTicket": "Average Ticket",
+      "occupancyRate": "Occupancy Rate"
+    },
     "activities": {
       "title": "Activities",
       "subtitle": "Recent history of actions and events on the platform.",
@@ -537,7 +932,587 @@
         "status": "Status",
         "value": "Value",
         "court": "Court"
+      },
+      "dashboard": {
+        "viewAll": "View All",
+        "resConfirmed": "Confirmed",
+        "resPending": "Pending"
       }
+    },
+    "roles": {
+      "admin": "Admin",
+      "manager": "Manager",
+      "athlete": "Athlete"
+    },
+    "users": {
+      "title": "User Management",
+      "subtitle": "Manage profiles, permissions, and court associations on the platform.",
+      "newUser": "New User",
+      "searchPlaceholder": "Search by name or email...",
+      "rolePlaceholder": "Role",
+      "allRoles": "All Roles",
+      "noUsers": "No users found",
+      "noUsersDesc": "Try adjusting your filters or create a new user.",
+      "noName": "No name",
+      "stats": {
+        "total": "Total Users",
+        "admins": "Administrators",
+        "managers": "Arena Managers",
+        "athletes": "Common Users"
+      },
+      "table": {
+        "user": "User",
+        "email": "Email",
+        "role": "Role",
+        "courts": "Assoc. Courts",
+        "joined": "Joined",
+        "courtsCount": "{{count}} courts",
+        "actions": "Actions"
+      },
+      "actions": {
+        "edit": "Edit",
+        "delete": "Delete"
+      },
+      "modals": {
+        "newUserTitle": "New User",
+        "editUserTitle": "Edit User",
+        "registration": "Registration",
+        "adjustments": "Adjustments",
+        "infoTab": "Information",
+        "accessTab": "Role & Access",
+        "security": "Security",
+        "protectedData": "Protected Data",
+        "personalData": "Personal Data",
+        "fullName": "Full Name",
+        "fullNamePlaceholder": "Ex: John Doe",
+        "emailAccess": "Access Email",
+        "emailPlaceholder": "john@playhub.com",
+        "phoneOptional": "Phone (Optional)",
+        "phonePlaceholder": "+1 (555) 000-0000",
+        "cpfOptional": "Tax ID / CPF (Optional)",
+        "cpfPlaceholder": "000.000.000-00",
+        "password": "Password",
+        "passwordHint": "Access {{mode}}",
+        "passwordModeEdit": "(Leave blank to keep current)",
+        "passwordModeCreate": "Password",
+        "passwordPlaceholder": "••••••••",
+        "securityTip": "Security Tip",
+        "securityTipDesc": "We recommend using strong passwords with at least 8 characters, including letters, numbers, and symbols.",
+        "roleOnPlatform": "Platform Role",
+        "roles": {
+          "user": "Common User",
+          "userDesc": "Book courts and manage favorites.",
+          "manager": "Arena Manager",
+          "managerDesc": "Manage associated courts.",
+          "admin": "Administrator",
+          "adminDesc": "Full access to all functions."
+        },
+        "courtAssociation": "Court Association",
+        "courtsSelected": "{{count}} selected",
+        "searchCourts": "Search courts...",
+        "registerBtn": "Register User",
+        "saveBtn": "Save Changes",
+        "deleteConfirmTitle": "Delete User?",
+        "deleteConfirmDesc": "This action is irreversible. All permissions and associations for this user will be lost.",
+        "errorTitle": "Error",
+        "updateErrorMessage": "A problem occurred while trying to save user changes.",
+        "createErrorMessage": "A problem occurred while trying to register the new user.",
+        "deleteSuccessTitle": "User Removed",
+        "deleteSuccessMessage": "The user has been permanently deleted from the platform.",
+        "deleteErrorMessage": "Could not remove this user at this time."
+      },
+      "toasts": {
+        "updateSuccess": "User updated successfully!",
+        "updateError": "Error updating user.",
+        "createSuccess": "User created successfully!",
+        "createError": "Error creating user.",
+        "deleteSuccess": "User deleted successfully!",
+        "deleteError": "Error deleting user."
+      }
+    },
+    "settings": {
+      "title": "System Settings",
+      "subtitle": "Adjust global platform parameters and dashboard preferences.",
+      "save": "Save Changes",
+      "saving": "Saving...",
+      "saveSuccess": "Settings saved successfully!",
+      "statusModal": {
+        "loadingTitle": "Saving Settings",
+        "loadingMsg": "Please wait a moment while we apply the new guidelines to the system.",
+        "successTitle": "Settings Saved",
+        "successMsg": "All set! The changes have been successfully applied across the platform."
+      },
+      "sections": {
+        "general": {
+          "title": "Basic Information",
+          "subtitle": "Main platform data",
+          "siteName": "Platform Name",
+          "currency": "Default Currency",
+          "supportEmail": "Support Email"
+        },
+        "notifications": {
+          "title": "Notifications",
+          "subtitle": "System alerts",
+          "email": "Transactional Emails",
+          "emailDesc": "Send booking confirmations and alerts by email.",
+          "sms": "SMS / WhatsApp Alerts",
+          "smsDesc": "Notify players via mobile. (Requires integration)."
+        },
+        "appearance": {
+          "title": "Appearance",
+          "subtitle": "Dashboard theme",
+          "light": "Light",
+          "dark": "Dark"
+        },
+        "danger": {
+          "title": "Risk Zone",
+          "subtitle": "Critical actions",
+          "maintenance": "Maintenance Mode",
+          "maintenanceDesc": "Blocks access for regular users. Only administrators can enter the system.",
+          "clearCache": "Clear Cache"
+        },
+        "profile": {
+          "title": "My Profile (Admin)",
+          "subtitle": "Your personal access data",
+          "phone": "Phone",
+          "cpf": "CPF"
+        }
+      }
+    },
+    "logs": {
+      "title": "System Logs",
+      "subtitle": "Real-time audit connected to the backend MongoDB.",
+      "sync": "Sync",
+      "export": "Export",
+      "stats": {
+        "health": "Health Check",
+        "healthy": "Healthy",
+        "sink": "Log Sink",
+        "audit": "Audit",
+        "connected": "Connected"
+      },
+      "searchPlaceholder": "Search by event, details or user...",
+      "typePlaceholder": "Log Type",
+      "allLevels": "All Logs",
+      "levels": {
+        "info": "Info",
+        "warning": "Warning",
+        "error": "Error",
+        "critical": "Critical",
+        "other": "Other"
+      },
+      "table": {
+        "timestamp": "Timestamp",
+        "message": "System Message",
+        "level": "Level",
+        "identity": "Identity",
+        "actions": "Actions"
+      },
+      "noLogs": "No logs found",
+      "noLogsDesc": "MongoDB query returned no records.",
+      "pagination": {
+        "showing": "Showing {{count}} of {{total}} registered logs",
+        "previous": "Previous",
+        "next": "Next"
+      }
+    }
+  },
+  "gestor": {
+    "sidebar": {
+      "main": "Main",
+      "dashboard": "Dashboard",
+      "reports": "Reports",
+      "myCourts": "My Courts",
+      "courts": "Courts",
+      "reservations": "Bookings",
+      "schedule": "Schedule",
+      "clients": "Clients",
+      "financial": "Financial",
+      "payments": "Payments",
+      "notifications": "Notifications",
+      "settings": "Settings",
+      "role": "Court Manager",
+      "lightTheme": "Light theme",
+      "darkTheme": "Dark theme",
+      "logout": "Sign Out"
+    },
+    "dashboard": {
+      "greeting": "Manager Panel, {{name}}",
+      "managerBadge": "Manager",
+      "newCourt": "New Court",
+      "stats": {
+        "managedCourts": "Managed Courts",
+        "reservationsMonth": "Bookings this Month",
+        "uniqueClients": "Unique Clients",
+        "monthlyRevenue": "Monthly Revenue"
+      },
+      "myCourts": "My Courts",
+      "manage": "Manage",
+      "courtStatus": {
+        "active": "Active",
+        "maintenance": "Maintenance",
+        "inactive": "Inactive"
+      },
+      "actions": {
+        "blockTime": "Block time",
+        "viewRequests": "View requests",
+        "editCourt": "Edit court"
+      },
+      "reservationsPerMonth": "Bookings/month",
+      "revenue": "Revenue",
+      "tabs": {
+        "recentReservations": "Recent Bookings",
+        "todaysSchedule": "Today's Schedule"
+      },
+      "table": {
+        "id": "ID",
+        "client": "Client",
+        "court": "Court",
+        "time": "Time",
+        "value": "Value",
+        "status": "Status",
+        "noResults": "No bookings found"
+      },
+      "viewAll": "View all",
+      "revenueByCourt": "Revenue by Court",
+      "todaySummary": "Today's Summary",
+      "todayStats": {
+        "reservations": "Bookings today",
+        "revenue": "Revenue today",
+        "clients": "Clients today"
+      },
+      "quickActions": "Quick Actions",
+      "quickActionsDesc": "Manage your courts with agility"
+    },
+    "schedule": {
+      "title": "Courts Schedule",
+      "subtitle": "View occupations, confirm pending bookings and perform strategic blocks for maintenance or internal use.",
+      "management": "Availability Management",
+      "searchPlaceholder": "Search court or sport...",
+      "loading": "Loading schedule...",
+      "noCourts": "No courts found",
+      "noCourtsDesc": "Try adjusting your search or you don't have linked courts yet.",
+      "card": {
+        "time": "Time",
+        "price": "Price/h",
+        "manageSchedule": "Manage Schedule"
+      },
+      "modal": {
+        "officialSchedule": "Official Schedule",
+        "manageAvailability": "Manage availability and view bookings in real time.",
+        "modality": "Modality",
+        "selectedDay": "Selected Day",
+        "status": {
+          "free": "Free",
+          "occupied": "Occupied",
+          "blocked": "Blocked"
+        },
+        "blockConfirm": {
+          "title": "Block Time",
+          "desc": "Do you want to block the time from {{start}}:00 to {{end}}:00 for maintenance or internal use?",
+          "confirm": "Confirm Block"
+        },
+        "details": {
+          "blockedTitle": "Blocked Time",
+          "reservedTitle": "Booking Details",
+          "opInfo": "Operational Information",
+          "time": "Time",
+          "status": "Status",
+          "client": "Client",
+          "internalUse": "Internal Use",
+          "responsible": "Responsible for occupation",
+          "reservationId": "Booking ID:",
+          "totalValue": "Total Value:",
+          "close": "Close Details",
+          "release": "Release Time"
+        },
+        "releaseConfirm": {
+          "title": "Release Time",
+          "desc": "Do you want to release this time? It will be available for booking by any client again.",
+          "confirm": "Confirm Release"
+        },
+        "warning": "Schedule changes are permanent. Blocks prevent new clients from booking these times."
+      }
+    },
+    "courts": {
+      "title": "Court Management",
+      "subtitle": "Create, edit and track your courts' performance.",
+      "management": "My Courts",
+      "searchPlaceholder": "Search court...",
+      "addCourt": "New Court",
+      "noCourts": "No courts found",
+      "noCourtsDesc": "You don't have any courts yet or the search found no results.",
+      "table": {
+        "court": "Court",
+        "location": "Location",
+        "sport": "Modality",
+        "price": "Price/h",
+        "status": "Status",
+        "actions": "Actions"
+      },
+      "stats": {
+        "total": "Total Courts",
+        "active": "Active Courts",
+        "occupancy": "Occupancy Rate",
+        "maintenance": "In Maintenance"
+      },
+      "form": {
+        "newTitle": "New Court",
+        "newSubtitle": "Fill in the details to register a new court",
+        "editTitle": "Edit Court",
+        "editSubtitle": "Change the selected court settings",
+        "tabs": {
+          "general": "Information",
+          "location": "Location",
+          "features": "Sports and Extras",
+          "media": "Media and Gallery",
+          "availability": "Availability"
+        },
+        "name": "Arena Name",
+        "type": "Main Sport",
+        "price": "Hourly Price (R$)",
+        "capacity": "Capacity (Players)",
+        "description": "Detailed Description",
+        "descPlaceholder": "Describe the highlights of your court...",
+        "badge": "Badge / Highlight",
+        "status": "Court Status",
+        "location": "Full Address",
+        "neighborhood": "Neighborhood",
+        "city": "City",
+        "state": "State",
+        "features": "Select the amenities offered",
+        "sportsTitle": "Modalities and Sports",
+        "extrasTitle": "Amenities (Extras)",
+        "newAmenity": "New amenity...",
+        "galleryTitle": "Image Gallery",
+        "upload": "Upload",
+        "noImages": "No images uploaded yet.",
+        "hoursTitle": "Operating Hours",
+        "default8": "Default 08h-22h",
+        "total6": "Total 06h-23h",
+        "closedState": "Closed",
+        "openState": "Open",
+        "openingPrefix": "Opening:",
+        "closingPrefix": "Closing:",
+        "uploadImage": "Upload Image",
+        "uploadHint": "Supported formats: JPG, PNG. Max 5MB.",
+        "openingHour": "Opening (Hour)",
+        "closingHour": "Closing (Hour)",
+        "discard": "Discard",
+        "saveChanges": "Save Changes",
+        "createCourt": "Create Court",
+        "saving": "Saving...",
+        "namePlaceholder": "Ex: Arena Prime Society",
+        "neighborhoodPlaceholder": "Ex: Vila Olimpia",
+        "cityPlaceholder": "Ex: Sao Paulo",
+        "statePlaceholder": "Ex: NY",
+        "addressPlaceholder": "Ex: Madison Avenue, 205",
+        "badgePlaceholder": "Ex: Summer Promotion",
+        "amenities": {
+          "lockerRoom": "Locker Room",
+          "parking": "Parking",
+          "lighting": "Lighting",
+          "wifi": "Wifi",
+          "snackBar": "Snack Bar",
+          "shower": "Shower",
+          "gym": "Gym",
+          "pool": "Pool",
+          "bleachers": "Bleachers"
+        }
+      },
+      "toasts": {
+        "createSuccess": "Court created successfully!",
+        "createError": "Error creating court.",
+        "updateSuccess": "Court updated successfully!",
+        "updateError": "Error updating court.",
+        "deleteSuccess": "Court deleted successfully!",
+        "deleteError": "Error deleting court."
+      },
+      "deleteConfirm": {
+        "title": "Delete Court",
+        "desc": "Are you sure you want to delete this court? This action cannot be undone and all future bookings will be affected.",
+        "confirm": "Delete Permanently",
+        "cancel": "Cancel"
+      },
+      "allTypes": "All Types",
+      "allStatuses": "All Statuses",
+      "type": "Type",
+      "active": "Active",
+      "maintenance": "Maintenance",
+      "closed": "Closed",
+      "edit": "Edit",
+      "delete": "Delete",
+      "noResults": "No courts found"
+    },
+    "reservations": {
+      "title": "Booking Management",
+      "subtitle": "View and manage all bookings for your courts.",
+      "searchPlaceholder": "Search by client, court or ID...",
+      "allCourts": "All Courts",
+      "allStatuses": "All Statuses",
+      "table": {
+        "id": "ID",
+        "client": "Client",
+        "court": "Court",
+        "date": "Date and Time",
+        "price": "Price",
+        "status": "Status",
+        "actions": "Actions"
+      },
+      "noResults": "No bookings found",
+      "viewDetails": "View Details",
+      "cancelReservation": "Cancel Booking",
+      "cancelConfirm": {
+        "title": "Cancel Booking",
+        "desc": "Are you sure you want to cancel this booking? The slot will become available again.",
+        "confirm": "Yes, Cancel",
+        "cancel": "Go Back"
+      }
+    },
+    "reports": {
+      "title": "Reports and Analytics",
+      "subtitle": "Track the financial performance and occupancy of your courts.",
+      "exportPdf": "Export PDF",
+      "revenue": "Total Revenue",
+      "occupancy": "Occupancy Rate",
+      "totalReservations": "Total Bookings",
+      "uniqueClients": "Active Clients",
+      "revenueByCourt": "Revenue by Court",
+      "reservationsByDay": "Bookings by Day",
+      "courtPerformance": "Court Performance",
+      "generatingPdf": "Generating PDF..."
+    },
+    "clients": {
+      "title": "My Clients",
+      "subtitle": "View the clients who use your courts and their history.",
+      "searchPlaceholder": "Search by name or email...",
+      "table": {
+        "name": "Client",
+        "contact": "Contact",
+        "totalReservations": "Total Bookings",
+        "totalSpent": "Total Spent",
+        "lastVisit": "Last Visit"
+      },
+      "noResults": "No clients found",
+      "deletedUser": "Deleted User",
+      "notInformed": "Not informed"
+    },
+    "payments": {
+      "title": "Financial Control",
+      "subtitle": "Track payments and receivables for your courts.",
+      "searchPlaceholder": "Search by transaction ID or client...",
+      "allMethods": "All Methods",
+      "table": {
+        "id": "Transaction ID",
+        "reservationId": "Booking ID",
+        "client": "Client",
+        "amount": "Amount",
+        "method": "Method",
+        "status": "Status",
+        "date": "Date"
+      },
+      "noResults": "No payments found"
+    },
+    "notifications": {
+      "title": "Notification Center",
+      "subtitle": "Keep track of important alerts and system updates.",
+      "markAllRead": "Mark all as read",
+      "empty": "No notifications right now",
+      "timeAgo": "just now",
+      "types": {
+        "reservation": "New Booking",
+        "cancellation": "Cancellation",
+        "payment": "Payment"
+      }
+    },
+    "settings": {
+      "title": "Account Settings",
+      "subtitle": "Manage your profile and notification preferences.",
+      "profile": {
+        "title": "Profile",
+        "name": "Full Name",
+        "email": "Email",
+        "phone": "Phone",
+        "cpf": "CPF"
+      },
+      "preferences": {
+        "title": "Preferences",
+        "emailNotif": "Email Notifications",
+        "emailNotifDesc": "Receive updates about bookings in your email",
+        "pushNotif": "Push Notifications",
+        "pushNotifDesc": "Instant alerts in the browser",
+        "theme": "System Theme"
+      },
+      "save": "Save Changes",
+      "saving": "Saving...",
+      "saveSuccess": "Settings saved successfully!"
+    }
+  },
+  "privacy": {
+    "title": "Privacy Policy",
+    "lastUpdate": "Last updated: April 30, 2026",
+    "sections": {
+      "collection": {
+        "title": "1. Information Collection",
+        "text": "We collect information you provide directly to us, such as when you create an account, update your profile, use our interactive features, or communicate with us. Types of information we may collect include your name, email address, phone number, and payment information."
+      },
+      "usage": {
+        "title": "2. Information Usage",
+        "text": "We use the information we collect to provide, maintain, and improve our services, process transactions, send technical notices, updates, security alerts, and administrative messages, as well as to respond to your comments and questions."
+      },
+      "sharing": {
+        "title": "3. Information Sharing",
+        "text": "We may share your information with court management partners to facilitate your bookings. We do not sell, rent, or share your personal information with third parties for marketing purposes without your explicit consent."
+      },
+      "security": {
+        "title": "4. Security",
+        "text": "We take reasonable measures to help protect your information from loss, theft, misuse, unauthorized access, disclosure, alteration, and destruction. However, please remember that no system of transmitting or storing data over the internet is 100% secure."
+      }
+    }
+  },
+  "terms": {
+    "title": "Terms of Use",
+    "lastUpdate": "Last updated: April 30, 2026",
+    "sections": {
+      "acceptance": {
+        "title": "1. Acceptance of Terms",
+        "text": "By accessing and using the PlayHub platform, you agree to comply with and be bound by these Terms of Use. If you do not agree to any part of these terms, you should not use our services."
+      },
+      "usage": {
+        "title": "2. Platform Usage",
+        "text": "You agree to use the platform only for lawful purposes and in a manner that does not infringe the rights of third parties or restrict the use of the platform by any other person."
+      },
+      "bookings": {
+        "title": "3. Bookings and Cancellations",
+        "text": "Booking and cancellation policies are set by each sports court administrator. PlayHub acts solely as an intermediary in the booking process."
+      },
+      "liability": {
+        "title": "4. Limitation of Liability",
+        "text": "PlayHub is not liable for direct, indirect, incidental, or consequential damages resulting from the use or inability to use our services."
+      }
+    }
+  },
+  "errorBoundary": {
+    "title": "Oops! Something went wrong.",
+    "description": "We encountered an unexpected error while loading the application. Our team has been notified.",
+    "retry": "Try again"
+  },
+  "sports": {
+    "soccerSociety": "Soccer Society",
+    "beachTennis": "Beach Tennis",
+    "beachVolleyball": "Beach Volleyball",
+    "basketball": "Basketball",
+    "futsal": "Futsal",
+    "padel": "Padel",
+    "tennis": "Tennis",
+    "handball": "Handball",
+    "volleyball": "Volleyball",
+    "footvolley": "Footvolley",
+    "tags": {
+      "popular": "Most Popular",
+      "trending": "Trending",
+      "classic": "Classic",
+      "featured": "Featured"
     }
   }
 }

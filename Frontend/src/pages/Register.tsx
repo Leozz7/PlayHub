@@ -14,25 +14,28 @@ import logo from '/assets/logo.png';
 import { api } from '@/lib/api';
 import { useAuthStore } from '@/data/useAuthStore';
 
-const registerSchema = z.object({
-  firstName: z.string().min(2, 'O nome deve ter pelo menos 2 caracteres'),
-  lastName: z.string().min(2, 'O sobrenome deve ter pelo menos 2 caracteres'),
-  email: z.string().email('E-mail inválido'),
-  password: z.string().min(6, 'A senha deve ter pelo menos 6 caracteres'),
-  confirmPassword: z.string()
-}).refine((data) => data.password === data.confirmPassword, {
-  message: "As senhas não coincidem",
-  path: ["confirmPassword"],
-});
-
-type RegisterFormValues = z.infer<typeof registerSchema>;
-
 export default function Register() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
-  const { t } = useTranslation();
   const phToast = usePlayHubToast();
   const setAuth = useAuthStore((state) => state.setAuth);
+
+  const registerSchema = z.object({
+    firstName: z.string().min(2, t('register.validation.nameMin')),
+    lastName: z.string().min(2, t('register.validation.lastNameMin')),
+    email: z.string().email(t('register.validation.emailInvalid')),
+    password: z.string()
+      .min(8, t('register.validation.passwordMin'))
+      .regex(/[A-Z]/, t('register.validation.passwordUpper'))
+      .regex(/[0-9]/, t('register.validation.passwordNumber')),
+    confirmPassword: z.string()
+  }).refine((data) => data.password === data.confirmPassword, {
+    message: t('register.validation.passwordMismatch'),
+    path: ["confirmPassword"],
+  });
+
+  type RegisterFormValues = z.infer<typeof registerSchema>;
 
   const {
     register,
@@ -50,13 +53,13 @@ export default function Register() {
         email: data.email,
         password: data.password
       };
-      
+
       const response = await api.post('/auth/register', payload);
-      
+
       if (response.data?.accessToken && response.data?.user) {
         setAuth(response.data.user, response.data.accessToken);
         phToast.registerSuccess();
-        
+
         if (response.data.user.role === 'Admin' || response.data.user.role === 'Manager') {
           navigate('/admin');
         } else {
@@ -67,7 +70,7 @@ export default function Register() {
         navigate('/login');
       }
     } catch (err: any) {
-      phToast.registerError(err?.response?.data?.message || 'Ocorreu um erro ao criar a conta.');
+      phToast.registerError(err?.response?.data?.message || t('register.validation.genericError'));
     } finally {
       setIsLoading(false);
     }
@@ -75,7 +78,6 @@ export default function Register() {
 
   return (
     <div className="min-h-screen w-full flex bg-white dark:bg-background transition-colors duration-500">
-      {/* Painel Esquerdo: Branding */}
       <div className="hidden lg:flex w-1/2 relative bg-gray-50 dark:bg-background items-center justify-center overflow-hidden border-r border-gray-100 dark:border-white/10">
         <HeroBackground />
         <div className="relative z-10 p-12 max-w-xl text-center">
@@ -88,7 +90,7 @@ export default function Register() {
           </p>
 
           <div className="mt-10 flex flex-col gap-4 text-left">
-            {(t('register.steps', { returnObjects: true }) as {n: string, label: string}[]).map(step => (
+            {(t('register.steps', { returnObjects: true }) as { n: string, label: string }[]).map(step => (
               <div key={step.n} className="flex items-center gap-4 bg-white/60 dark:bg-gray-800/60 backdrop-blur-sm rounded-2xl px-5 py-3.5 border border-gray-100 dark:border-gray-700/50">
                 <span className="text-xs font-black text-[#8CE600]">{step.n}</span>
                 <span className="text-sm font-semibold text-gray-700 dark:text-gray-300">{step.label}</span>
@@ -98,7 +100,6 @@ export default function Register() {
         </div>
       </div>
 
-      {/* Painel Direito: Formulário */}
       <div className="w-full lg:w-1/2 flex flex-col relative bg-white dark:bg-background overflow-y-auto">
 
         <div className="absolute top-4 left-6 z-20">

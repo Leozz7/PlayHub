@@ -7,21 +7,31 @@ import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { usePlayHubToast } from '@/hooks/usePlayHubToast';
 import { ArrowLeft, Mail } from 'lucide-react';
 import { HeroBackground } from '@/components/ui/HeroBackground';
 import logo from '/assets/logo.png';
 
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+
 const forgotPasswordSchema = z.object({
-  email: z.string().email('E-mail inválido'),
+  email: z.string()
+    .min(1, 'O e-mail é obrigatório')
+    .email('E-mail inválido'),
 });
 
 type ForgotPasswordFormValues = z.infer<typeof forgotPasswordSchema>;
 
 export default function ForgotPassword() {
   const { t } = useTranslation();
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const phToast = usePlayHubToast();
+  const [showDevModal, setShowDevModal] = useState(false);
 
   const {
     register,
@@ -31,12 +41,8 @@ export default function ForgotPassword() {
     resolver: zodResolver(forgotPasswordSchema),
   });
 
-  const onSubmit = async (_data: ForgotPasswordFormValues) => {
-    setIsSubmitting(true);
-    setTimeout(() => {
-      setIsSubmitting(false);
-      phToast.forgotPasswordSuccess();
-    }, 1500);
+  const onSubmit = () => {
+    setShowDevModal(true);
   };
 
   return (
@@ -109,18 +115,9 @@ export default function ForgotPassword() {
               <div className="pt-2">
                 <Button
                   type="submit"
-                  disabled={isSubmitting}
-                  className="w-full h-13 rounded-2xl bg-[#8CE600] hover:bg-[#7bc900] text-gray-950 font-black tracking-widest uppercase text-[11px] shadow-xl shadow-[#8CE600]/20 hover:shadow-[#8CE600]/30 transition-all active:scale-[0.98] disabled:opacity-60"
+                  className="w-full h-13 rounded-2xl bg-[#8CE600] hover:bg-[#7bc900] text-gray-950 font-black tracking-widest uppercase text-[11px] shadow-xl shadow-[#8CE600]/20 hover:shadow-[#8CE600]/30 transition-all active:scale-[0.98]"
                 >
-                  {isSubmitting ? (
-                    <span className="flex items-center gap-2">
-                      <svg className="animate-spin w-4 h-4" viewBox="0 0 24 24" fill="none">
-                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z" />
-                      </svg>
-                      {t('forgotPassword.sending')}
-                    </span>
-                  ) : t('forgotPassword.submitBtn')}
+                  {t('forgotPassword.submitBtn')}
                 </Button>
               </div>
             </form>
@@ -134,6 +131,27 @@ export default function ForgotPassword() {
           </div>
         </div>
       </div>
+
+      <AlertDialog open={showDevModal} onOpenChange={setShowDevModal}>
+        <AlertDialogContent className="rounded-3xl border-gray-100 dark:border-white/10 shadow-2xl">
+          <AlertDialogHeader>
+            <AlertDialogTitle className="text-2xl font-black tracking-tighter text-gray-900 dark:text-white">
+              {t('forgotPassword.underDevelopment.title')}
+            </AlertDialogTitle>
+            <AlertDialogDescription className="text-gray-500 dark:text-gray-400 font-medium leading-relaxed pt-2">
+              {t('forgotPassword.underDevelopment.description')}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter className="mt-4">
+            <AlertDialogAction 
+              onClick={() => setShowDevModal(false)}
+              className="bg-[#8CE600] hover:bg-[#7bc900] text-gray-950 font-bold px-8 h-12 rounded-2xl transition-all shadow-lg shadow-[#8CE600]/20"
+            >
+              {t('forgotPassword.underDevelopment.close')}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

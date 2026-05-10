@@ -5,7 +5,7 @@ using PlayHub.Application.Features.Favorites.Commands.AddFavorite;
 using PlayHub.Application.Features.Favorites.Commands.RemoveFavorite;
 using PlayHub.Application.Features.Favorites.Queries.GetMyFavorites;
 using PlayHub.Application.Features.Courts.Dtos;
-using System.Security.Claims;
+using PlayHub.Application.Common.Interfaces;
 
 namespace PlayHub.Api.Controllers;
 
@@ -15,20 +15,16 @@ namespace PlayHub.Api.Controllers;
 public class FavoritesController : ControllerBase
 {
     private readonly ISender _mediator;
+    private readonly ICurrentUserService _currentUserService;
 
-    public FavoritesController(ISender mediator)
+    public FavoritesController(ISender mediator, ICurrentUserService currentUserService)
     {
         _mediator = mediator;
+        _currentUserService = currentUserService;
     }
 
-    private Guid CurrentUserId =>
-        Guid.TryParse(
-            User.FindFirstValue(ClaimTypes.NameIdentifier) ?? User.FindFirstValue("sub"),
-            out var id)
-        ? id
-        : throw new UnauthorizedAccessException("Token inválido: UserId não encontrado.");
+    private Guid CurrentUserId => _currentUserService.UserId;
 
-    /// <summary>Retorna as quadras favoritas do usuário autenticado.</summary>
     [HttpGet]
     public async Task<ActionResult<List<CourtDto>>> GetMyFavorites()
     {
@@ -36,7 +32,6 @@ public class FavoritesController : ControllerBase
         return Ok(result);
     }
 
-    /// <summary>Adiciona uma quadra aos favoritos do usuário autenticado.</summary>
     [HttpPost("{courtId:guid}")]
     public async Task<ActionResult> AddFavorite(Guid courtId)
     {
@@ -47,7 +42,6 @@ public class FavoritesController : ControllerBase
         return NoContent();
     }
 
-    /// <summary>Remove uma quadra dos favoritos do usuário autenticado.</summary>
     [HttpDelete("{courtId:guid}")]
     public async Task<ActionResult> RemoveFavorite(Guid courtId)
     {

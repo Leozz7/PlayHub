@@ -7,6 +7,8 @@ public record UpdateUserCommand(
     string Name,
     string Email,
     string Role,
+    string? Phone = null,
+    string? Cpf = null,
     List<Guid>? CoutsId = null,
     string? Password = null
 ) : IRequest<bool>;

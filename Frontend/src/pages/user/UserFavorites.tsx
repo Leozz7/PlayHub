@@ -1,7 +1,8 @@
 import { Link } from 'react-router-dom';
+import { useTranslation, Trans } from 'react-i18next';
 import { 
-  Heart, ArrowUpRight, Search, Loader2, LayoutGrid, 
-  MapPin, Star, Clock, Trophy, Sparkles, Filter 
+  Heart, ArrowUpRight, Search, LayoutGrid, 
+  MapPin, Star, Trophy, Sparkles 
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useMyFavorites } from '@/features/favorites/hooks/useFavorites';
@@ -11,9 +12,9 @@ import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 
 const STATUS_MAP = {
-  available: { label: 'Disponível', dot: 'bg-[#8CE600]', text: 'text-[#8CE600]', bg: 'bg-[#8CE600]/10' },
-  busy: { label: 'Ocupada', dot: 'bg-amber-500', text: 'text-amber-500', bg: 'bg-amber-500/10' },
-  closed: { label: 'Fechada', dot: 'bg-red-500', text: 'text-red-500', bg: 'bg-red-500/10' },
+  available: { label: 'user.favorites.card.status.available', dot: 'bg-[#8CE600]', text: 'text-[#8CE600]', bg: 'bg-[#8CE600]/10' },
+  busy: { label: 'user.favorites.card.status.busy', dot: 'bg-amber-500', text: 'text-amber-500', bg: 'bg-amber-500/10' },
+  closed: { label: 'user.favorites.card.status.closed', dot: 'bg-red-500', text: 'text-red-500', bg: 'bg-red-500/10' },
 };
 
 function FavoriteCardSkeleton() {
@@ -35,6 +36,7 @@ function FavoriteCardSkeleton() {
 }
 
 export default function UserFavorites() {
+  const { t } = useTranslation();
   const { data: courts = [], isLoading } = useMyFavorites();
 
   return (
@@ -49,14 +51,16 @@ export default function UserFavorites() {
               className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-red-500/10 border border-red-500/20 text-red-500 text-xs font-black uppercase tracking-widest"
             >
               <Heart className="w-3.5 h-3.5" fill="currentColor" />
-              Minha Coleção
+              {t('user.favorites.collection')}
             </motion.div>
             <motion.h1 
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               className="text-4xl md:text-6xl font-black tracking-tighter text-gray-900 dark:text-white leading-none"
             >
-              Quadras <span className="text-[#8CE600]">Favoritas</span>
+              <Trans i18nKey="user.favorites.title">
+                Quadras <span className="text-[#8CE600]">Favoritas</span>
+              </Trans>
             </motion.h1>
             <motion.p 
               initial={{ opacity: 0, y: 20 }}
@@ -65,8 +69,8 @@ export default function UserFavorites() {
               className="text-gray-500 dark:text-gray-400 text-lg max-w-xl font-medium"
             >
               {courts.length > 0
-                ? `Você selecionou ${courts.length} arena${courts.length !== 1 ? 's' : ''} incríveis para o seu próximo jogo.`
-                : 'Sua lista de desejos está pronta para ser preenchida com as melhores arenas da região.'}
+                ? t('user.favorites.subtitle.withItems', { count: courts.length })
+                : t('user.favorites.subtitle.empty')}
             </motion.p>
           </div>
 
@@ -77,7 +81,7 @@ export default function UserFavorites() {
               className="flex items-center gap-4 bg-gray-50 dark:bg-white/5 p-4 rounded-3xl border border-gray-100 dark:border-white/10"
             >
               <div className="flex -space-x-3">
-                {courts.slice(0, 3).map((c, i) => (
+                {courts.slice(0, 3).map((c) => (
                   <div key={c.id} className="w-10 h-10 rounded-full border-2 border-white dark:border-[#02060d] overflow-hidden bg-gray-200">
                     <img src={c.img} alt="" className="w-full h-full object-cover" />
                   </div>
@@ -89,7 +93,7 @@ export default function UserFavorites() {
                 )}
               </div>
               <div className="pr-2">
-                <p className="text-[10px] font-black uppercase text-gray-400 tracking-widest">Total Salvo</p>
+                <p className="text-[10px] font-black uppercase text-gray-400 tracking-widest">{t('user.favorites.stats.totalSaved')}</p>
                 <p className="text-xl font-black dark:text-white leading-tight">{courts.length}</p>
               </div>
             </motion.div>
@@ -101,12 +105,12 @@ export default function UserFavorites() {
             <div className="flex items-center gap-6">
               <div className="flex items-center gap-2 text-xs font-black uppercase tracking-widest text-gray-400">
                 <LayoutGrid className="w-4 h-4" />
-                Visualização em Grade
+                {t('user.favorites.view.grid')}
               </div>
             </div>
             <Button variant="ghost" asChild className="text-[#8CE600] hover:text-[#8CE600] hover:bg-[#8CE600]/10 font-black text-xs uppercase tracking-widest rounded-xl">
               <Link to="/catalog" className="flex items-center gap-2">
-                Explorar Mais <ArrowUpRight className="w-4 h-4" />
+                {t('user.favorites.view.exploreMore')} <ArrowUpRight className="w-4 h-4" />
               </Link>
             </Button>
           </div>
@@ -134,14 +138,14 @@ export default function UserFavorites() {
                   <Sparkles className="w-4 h-4 text-gray-950" />
                 </div>
               </div>
-              <h2 className="text-2xl font-black text-gray-900 dark:text-white mb-3">Sua coleção está vazia</h2>
+              <h2 className="text-2xl font-black text-gray-900 dark:text-white mb-3">{t('user.favorites.empty.title')}</h2>
               <p className="text-gray-500 dark:text-gray-400 max-w-sm mb-10 font-medium">
-                Encontre as melhores quadras e arenas. Toque no coração para salvá-las aqui e facilitar sua próxima reserva.
+                {t('user.favorites.empty.desc')}
               </p>
               <Button asChild className="h-14 px-10 bg-[#8CE600] hover:bg-[#7bc400] text-gray-950 rounded-2xl text-xs font-black uppercase tracking-[0.2em] shadow-xl shadow-[#8CE600]/20 transition-all hover:scale-105 active:scale-95 group">
                 <Link to="/catalog">
                   <Search className="w-4 h-4 mr-2" />
-                  Explorar Catálogo
+                  {t('user.favorites.empty.button')}
                   <ArrowUpRight className="w-4 h-4 ml-2 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
                 </Link>
               </Button>
@@ -175,7 +179,7 @@ export default function UserFavorites() {
                         )}
                         <div className={`flex items-center gap-2 px-3 py-1 rounded-full backdrop-blur-md border border-white/10 text-[10px] font-black uppercase tracking-widest ${STATUS_MAP[court.frontendStatus as keyof typeof STATUS_MAP]?.text || 'text-white'} bg-black/40`}>
                           <div className={`w-1.5 h-1.5 rounded-full ${STATUS_MAP[court.frontendStatus as keyof typeof STATUS_MAP]?.dot || 'bg-white'} shadow-[0_0_8px_currentColor]`} />
-                          {STATUS_MAP[court.frontendStatus as keyof typeof STATUS_MAP]?.label || 'Disponível'}
+                          {t(STATUS_MAP[court.frontendStatus as keyof typeof STATUS_MAP]?.label || 'user.favorites.card.status.available')}
                         </div>
                       </div>
 
@@ -209,7 +213,7 @@ export default function UserFavorites() {
 
                       <div className="flex items-center justify-between pt-4 border-t border-gray-100 dark:border-white/5">
                         <div className="flex flex-col">
-                          <span className="text-[10px] font-black uppercase text-gray-400 tracking-widest">Valor Hora</span>
+                          <span className="text-[10px] font-black uppercase text-gray-400 tracking-widest">{t('user.favorites.card.priceLabel')}</span>
                           <div className="flex items-baseline gap-1">
                             <span className="text-2xl font-black text-gray-900 dark:text-white">R$ {court.price}</span>
                             <span className="text-[10px] font-bold text-gray-400">/h</span>
@@ -218,7 +222,7 @@ export default function UserFavorites() {
 
                         <Button asChild className="h-12 px-6 bg-gray-900 dark:bg-white text-white dark:text-gray-900 hover:bg-[#8CE600] dark:hover:bg-[#8CE600] hover:text-gray-950 dark:hover:text-gray-950 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all shadow-lg group/btn">
                           <Link to={`/courts/${court.id}`}>
-                            Reservar
+                            {t('user.favorites.card.book')}
                             <ArrowUpRight className="w-4 h-4 ml-2 group-hover/btn:translate-x-0.5 group-hover/btn:-translate-y-0.5 transition-transform" />
                           </Link>
                         </Button>

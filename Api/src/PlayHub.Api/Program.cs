@@ -1,16 +1,24 @@
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.RateLimiting;
+using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using PlayHub.Application;
 using PlayHub.Application.Common.Interfaces;
 using PlayHub.Application.Common.Security;
+using PlayHub.Api.Middleware;
 using PlayHub.Infrastructure;
 using PlayHub.Infrastructure.Persistence;
+using Serilog;
 using System.Globalization;
 using System.Text;
 using System.Threading.RateLimiting;
+using PlayHub.Infrastructure.Hubs;
+using HealthChecks.UI.Client;
+using Microsoft.AspNetCore.Diagnostics.HealthChecks;
+using Serilog.Exceptions;
+using System.Security.Claims;
 
 var culture = new CultureInfo("pt-BR");
 CultureInfo.DefaultThreadCurrentCulture = culture;
@@ -23,26 +31,64 @@ builder.Configuration
     .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
     .AddEnvironmentVariables();
 
-builder.Services.AddControllers();
+// Serilog
+builder.Host.UseSerilog((ctx, services, config) =>
+    config
+        .ReadFrom.Configuration(ctx.Configuration)
+        .ReadFrom.Services(services)
+        .Enrich.FromLogContext()
+        .Enrich.WithMachineName()
+        .Enrich.WithThreadId()
+        .Enrich.WithExceptionDetails()
+        .Enrich.WithProperty("Application", "PlayHub")
+        .Enrich.WithProperty("Environment", ctx.HostingEnvironment.EnvironmentName)
+        .Destructure.ByTransforming<PlayHub.Api.Controllers.LoginRequest>(r => new
+        {
+            Email       = "***",
+            HasPassword = !string.IsNullOrEmpty(r.Password)
+        })
+        .Destructure.ByTransforming<PlayHub.Api.Controllers.RegisterRequest>(r => new
+        {
+            Name        = r.Name,
+            Email       = "***",
+            HasPassword = !string.IsNullOrEmpty(r.Password),
+            Cpf         = "***",
+            Phone       = "***"
+        })
+        .Destructure.ByTransforming<PlayHub.Application.Features.Users.Commands.RegisterUser.RegisterUserCommand>(r => new
+        {
+            Name        = r.Name,
+            Email       = "***",
+            HasPassword = !string.IsNullOrEmpty(r.Password)
+        })
+        .Destructure.ByTransforming<PlayHub.Application.Features.Users.Commands.ChangePassword.ChangePasswordCommand>(r => new
+        {
+            UserId      = r.UserId,
+            HasCurrent  = !string.IsNullOrEmpty(r.CurrentPassword),
+            HasNew      = !string.IsNullOrEmpty(r.NewPassword)
+        }));
 
+builder.Services.AddControllers();
+builder.Services.AddSignalR();
 builder.Services.AddEndpointsApiExplorer();
+
 builder.Services.AddSwaggerGen(c =>
 {
     c.SwaggerDoc("v1", new OpenApiInfo
     {
-        Title = "PlayHub API",
-        Version = "v1",
+        Title       = "PlayHub API",
+        Version     = "v1",
         Description = "Backend da plataforma PlayHub"
     });
 
     c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
     {
-        Name = "Authorization",
-        Type = SecuritySchemeType.Http,
-        Scheme = "bearer",
+        Name         = "Authorization",
+        Type         = SecuritySchemeType.Http,
+        Scheme       = "bearer",
         BearerFormat = "JWT",
-        In = ParameterLocation.Header,
-        Description = "Insira o token JWT no formato: Bearer {token}"
+        In           = ParameterLocation.Header,
+        Description  = "Insira o token JWT no formato: Bearer {token}"
     });
 
     c.AddSecurityRequirement(new OpenApiSecurityRequirement
@@ -53,7 +99,7 @@ builder.Services.AddSwaggerGen(c =>
                 Reference = new OpenApiReference
                 {
                     Type = ReferenceType.SecurityScheme,
-                    Id = "Bearer"
+                    Id   = "Bearer"
                 }
             },
             Array.Empty<string>()
@@ -81,8 +127,9 @@ builder.Services.AddCors(options =>
 builder.Services.AddApplication();
 builder.Services.AddInfrastructure(builder.Configuration);
 
+// JWT
 var jwtSection = builder.Configuration.GetSection("Jwt");
-var jwtKey = jwtSection["Key"]
+var jwtKey     = jwtSection["Key"]
     ?? throw new InvalidOperationException("Jwt:Key is not configured.");
 
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
@@ -90,14 +137,14 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     {
         options.TokenValidationParameters = new TokenValidationParameters
         {
-            ValidateIssuer = true,
-            ValidIssuer = jwtSection["Issuer"],
-            ValidateAudience = true,
-            ValidAudience = jwtSection["Audience"],
+            ValidateIssuer           = true,
+            ValidIssuer              = jwtSection["Issuer"],
+            ValidateAudience         = true,
+            ValidAudience            = jwtSection["Audience"],
             ValidateIssuerSigningKey = true,
-            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtKey)),
-            ValidateLifetime = true,
-            ClockSkew = TimeSpan.Zero
+            IssuerSigningKey         = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtKey)),
+            ValidateLifetime         = true,
+            ClockSkew                = TimeSpan.Zero
         };
     });
 
@@ -110,18 +157,20 @@ builder.Services.Configure<ForwardedHeadersOptions>(options =>
     options.KnownProxies.Clear();
 });
 
-var rlConfig = builder.Configuration.GetSection("RateLimiting");
-var permitLimit = rlConfig.GetValue<int>("PermitLimit", 100);
-var windowInMinutes = rlConfig.GetValue<int>("WindowInMinutes", 1);
+// Rate Limiter
+var rlConfig      = builder.Configuration.GetSection("RateLimiting");
+var permitLimit   = rlConfig.GetValue<int>("PermitLimit", 100);
+var windowMinutes = rlConfig.GetValue<int>("WindowInMinutes", 1);
 
 builder.Services.AddRateLimiter(options =>
 {
     options.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
-    
+
     options.OnRejected = async (context, token) =>
     {
-        await context.HttpContext.Response.WriteAsJsonAsync(new { 
-            message = "Limite de requisições excedido. Tente novamente mais tarde.",
+        await context.HttpContext.Response.WriteAsJsonAsync(new
+        {
+            message    = "Limite de requisições excedido. Tente novamente mais tarde.",
             retryAfter = "1 minute"
         }, token);
     };
@@ -132,12 +181,29 @@ builder.Services.AddRateLimiter(options =>
             factory: _ => new FixedWindowRateLimiterOptions
             {
                 PermitLimit = permitLimit,
-                Window = TimeSpan.FromMinutes(windowInMinutes),
-                QueueLimit = rlConfig.GetValue<int>("QueueLimit", 0)
+                Window      = TimeSpan.FromMinutes(windowMinutes),
+                QueueLimit  = rlConfig.GetValue<int>("QueueLimit", 0)
             }));
 });
 
-builder.WebHost.UseUrls("http://0.0.0.0:5000");
+// Health Checks
+var mongoConnectionString =
+    builder.Configuration["MongoDB:ConnectionString"]
+    ?? throw new InvalidOperationException("MongoDB:ConnectionString is not configured.");
+
+builder.Services.AddHealthChecks()
+    .AddMongoDb(
+        mongodbConnectionString: mongoConnectionString,
+        name: "mongodb",
+        failureStatus: HealthStatus.Unhealthy,
+        tags: ["db", "ready"])
+    .AddDiskStorageHealthCheck(setup => 
+        setup.AddDrive("/", minimumFreeMegabytes: 1024), 
+        name: "disk", 
+        tags: ["ready"])
+    .AddCheck("self",
+        () => HealthCheckResult.Healthy("API operacional."),
+        tags: ["live"]);
 
 var app = builder.Build();
 
@@ -151,22 +217,87 @@ if (app.Environment.IsDevelopment())
     });
 }
 
+// Request Logging (Serilog)
+app.UseSerilogRequestLogging(opts =>
+{
+    opts.MessageTemplate =
+        "HTTP {RequestMethod} {RequestPath} → {StatusCode} ({Elapsed:0.0}ms)";
+
+    // Rotas de autenticação ficam em Debug
+    opts.GetLevel = (httpCtx, _, _) =>
+    {
+        var path = httpCtx.Request.Path.Value ?? "";
+        
+        // Silencia logs
+        if (path.Contains("hubs", StringComparison.OrdinalIgnoreCase) || 
+            path.Contains("negotiate", StringComparison.OrdinalIgnoreCase) ||
+            path.Contains("swagger", StringComparison.OrdinalIgnoreCase) ||
+            path.Contains("health", StringComparison.OrdinalIgnoreCase))
+        {
+            return Serilog.Events.LogEventLevel.Debug;
+        }
+
+        return Serilog.Events.LogEventLevel.Information;
+    };
+
+    opts.EnrichDiagnosticContext = (diag, httpCtx) =>
+    {
+        diag.Set("RequestHost",   httpCtx.Request.Host.Value ?? "unknown");
+        diag.Set("RequestScheme", httpCtx.Request.Scheme ?? "unknown");
+        
+        var userId = httpCtx.User.FindFirstValue(ClaimTypes.NameIdentifier) 
+                  ?? httpCtx.User.FindFirstValue("sub");
+        
+        diag.Set("UserId", userId ?? "anonymous");
+        diag.Set("UserName", httpCtx.User.FindFirstValue(ClaimTypes.Name) ?? "anonymous");
+        diag.Set("ClientIp", httpCtx.Connection.RemoteIpAddress?.ToString() ?? "unknown");
+    };
+});
+
 app.UseForwardedHeaders();
+app.UseMiddleware<LogEnrichmentMiddleware>();
 app.UseCors("PlayHubPolicy");
 app.UseRateLimiter();
+
+// Middleware Global de Exceções
+app.UseMiddleware<GlobalExceptionMiddleware>();
+
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers().RequireRateLimiting("fixed");
+app.MapHub<NotificationHub>("/hubs/playhub");
 
+// Health Check Endpoints
+app.MapHealthChecks("/health", new HealthCheckOptions
+{
+    ResponseWriter = UIResponseWriter.WriteHealthCheckUIResponse,
+    Predicate      = _ => true
+}).AllowAnonymous();
+
+app.MapHealthChecks("/health/live", new HealthCheckOptions
+{
+    Predicate      = c => c.Tags.Contains("live"),
+    ResponseWriter = UIResponseWriter.WriteHealthCheckUIResponse
+}).AllowAnonymous();
+
+app.MapHealthChecks("/health/ready", new HealthCheckOptions
+{
+    Predicate      = c => c.Tags.Contains("ready"),
+    ResponseWriter = UIResponseWriter.WriteHealthCheckUIResponse
+}).AllowAnonymous();
+
+// Seed
 using (var scope = app.Services.CreateScope())
 {
     var services = scope.ServiceProvider;
-    var logger = services.GetRequiredService<ILogger<Program>>();
+    var logger   = services.GetRequiredService<ILogger<Program>>();
 
     try
     {
-        var dbContext = services.GetRequiredService<MongoDbContext>();
-        var hasher = services.GetRequiredService<PasswordHasher>();
+        var dbContext         = services.GetRequiredService<MongoDbContext>();
+        await dbContext.InitializeAsync();
+        
+        var hasher            = services.GetRequiredService<PasswordHasher>();
         var encryptionService = services.GetRequiredService<IEncryptionService>();
 
         await ApplicationDbContextSeed.SeedAdminAsync(dbContext, hasher, encryptionService);

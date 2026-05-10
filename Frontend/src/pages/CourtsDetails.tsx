@@ -12,24 +12,27 @@ import { usePlayHubToast } from '@/hooks/usePlayHubToast';
 import { FavoriteButton } from '@/components/FavoriteButton';
 import { useCourt, useCourtReviews, useSubmitReview } from '@/features/courts/hooks/useCourts';
 import { useCourtAvailability } from '@/features/courts/hooks/useCourtAvailability';
+import { useQueryClient } from '@tanstack/react-query';
+import { signalRService } from '@/lib/signalr';
+
 import { Court } from './CatalogData';
 
-const ClockIcon    = () => <Clock className="w-4 h-4 text-[#8CE600]" strokeWidth={1.5} />;
-const CheckIcon    = () => <CheckCircle2 className="w-3.5 h-3.5 text-[#8CE600]" strokeWidth={1.5} />;
-const ShieldIcon   = () => <Shield className="w-4 h-4 text-[#8CE600]" strokeWidth={1.5} />;
+const ClockIcon = () => <Clock className="w-4 h-4 text-[#8CE600]" strokeWidth={1.5} />;
+const CheckIcon = () => <CheckCircle2 className="w-3.5 h-3.5 text-[#8CE600]" strokeWidth={1.5} />;
+const ShieldIcon = () => <Shield className="w-4 h-4 text-[#8CE600]" strokeWidth={1.5} />;
 const CalendarIcon = () => <Calendar className="w-4 h-4 text-[#8CE600]" strokeWidth={1.5} />;
-const StarIcon     = () => <Star className="w-3.5 h-3.5" fill="currentColor" strokeWidth={1.5} />;
+const StarIcon = () => <Star className="w-3.5 h-3.5" fill="currentColor" strokeWidth={1.5} />;
 
 const AMENITY_ICON_MAP: Record<string, React.ReactNode> = {
-    'Vestiário':      <ShowerHead className="w-4 h-4 text-[#8CE600]" strokeWidth={1.5} />,
+    'Vestiário': <ShowerHead className="w-4 h-4 text-[#8CE600]" strokeWidth={1.5} />,
     'Estacionamento': <ParkingCircle className="w-4 h-4 text-[#8CE600]" strokeWidth={1.5} />,
-    'Iluminação':     <Lightbulb className="w-4 h-4 text-[#8CE600]" strokeWidth={1.5} />,
-    'Wifi':           <Wifi className="w-4 h-4 text-[#8CE600]" strokeWidth={1.5} />,
-    'Lanchonete':     <Coffee className="w-4 h-4 text-[#8CE600]" strokeWidth={1.5} />,
-    'Ducha':          <ShowerHead className="w-4 h-4 text-[#8CE600]" strokeWidth={1.5} />,
-    'Academia':       <Dumbbell className="w-4 h-4 text-[#8CE600]" strokeWidth={1.5} />,
-    'Piscina':        <Waves className="w-4 h-4 text-[#8CE600]" strokeWidth={1.5} />,
-    'Arquibancada':   <Users className="w-4 h-4 text-[#8CE600]" strokeWidth={1.5} />,
+    'Iluminação': <Lightbulb className="w-4 h-4 text-[#8CE600]" strokeWidth={1.5} />,
+    'Wifi': <Wifi className="w-4 h-4 text-[#8CE600]" strokeWidth={1.5} />,
+    'Lanchonete': <Coffee className="w-4 h-4 text-[#8CE600]" strokeWidth={1.5} />,
+    'Ducha': <ShowerHead className="w-4 h-4 text-[#8CE600]" strokeWidth={1.5} />,
+    'Academia': <Dumbbell className="w-4 h-4 text-[#8CE600]" strokeWidth={1.5} />,
+    'Piscina': <Waves className="w-4 h-4 text-[#8CE600]" strokeWidth={1.5} />,
+    'Arquibancada': <Users className="w-4 h-4 text-[#8CE600]" strokeWidth={1.5} />,
 };
 
 
@@ -44,7 +47,7 @@ function formatSlots(slots: number[], t: any) {
     const sorted = [...slots].sort((a, b) => a - b);
     const groups: number[][] = [];
     let currentGroup = [sorted[0]];
-    
+
     for (let i = 1; i < sorted.length; i++) {
         if (sorted[i] === sorted[i - 1] + 1) {
             currentGroup.push(sorted[i]);
@@ -54,7 +57,7 @@ function formatSlots(slots: number[], t: any) {
         }
     }
     groups.push(currentGroup);
-    
+
     return groups.map(g => `${String(g[0]).padStart(2, '0')}:00 às ${String(g[g.length - 1] + 1).padStart(2, '0')}:00`).join(', ');
 }
 
@@ -63,8 +66,8 @@ function TimeSlot({ hour, status, onClick }: { hour: number; status: SlotStatus;
     const end = `${String(hour + 1).padStart(2, '0')}:00`;
     const styles: Record<SlotStatus, string> = {
         available: 'bg-white dark:bg-background border-gray-200 dark:border-white/10 hover:border-[#8CE600] hover:bg-[#8CE600]/10 cursor-pointer text-gray-700 dark:text-gray-300 hover:-translate-y-1 hover:shadow-lg hover:shadow-[#8CE600]/10',
-        busy:      'bg-gray-50 dark:bg-gray-800/40 border-gray-100 dark:border-white/10/60 cursor-not-allowed text-gray-400 dark:text-gray-600 opacity-60',
-        selected:  'bg-[#8CE600] border-[#8CE600] text-gray-950 cursor-pointer shadow-lg shadow-[#8CE600]/30 ring-2 ring-[#8CE600] ring-offset-2 ring-offset-white dark:ring-offset-gray-950 scale-[1.02] z-10',
+        busy: 'bg-gray-50 dark:bg-gray-800/40 border-gray-100 dark:border-white/10/60 cursor-not-allowed text-gray-400 dark:text-gray-600 opacity-60',
+        selected: 'bg-[#8CE600] border-[#8CE600] text-gray-950 cursor-pointer shadow-lg shadow-[#8CE600]/30 ring-2 ring-[#8CE600] ring-offset-2 ring-offset-white dark:ring-offset-gray-950 scale-[1.02] z-10',
     };
     return (
         <button
@@ -171,18 +174,51 @@ export default function CourtsDetails() {
     }, [court]);
 
     const navigate = useNavigate();
-    const [selectedDay, setSelectedDay]   = useState<Date>(new Date());
+    const [selectedDay, setSelectedDay] = useState<Date>(new Date());
     const [selectedSlots, setSelectedSlots] = useState<number[]>([]);
     const [isGalleryModalOpen, setIsGalleryModalOpen] = useState(false);
     const [modalActiveIndex, setModalActiveIndex] = useState(0);
     const [reviewRating, setReviewRating] = useState(0);
-    const [reviewHover,  setReviewHover]  = useState(0);
-    const [reviewText,   setReviewText]   = useState('');
+    const [reviewHover, setReviewHover] = useState(0);
+    const [reviewText, setReviewText] = useState('');
     const [isReviewsModalOpen, setIsReviewsModalOpen] = useState(false);
+    const [isCpfModalOpen, setIsCpfModalOpen] = useState(false);
     const phToast = usePlayHubToast();
 
     const { data: reviews = [], isLoading: isReviewsLoading } = useCourtReviews(id || '');
     const submitReview = useSubmitReview(id || '');
+    const queryClient = useQueryClient();
+
+    // Ouvir atualizações em tempo real do SignalR
+    useEffect(() => {
+        const connection = signalRService.connection;
+        if (!connection) return;
+
+        const handleReservationCreated = (data: { courtId: string, startTime: string }) => {
+            if (data.courtId === id) {
+                // Invalidamos a busca de disponibilidade
+                queryClient.invalidateQueries({ queryKey: ['courtAvailability', id] });
+
+                // Verificamos se o horário reservado conflita com a seleção atual
+                // Convertemos a string ISO para data e pegamos a hora
+                const reservedHour = new Date(data.startTime).getUTCHours();
+
+                setSelectedSlots(prev => {
+                    if (prev.includes(reservedHour)) {
+                        phToast.error(t('details.slotTakenWarning', "Este horário acabou de ser reservado por outro usuário!"));
+                        return prev.filter(h => h !== reservedHour);
+                    }
+                    phToast.info(t('details.realTimeUpdate', "A disponibilidade da quadra foi atualizada."));
+                    return prev;
+                });
+            }
+        };
+
+        connection.on("ReservationCreated", handleReservationCreated);
+        return () => {
+            connection.off("ReservationCreated", handleReservationCreated);
+        };
+    }, [id, queryClient, phToast]);
 
     const alreadyReviewed = useMemo(() => {
         if (!user || reviews.length === 0) return false;
@@ -191,7 +227,7 @@ export default function CourtsDetails() {
 
     const handleShare = async () => {
         if (!court) return;
-        
+
         if (navigator.share) {
             try {
                 await navigator.share({
@@ -207,7 +243,7 @@ export default function CourtsDetails() {
             alert('Link copiado para a área de transferência!');
         }
     };
-    
+
     const [showDatePicker, setShowDatePicker] = useState(false);
     const [pickerMonth, setPickerMonth] = useState<Date>(startOfMonth(new Date()));
 
@@ -223,7 +259,7 @@ export default function CourtsDetails() {
     const allImages = useMemo(() => {
         if (!court) return [];
         const list: string[] = [];
-        
+
         if (court.mainImageBase64) {
             list.push(court.mainImageBase64);
         } else if (court.img) {
@@ -273,19 +309,25 @@ export default function CourtsDetails() {
 
     function handleBook() {
         if (!court) return;
+
+        if (isAuthenticated && user && !user.cpf) {
+            setIsCpfModalOpen(true);
+            return;
+        }
+
         navigate('/booking/confirm', {
             state: {
                 court: {
-                    id:           court.id,
-                    name:         court.name,
-                    address:      court.address,
+                    id: court.id,
+                    name: court.name,
+                    address: court.address,
                     neighborhood: court.neighborhood,
-                    city:         court.city,
-                    price:        court.price,
-                    img:          court.img,
-                    sports:       court.sports,
+                    city: court.city,
+                    price: court.price,
+                    img: court.img,
+                    sports: court.sports,
                 },
-                date:  selectedDay.toISOString(),
+                date: selectedDay.toISOString(),
                 slots: selectedSlots,
             },
         });
@@ -332,19 +374,19 @@ export default function CourtsDetails() {
                     <Link to="/catalog" className="inline-flex items-center gap-2 text-gray-500 dark:text-gray-400 hover:text-[#8CE600] text-xs font-bold uppercase tracking-widest mb-5 transition-colors">
                         <ArrowLeft className="w-4 h-4" /> {t('details.backToCatalog')}
                     </Link>
-                    
+
                     <div className="grid grid-cols-4 grid-rows-2 gap-3 h-[450px] rounded-[2.5rem] overflow-hidden">
-                        <div 
-                            className="col-span-2 row-span-2 relative overflow-hidden cursor-pointer group" 
+                        <div
+                            className="col-span-2 row-span-2 relative overflow-hidden cursor-pointer group"
                             onClick={() => {
                                 setModalActiveIndex(0);
                                 setIsGalleryModalOpen(true);
                             }}
                         >
-                            <img 
-                                src={allImages[0]} 
-                                alt={court.name} 
-                                className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" 
+                            <img
+                                src={allImages[0]}
+                                alt={court.name}
+                                className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
                             />
                             <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-60 group-hover:opacity-80 transition-opacity" />
                             <div className="absolute bottom-6 left-6">
@@ -362,22 +404,22 @@ export default function CourtsDetails() {
                         </div>
 
                         {allImages.slice(1, 4).map((src, i) => (
-                            <div 
-                                key={i} 
-                                className="relative overflow-hidden cursor-pointer group" 
+                            <div
+                                key={i}
+                                className="relative overflow-hidden cursor-pointer group"
                                 onClick={() => {
                                     setModalActiveIndex(i + 1);
                                     setIsGalleryModalOpen(true);
                                 }}
                             >
-                                <img 
-                                    src={src} 
-                                    alt={`${court.name} ${i + 2}`} 
-                                    loading="lazy" 
-                                    className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" 
+                                <img
+                                    src={src}
+                                    alt={`${court.name} ${i + 2}`}
+                                    loading="lazy"
+                                    className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
                                 />
                                 <div className="absolute inset-0 bg-black/10 group-hover:bg-transparent transition-colors" />
-                                
+
                                 {i === 2 && allImages.length > 4 && (
                                     <div className="absolute inset-0 bg-black/60 flex flex-col items-center justify-center group-hover:bg-black/40 transition-all backdrop-blur-[2px]">
                                         <span className="text-white font-black text-lg">+{allImages.length - 3}</span>
@@ -385,11 +427,11 @@ export default function CourtsDetails() {
                                     </div>
                                 )}
                                 {i === 2 && allImages.length <= 4 && (
-                                     <div className="absolute inset-0 bg-black/20 group-hover:bg-transparent transition-colors flex items-center justify-center">
-                                         <div className="p-3 rounded-full bg-white/10 backdrop-blur-md opacity-0 group-hover:opacity-100 transition-opacity">
-                                             <Camera className="w-5 h-5 text-white" />
-                                         </div>
-                                     </div>
+                                    <div className="absolute inset-0 bg-black/20 group-hover:bg-transparent transition-colors flex items-center justify-center">
+                                        <div className="p-3 rounded-full bg-white/10 backdrop-blur-md opacity-0 group-hover:opacity-100 transition-opacity">
+                                            <Camera className="w-5 h-5 text-white" />
+                                        </div>
+                                    </div>
                                 )}
                             </div>
                         ))}
@@ -397,29 +439,29 @@ export default function CourtsDetails() {
 
                     {isGalleryModalOpen && (
                         <div className="fixed inset-0 z-[200] flex items-center justify-center bg-black/95 backdrop-blur-3xl animate-in fade-in duration-300">
-                            <button 
-                                onClick={() => setIsGalleryModalOpen(false)} 
+                            <button
+                                onClick={() => setIsGalleryModalOpen(false)}
                                 className="absolute top-6 right-6 text-white/50 hover:text-white transition-colors p-2 bg-white/10 hover:bg-white/20 rounded-full z-10"
                             >
                                 <X className="w-6 h-6" />
                             </button>
-                            
+
                             <div className="w-full max-w-6xl h-full md:h-[85vh] flex flex-col md:flex-row gap-4 p-4 md:p-8 pt-20 md:pt-8">
                                 <div className="flex-1 relative rounded-[2rem] overflow-hidden bg-black/50 flex items-center justify-center border border-white/10">
-                                    <img 
-                                        src={allImages[modalActiveIndex]} 
-                                        alt={`Gallery ${modalActiveIndex}`} 
+                                    <img
+                                        src={allImages[modalActiveIndex]}
+                                        alt={`Gallery ${modalActiveIndex}`}
                                         className="w-full h-full object-contain animate-in fade-in zoom-in-95 duration-500"
                                         key={modalActiveIndex}
                                     />
-                                    
-                                    <button 
+
+                                    <button
                                         onClick={(e) => { e.stopPropagation(); setModalActiveIndex(idx => idx > 0 ? idx - 1 : allImages.length - 1); }}
                                         className="absolute left-6 top-1/2 -translate-y-1/2 p-4 bg-black/50 hover:bg-[#8CE600] text-white hover:text-black rounded-full backdrop-blur-md transition-all hover:scale-110 border border-white/10"
                                     >
                                         <ChevronLeft className="w-6 h-6" />
                                     </button>
-                                    <button 
+                                    <button
                                         onClick={(e) => { e.stopPropagation(); setModalActiveIndex(idx => idx < allImages.length - 1 ? idx + 1 : 0); }}
                                         className="absolute right-6 top-1/2 -translate-y-1/2 p-4 bg-black/50 hover:bg-[#8CE600] text-white hover:text-black rounded-full backdrop-blur-md transition-all hover:scale-110 border border-white/10"
                                     >
@@ -430,11 +472,11 @@ export default function CourtsDetails() {
                                         {modalActiveIndex + 1} / {allImages.length}
                                     </div>
                                 </div>
-                                
+
                                 <div className="w-full md:w-48 flex flex-row md:flex-col gap-3 overflow-x-auto md:overflow-y-auto scrollbar-none py-2 md:py-0 md:pr-2" style={{ scrollbarWidth: 'none' }}>
                                     {allImages.map((src, idx) => (
-                                        <button 
-                                            key={idx} 
+                                        <button
+                                            key={idx}
                                             onClick={() => setModalActiveIndex(idx)}
                                             className={`relative shrink-0 w-24 md:w-full aspect-[4/3] rounded-2xl overflow-hidden border-2 transition-all duration-300 ${modalActiveIndex === idx ? 'border-[#8CE600] scale-100 opacity-100 shadow-lg shadow-[#8CE600]/20' : 'border-transparent opacity-40 hover:opacity-100 hover:scale-[1.02]'}`}
                                         >
@@ -450,7 +492,7 @@ export default function CourtsDetails() {
                         <Stars rating={court.rating} />
                         <span className="text-gray-500 dark:text-gray-400 text-sm">({court.reviewCount} avaliações)</span>
                         <span className="ml-auto flex items-center gap-1.5 text-xs text-gray-500 dark:text-gray-400"><ClockIcon />{court.openingHour}h – {court.closingHour}h</span>
-                        <button 
+                        <button
                             onClick={handleShare}
                             className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-white dark:bg-white/5 border border-gray-100 dark:border-white/10 text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-white/10 transition-colors text-xs font-bold uppercase tracking-widest"
                             title="Compartilhar"
@@ -508,19 +550,18 @@ export default function CourtsDetails() {
                             {days.map((day) => {
                                 const iso = format(day, 'yyyy-MM-dd');
                                 const isSelected = format(selectedDay, 'yyyy-MM-dd') === iso;
-                                const isUnavail  = court.unavailableDates?.includes(iso);
+                                const isUnavail = court.unavailableDates?.includes(iso);
                                 return (
                                     <button
                                         key={iso}
                                         onClick={() => handleDaySelect(day)}
                                         disabled={isUnavail}
-                                        className={`shrink-0 flex flex-col items-center rounded-2xl px-4 py-3 border-2 transition-all duration-200 min-w-[64px] ${
-                                            isUnavail
+                                        className={`shrink-0 flex flex-col items-center rounded-2xl px-4 py-3 border-2 transition-all duration-200 min-w-[64px] ${isUnavail
                                                 ? 'border-gray-100 dark:border-white/10 bg-gray-50 dark:bg-background/50 text-gray-300 dark:text-gray-600 cursor-not-allowed'
                                                 : isSelected
                                                     ? 'border-[#8CE600] bg-[#8CE600] text-gray-950 shadow-lg shadow-[#8CE600]/30'
                                                     : 'border-gray-200 dark:border-gray-700 bg-white dark:bg-background hover:border-[#8CE600] text-gray-700 dark:text-gray-300'
-                                        }`}
+                                            }`}
                                     >
                                         <span className="text-[10px] font-bold uppercase tracking-widest">{format(day, 'EEE', { locale: ptBR })}</span>
                                         <span className="text-lg font-black leading-tight">{format(day, 'dd')}</span>
@@ -529,13 +570,12 @@ export default function CourtsDetails() {
                                 );
                             })}
 
-                            <button 
+                            <button
                                 onClick={() => setShowDatePicker(true)}
-                                className={`relative shrink-0 flex flex-col items-center justify-center rounded-2xl px-2 py-3 border-2 transition-all duration-200 min-w-[64px] ${
-                                    !isSelectedInDays 
-                                        ? 'border-[#8CE600] bg-[#8CE600] text-gray-950 shadow-lg shadow-[#8CE600]/30' 
+                                className={`relative shrink-0 flex flex-col items-center justify-center rounded-2xl px-2 py-3 border-2 transition-all duration-200 min-w-[64px] ${!isSelectedInDays
+                                        ? 'border-[#8CE600] bg-[#8CE600] text-gray-950 shadow-lg shadow-[#8CE600]/30'
                                         : 'border-gray-200 dark:border-gray-700 bg-white dark:bg-background hover:border-[#8CE600] text-gray-700 dark:text-gray-300'
-                                }`}
+                                    }`}
                             >
                                 <Calendar className={`w-5 h-5 mb-1 ${!isSelectedInDays ? 'text-gray-950' : 'text-gray-400 dark:text-gray-500'}`} />
                                 <span className="text-[10px] font-bold uppercase tracking-widest text-center mt-0.5">
@@ -569,7 +609,7 @@ export default function CourtsDetails() {
                                             const isPast = isBefore(day, startOfDay(new Date()));
                                             const isSelected = isSameDay(day, selectedDay);
                                             const isCurrentMonth = day.getMonth() === pickerMonth.getMonth();
-                                            
+
                                             return (
                                                 <button
                                                     key={i}
@@ -578,15 +618,14 @@ export default function CourtsDetails() {
                                                         handleDaySelect(day);
                                                         setShowDatePicker(false);
                                                     }}
-                                                    className={`h-10 w-full rounded-xl flex items-center justify-center text-sm transition-all ${
-                                                        isSelected 
-                                                            ? 'bg-[#8CE600] text-gray-950 font-black shadow-md shadow-[#8CE600]/20' 
-                                                            : isPast 
-                                                                ? 'text-gray-200 dark:text-gray-800 cursor-not-allowed' 
+                                                    className={`h-10 w-full rounded-xl flex items-center justify-center text-sm transition-all ${isSelected
+                                                            ? 'bg-[#8CE600] text-gray-950 font-black shadow-md shadow-[#8CE600]/20'
+                                                            : isPast
+                                                                ? 'text-gray-200 dark:text-gray-800 cursor-not-allowed'
                                                                 : isCurrentMonth
                                                                     ? 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 font-bold'
                                                                     : 'text-gray-400 dark:text-gray-600 hover:bg-gray-100 dark:hover:bg-gray-800'
-                                                    }`}
+                                                        }`}
                                                 >
                                                     {format(day, 'd')}
                                                 </button>
@@ -606,9 +645,9 @@ export default function CourtsDetails() {
                         ) : (
                             <>
                                 <div className="flex items-center gap-4 mb-4 text-[11px] font-bold uppercase tracking-widest text-gray-500">
-                                    <span className="flex items-center gap-1.5"><span className="w-3 h-3 rounded-full bg-white dark:bg-background border-2 border-gray-300 dark:border-gray-600 inline-block"/></span> Disponível
-                                    <span className="flex items-center gap-1.5"><span className="w-3 h-3 rounded-full bg-gray-200 dark:bg-gray-700 inline-block"/></span> Ocupado
-                                    <span className="flex items-center gap-1.5"><span className="w-3 h-3 rounded-full bg-[#8CE600] inline-block"/></span> Selecionado
+                                    <span className="flex items-center gap-1.5"><span className="w-3 h-3 rounded-full bg-white dark:bg-background border-2 border-gray-300 dark:border-gray-600 inline-block" /></span> Disponível
+                                    <span className="flex items-center gap-1.5"><span className="w-3 h-3 rounded-full bg-gray-200 dark:bg-gray-700 inline-block" /></span> Ocupado
+                                    <span className="flex items-center gap-1.5"><span className="w-3 h-3 rounded-full bg-[#8CE600] inline-block" /></span> Selecionado
                                 </div>
                                 <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
                                     {isAvailabilityLoading ? (
@@ -617,7 +656,15 @@ export default function CourtsDetails() {
                                         </div>
                                     ) : (
                                         hours.map(hour => {
-                                            const status: SlotStatus = selectedSlots.includes(hour) ? 'selected' : busySlots.includes(hour) ? 'busy' : 'available';
+                                            const isBusy = busySlots.includes(hour);
+                                            const isSelected = selectedSlots.includes(hour);
+
+                                            // Se o horário ficou ocupado enquanto estava selecionado, removemos da seleção
+                                            if (isBusy && isSelected) {
+                                                setSelectedSlots(prev => prev.filter(h => h !== hour));
+                                            }
+
+                                            const status: SlotStatus = isBusy ? 'busy' : isSelected ? 'selected' : 'available';
                                             return (
                                                 <TimeSlot key={hour} hour={hour} status={status} onClick={() => toggleSlot(hour)} />
                                             );
@@ -655,14 +702,14 @@ export default function CourtsDetails() {
                                     <div className="text-center shrink-0">
                                         <p className="text-5xl font-black text-gray-900 dark:text-white">{court.rating.toFixed(1)}</p>
                                         <div className="flex justify-center gap-0.5 my-1">
-                                            {[1,2,3,4,5].map(n => (
+                                            {[1, 2, 3, 4, 5].map(n => (
                                                 <Star key={n} className="w-4 h-4" fill={n <= Math.round(court.rating) ? '#8CE600' : 'none'} stroke={n <= Math.round(court.rating) ? '#8CE600' : 'currentColor'} strokeWidth={1.5} />
                                             ))}
                                         </div>
                                         <p className="text-xs text-gray-500 dark:text-gray-400 font-bold">{reviews.length} avaliações</p>
                                     </div>
                                     <div className="flex-1 w-full space-y-1.5">
-                                        {[5,4,3,2,1].map(star => {
+                                        {[5, 4, 3, 2, 1].map(star => {
                                             const count = reviews.filter(r => r.rating === star).length;
                                             const pct = reviews.length > 0 ? (count / reviews.length) * 100 : 0;
                                             return (
@@ -709,7 +756,7 @@ export default function CourtsDetails() {
                                                     </div>
                                                 </div>
                                                 <div className="flex gap-0.5">
-                                                    {[1,2,3,4,5].map(n => (
+                                                    {[1, 2, 3, 4, 5].map(n => (
                                                         <Star key={n} className="w-3.5 h-3.5" fill={n <= r.rating ? '#8CE600' : 'none'} stroke={n <= r.rating ? '#8CE600' : 'currentColor'} strokeWidth={1.5} />
                                                     ))}
                                                 </div>
@@ -765,14 +812,14 @@ export default function CourtsDetails() {
                                                     <div className="text-center shrink-0">
                                                         <p className="text-4xl font-black text-gray-900 dark:text-white">{court.rating.toFixed(1)}</p>
                                                         <div className="flex justify-center gap-0.5 my-1">
-                                                            {[1,2,3,4,5].map(n => (
+                                                            {[1, 2, 3, 4, 5].map(n => (
                                                                 <Star key={n} className="w-3.5 h-3.5" fill={n <= Math.round(court.rating) ? '#8CE600' : 'none'} stroke={n <= Math.round(court.rating) ? '#8CE600' : 'currentColor'} strokeWidth={1.5} />
                                                             ))}
                                                         </div>
                                                         <p className="text-[10px] text-gray-500 dark:text-gray-400 font-bold">{reviews.length} avaliações</p>
                                                     </div>
                                                     <div className="flex-1 space-y-1.5">
-                                                        {[5,4,3,2,1].map(star => {
+                                                        {[5, 4, 3, 2, 1].map(star => {
                                                             const count = reviews.filter(r => r.rating === star).length;
                                                             const pct = reviews.length > 0 ? (count / reviews.length) * 100 : 0;
                                                             return (
@@ -798,15 +845,15 @@ export default function CourtsDetails() {
                                                             <div className="flex items-center gap-2.5">
                                                                 <div className="w-8 h-8 rounded-xl bg-[#8CE600] text-gray-950 flex items-center justify-center text-[11px] font-black shrink-0">{r.userInitials}</div>
                                                                 <div>
-                                                                    <p className="font-bold text-sm text-gray-900 dark:text-white leading-tight">{r.userName}</p>
-                                                                    <p className="text-[10px] text-gray-400">
+                                                                    <p className="font-bold text-sm text-gray-900 dark:text-white">{r.userName}</p>
+                                                                    <p className="text-[10px] text-gray-500 dark:text-gray-400">
                                                                         {format(new Date(r.createdAt), "dd 'de' MMM yyyy", { locale: ptBR })}
                                                                     </p>
                                                                 </div>
                                                             </div>
                                                             <div className="flex gap-0.5">
-                                                                {[1,2,3,4,5].map(n => (
-                                                                    <Star key={n} className="w-3 h-3" fill={n <= r.rating ? '#8CE600' : 'none'} stroke={n <= r.rating ? '#8CE600' : 'currentColor'} strokeWidth={1.5} />
+                                                                {[1, 2, 3, 4, 5].map(n => (
+                                                                    <Star key={n} className="w-3.5 h-3.5" fill={n <= r.rating ? '#8CE600' : 'none'} stroke={n <= r.rating ? '#8CE600' : 'currentColor'} strokeWidth={1.5} />
                                                                 ))}
                                                             </div>
                                                         </div>
@@ -817,6 +864,40 @@ export default function CourtsDetails() {
                                         </div>
                                     </div>
                                 )}
+
+                                {/* CPF Modal */}
+                                {isCpfModalOpen && (
+                                    <div className="fixed inset-0 z-[200] flex items-center justify-center p-4">
+                                        <div
+                                            className="absolute inset-0 bg-black/60 backdrop-blur-sm"
+                                            onClick={() => setIsCpfModalOpen(false)}
+                                        />
+                                        <div className="relative z-10 w-full max-w-sm flex flex-col bg-white dark:bg-background rounded-3xl border border-gray-100 dark:border-white/10 shadow-2xl p-6 text-center animate-in zoom-in-95 duration-200">
+                                            <div className="w-16 h-16 mx-auto bg-amber-100 dark:bg-amber-900/30 text-amber-600 dark:text-amber-400 rounded-full flex items-center justify-center mb-4">
+                                                <Shield className="w-8 h-8" />
+                                            </div>
+                                            <h2 className="text-xl font-black tracking-tight text-gray-900 dark:text-white mb-2">{t('details.cpfModal.title')}</h2>
+                                            <p className="text-sm text-gray-600 dark:text-gray-400 mb-6">
+                                                {t('details.cpfModal.description')}
+                                            </p>
+                                            <div className="flex flex-col gap-2">
+                                                <button
+                                                    onClick={() => navigate('/lz_user/profile')}
+                                                    className="w-full py-3 rounded-xl font-black text-sm uppercase tracking-widest bg-[#8CE600] text-gray-950 hover:bg-[#7bc900] transition-colors"
+                                                >
+                                                    {t('details.cpfModal.completeProfile')}
+                                                </button>
+                                                <button
+                                                    onClick={() => setIsCpfModalOpen(false)}
+                                                    className="w-full py-3 rounded-xl font-bold text-sm text-gray-500 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-white/5 transition-colors"
+                                                >
+                                                    {t('details.cpfModal.cancel')}
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                )}
+
                             </>
                         )}
 
@@ -849,7 +930,7 @@ export default function CourtsDetails() {
                                 }} className="bg-gray-50 dark:bg-background/50 rounded-3xl p-5 border border-gray-100 dark:border-white/10 space-y-4">
                                     <div className="flex items-center gap-1">
                                         <p className="text-sm font-bold text-gray-700 dark:text-gray-300 mr-2">{t('details.yourRating')}</p>
-                                        {[1,2,3,4,5].map(n => (
+                                        {[1, 2, 3, 4, 5].map(n => (
                                             <button key={n} type="button"
                                                 onMouseEnter={() => setReviewHover(n)}
                                                 onMouseLeave={() => setReviewHover(0)}
