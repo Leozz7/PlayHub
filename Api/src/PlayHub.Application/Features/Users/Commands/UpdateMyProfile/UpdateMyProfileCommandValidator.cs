@@ -14,11 +14,11 @@ public class UpdateMyProfileCommandValidator : AbstractValidator<UpdateMyProfile
 
         RuleFor(x => x.Email)
             .NotEmpty().WithMessage("E-mail é obrigatório.")
-            .EmailAddress().WithMessage("Formato de e-mail inválido.");
+            .EmailAddress().WithMessage("E-mail inválido.");
 
         RuleFor(x => x.Cpf)
             .Must(x => string.IsNullOrWhiteSpace(x) || x.IsValidCpf())
-            .WithMessage("O CPF informado é inválido.");
+            .WithMessage("CPF inválido.");
             
         RuleFor(x => x.Phone)
             .Matches(@"^\d+$")
