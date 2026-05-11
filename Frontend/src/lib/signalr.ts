@@ -3,24 +3,20 @@ import * as signalR from '@microsoft/signalr';
 class SignalRService {
   public connection: signalR.HubConnection | null = null;
   private url = import.meta.env.VITE_SIGNALR_URL || 'http://localhost:5000/hubs/playhub';
-  private currentToken: string | null = null;
 
-  public startConnection = async (token: string) => {
+  public startConnection = async () => {
     if (this.connection && 
-        this.connection.state === signalR.HubConnectionState.Connected && 
-        this.currentToken === token) {
+        this.connection.state === signalR.HubConnectionState.Connected) {
       return;
     }
 
-    if (this.currentToken && this.currentToken !== token) {
+    if (this.connection) {
       await this.stopConnection();
     }
 
-    this.currentToken = token;
-
     this.connection = new signalR.HubConnectionBuilder()
       .withUrl(this.url, {
-        accessTokenFactory: () => token,
+        withCredentials: true
       })
       .withAutomaticReconnect([0, 2000, 10000, 30000])
       .configureLogging(signalR.LogLevel.Information)
@@ -31,9 +27,7 @@ class SignalRService {
       console.log('SignalR Connected');
     } catch (err) {
       console.error('SignalR Connection Error: ', err);
-      if (this.currentToken === token) {
-        setTimeout(() => this.startConnection(token), 5000);
-      }
+      setTimeout(() => this.startConnection(), 5000);
     }
   };
 
@@ -46,7 +40,6 @@ class SignalRService {
         console.error('Error stopping SignalR: ', err);
       } finally {
         this.connection = null;
-        this.currentToken = null;
       }
     }
   }

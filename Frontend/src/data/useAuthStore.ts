@@ -5,26 +5,29 @@ import { useFavoritesStore } from './useFavoritesStore';
 
 interface AuthState {
   user: User | null;
-  token: string | null;
-  setAuth: (user: User, token: string) => void;
-  logout: () => void;
   isAuthenticated: boolean;
+  setAuth: (user: User) => void;
+  updateUser: (user: User) => void;
+  logout: () => void;
 }
 
 export const useAuthStore = create<AuthState>()(
   persist(
     (set) => ({
       user: null,
-      token: null,
       isAuthenticated: false,
-      setAuth: (user, token) => set({ user, token, isAuthenticated: true }),
+      setAuth: (user) => set({ user, isAuthenticated: true }),
+      updateUser: (user) => set({ user }),
       logout: () => {
-        set({ user: null, token: null, isAuthenticated: false });
+        set({ user: null, isAuthenticated: false });
         useFavoritesStore.getState().clear();
       },
     }),
     {
       name: 'playhub-auth',
+      partialize: (state) => ({
+        isAuthenticated: state.isAuthenticated,
+      }),
     }
   )
 );
