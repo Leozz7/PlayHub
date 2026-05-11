@@ -1,9 +1,9 @@
 "use client"
 
 import * as React from "react"
-import { format, parseISO, isValid, addMonths, subMonths, setYear, setMonth, startOfMonth, endOfMonth, eachDayOfInterval, isSameDay, isSameMonth, setHours, setMinutes, parse } from "date-fns"
+import { format, isValid, addMonths, subMonths, setYear, setMonth, startOfMonth, endOfMonth, eachDayOfInterval, isSameDay, isSameMonth, setHours, setMinutes, parse } from "date-fns"
 import { ptBR } from "date-fns/locale"
-import { Calendar as CalendarIcon, X, ChevronLeft, ChevronRight, Clock, Check, Zap } from "lucide-react"
+import { Calendar as CalendarIcon, ChevronLeft, ChevronRight, Clock, Check, Zap } from "lucide-react"
 import { motion, AnimatePresence } from "framer-motion"
 
 import { cn } from "@/lib/utils"

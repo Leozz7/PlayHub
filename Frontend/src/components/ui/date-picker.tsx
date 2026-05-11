@@ -3,7 +3,7 @@
 import * as React from "react"
 import { format, parseISO, isValid, addMonths, subMonths, setYear, setMonth, startOfMonth, endOfMonth, eachDayOfInterval, isSameDay, isSameMonth, parse } from "date-fns"
 import { ptBR } from "date-fns/locale"
-import { Calendar as CalendarIcon, X, ChevronLeft, ChevronRight, CalendarDays, Layers, Zap, Keyboard } from "lucide-react"
+import { Calendar as CalendarIcon, X, ChevronLeft, ChevronRight, Zap } from "lucide-react"
 import { motion, AnimatePresence } from "framer-motion"
 
 import { cn } from "@/lib/utils"

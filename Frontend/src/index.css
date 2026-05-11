@@ -71,9 +71,6 @@
 @layer base {
   * {
     @apply border-border;
-    transition-property: background-color, border-color, color, fill, stroke, box-shadow;
-    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
-    transition-duration: 300ms;
   }
 
   body {
@@ -113,3 +110,7 @@
     background-color: rgba(140, 230, 0, 0.4);
   }
 }
+.perspective-1000 { perspective: 1000px; }
+.transform-style-3d { transform-style: preserve-3d; }
+.backface-hidden { backface-visibility: hidden; }
+.rotate-y-180 { transform: rotateY(180deg); }
