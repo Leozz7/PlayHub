@@ -11,7 +11,7 @@ import { usePlayHubToast } from '@/hooks/usePlayHubToast';
 
 export default function GestorSettings() {
   const { t } = useTranslation();
-  const { user, setAuth, token } = useAuthStore();
+  const { user, updateUser } = useAuthStore();
   const { theme, setTheme } = useTheme();
   const phToast = usePlayHubToast();
 
@@ -26,16 +26,15 @@ export default function GestorSettings() {
   });
 
   const handleSave = () => {
-    setSaving(true);
-    // Simulate API call
+    setSaving(true);    
     setTimeout(() => {
-      if (user && token) {
-        setAuth({
+      if (user) {
+        updateUser({
           ...user,
           name: formData.name,
           phone: formData.phone,
           cpf: formData.cpf
-        }, token);
+        });
       }
       phToast.success(t('gestor.settings.saveSuccess'));
       setSaving(false);
@@ -43,39 +42,29 @@ export default function GestorSettings() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-background">
-      {/* Header Section */}
-      <div className="bg-white dark:bg-white/[0.02] border-b border-gray-100 dark:border-white/5 pt-12 pb-12">
-        <div className="max-w-[1400px] mx-auto px-8">
-          <div className="flex flex-col md:flex-row md:items-end justify-between gap-8">
-            <div className="space-y-2">
-              <div className="flex items-center gap-2">
-                <div className="w-8 h-8 rounded-xl bg-gray-500/10 flex items-center justify-center">
-                  <Settings className="w-4 h-4 text-gray-500" />
-                </div>
-                <span className="text-[10px] font-black uppercase tracking-widest text-gray-500">{t('gestor.sidebar.settings')}</span>
-              </div>
-              <h1 className="text-4xl font-black tracking-tight text-gray-900 dark:text-white">
-                {t('gestor.settings.title')}
-              </h1>
-              <p className="text-gray-500 dark:text-gray-400 text-sm max-w-lg">
-                {t('gestor.settings.subtitle')}
-              </p>
+    <div className="p-8 space-y-8 animate-in fade-in duration-700">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
+        <div>
+          <h1 className="text-3xl font-black tracking-tight text-gray-900 dark:text-white mb-2 flex items-center gap-3">
+            <div className="w-12 h-12 rounded-2xl bg-[#8CE600]/10 border border-[#8CE600]/20 flex items-center justify-center text-[#8CE600]">
+              <Settings className="w-6 h-6" />
             </div>
-
-            <Button onClick={handleSave} disabled={saving} className="bg-[#8CE600] hover:bg-[#7bc400] text-gray-950 px-8 py-6 rounded-2xl font-black tracking-widest text-xs shadow-lg shadow-[#8CE600]/20 flex items-center gap-2 transition-all hover:scale-105">
-              {saving ? (
-                 <div className="w-4 h-4 border-2 border-gray-950/20 border-t-gray-950 rounded-full animate-spin" />
-              ) : <CheckCircle2 className="w-4 h-4" />}
-              {saving ? t('gestor.settings.saving') : t('gestor.settings.save')}
-            </Button>
-          </div>
+            {t('gestor.settings.title')}
+          </h1>
+          <p className="text-gray-500 dark:text-gray-400">
+            {t('gestor.settings.subtitle')}
+          </p>
         </div>
+
+        <Button onClick={handleSave} disabled={saving} className="bg-[#8CE600] hover:bg-[#7bc400] text-gray-950 px-8 py-6 rounded-2xl font-black tracking-widest text-xs shadow-lg shadow-[#8CE600]/20 flex items-center gap-2 transition-all hover:scale-105">
+          {saving ? (
+             <div className="w-4 h-4 border-2 border-gray-950/20 border-t-gray-950 rounded-full animate-spin" />
+          ) : <CheckCircle2 className="w-4 h-4" />}
+          {saving ? t('gestor.settings.saving') : t('gestor.settings.save')}
+        </Button>
       </div>
 
-      {/* Main Content */}
-      <div className="max-w-[1400px] mx-auto px-8 py-12">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           {/* Profile Form */}
           <div className="bg-white dark:bg-white/[0.02] border border-gray-100 dark:border-white/5 rounded-[2rem] p-8 shadow-xl shadow-gray-200/20 dark:shadow-black/20">
             <div className="flex items-center gap-3 mb-8">
@@ -159,7 +148,6 @@ export default function GestorSettings() {
               </div>
             </div>
           </div>
-        </div>
       </div>
     </div>
   );
