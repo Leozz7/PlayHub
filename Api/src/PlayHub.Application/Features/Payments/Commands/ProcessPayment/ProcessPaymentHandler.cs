@@ -12,10 +12,12 @@ namespace PlayHub.Application.Features.Payments.Commands.ProcessPayment;
 public class ProcessPaymentHandler : IRequestHandler<ProcessPaymentCommand, bool>
 {
     private readonly IApplicationDbContext _context;
+    private readonly ICurrentUserService _currentUserService;
 
-    public ProcessPaymentHandler(IApplicationDbContext context)
+    public ProcessPaymentHandler(IApplicationDbContext context, ICurrentUserService currentUserService)
     {
         _context = context;
+        _currentUserService = currentUserService;
     }
 
     public async Task<bool> Handle(ProcessPaymentCommand request, CancellationToken cancellationToken)
@@ -25,6 +27,23 @@ public class ProcessPaymentHandler : IRequestHandler<ProcessPaymentCommand, bool
 
         if (payment == null)
             return false;
+
+        if (!_currentUserService.IsAdmin)
+        {
+            if (_currentUserService.IsManager)
+            {
+                var authReservation = await _context.Reservations
+                    .Find(r => r.Id == payment.ReservationId)
+                    .FirstOrDefaultAsync(cancellationToken);
+
+                if (authReservation == null || !_currentUserService.IsAuthorizedForCourt(authReservation.CourtId))
+                    return false;
+            }
+            else if (payment.UserId != _currentUserService.UserId)
+            {
+                return false;
+            }
+        }
 
         payment.ProcessPayment(request.TransactionId, request.PaymentDate);
 

@@ -81,14 +81,14 @@ public class GetSystemLogsWithPaginationHandler : IRequestHandler<GetSystemLogsW
                 else if (props.Contains("RequestIp")) ipAddress = props["RequestIp"].ToString();
             }
 
-            // Fallback: tenta no root caso o sink esteja configurado diferente
+            // fallback: tenta no root caso o sink esteja configurado diferente
             if (string.IsNullOrEmpty(ipAddress))
             {
                 if (log.Contains("ClientIp")) ipAddress = log["ClientIp"].ToString();
                 else if (log.Contains("RemoteIpAddress")) ipAddress = log["RemoteIpAddress"].ToString();
             }
 
-            // Simplificar o Source (pegar apenas o nome da classe)
+            // simplifica o source
             if (source != null && source.Contains('.'))
             {
                 source = source.Split('.').Last();

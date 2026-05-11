@@ -62,6 +62,13 @@ export default function BookingConfirmation() {
     const [isSlotTaken, setIsSlotTaken] = useState(false);
     const phToast = usePlayHubToast();
 
+    // Card States
+    const [cardNumber, setCardNumber] = useState('');
+    const [cardName, setCardName] = useState('');
+    const [cardExpiry, setCardExpiry] = useState('');
+    const [cardCvv, setCardCvv] = useState('');
+    const [isFlipped, setIsFlipped] = useState(false);
+
     useEffect(() => {
         const connection = signalRService.connection;
         if (!connection || !state) return;
@@ -70,9 +77,9 @@ export default function BookingConfirmation() {
             if (data.courtId === state.court.id) {
                 // Verificar se o horário reservado conflita com os slots selecionados
                 const reservedDate = new Date(data.startTime);
-                const reservedHour = reservedDate.getUTCHours();
-                const reservedDateStr = reservedDate.toISOString().split('T')[0];
-                const stateDateStr = new Date(state.date).toISOString().split('T')[0];
+                const reservedHour = reservedDate.getHours();
+                const reservedDateStr = format(reservedDate, 'yyyy-MM-dd');
+                const stateDateStr = format(new Date(state.date), 'yyyy-MM-dd');
 
                 if (reservedDateStr === stateDateStr && state.slots.includes(reservedHour)) {
                     setIsSlotTaken(true);
@@ -111,6 +118,33 @@ export default function BookingConfirmation() {
     const { court, date, slots } = state;
     const dateObj = new Date(date);
     const total   = slots.length * court.price;
+
+    const formatCardNumber = (value: string) => {
+        const v = value.replace(/\s+/g, '').replace(/[^0-9]/gi, '');
+        const matches = v.match(/\d{4,16}/g);
+        const match = matches && matches[0] || '';
+        const parts = [];
+        for (let i = 0, len = match.length; i < len; i += 4) {
+            parts.push(match.substring(i, i + 4));
+        }
+        if (parts.length) return parts.join(' ');
+        return value;
+    };
+
+    const formatExpiry = (value: string) => {
+        return value
+            .replace(/[^0-9]/g, '')
+            .replace(/^([2-9])/, '0$1')
+            .replace(/^(0[1-9]|1[0-2])([0-9])/, '$1/$2')
+            .replace(/^(0[1-9]|1[0-2])\/([0-9]{0,2}).*/, '$1/$2');
+    };
+
+    const getCardType = (number: string) => {
+        if (number.startsWith('4')) return 'Visa';
+        if (number.startsWith('5')) return 'Mastercard';
+        if (number.startsWith('3')) return 'American Express';
+        return 'Card';
+    };
 
     if (confirmed) {
         return (
@@ -202,10 +236,10 @@ export default function BookingConfirmation() {
             const lastSlot = sortedSlots[sortedSlots.length - 1];
 
             const start = new Date(date);
-            start.setUTCHours(firstSlot, 0, 0, 0);
+            start.setHours(firstSlot, 0, 0, 0);
 
             const end = new Date(date);
-            end.setUTCHours(lastSlot + 1, 0, 0, 0);
+            end.setHours(lastSlot + 1, 0, 0, 0);
 
             const payload = {
                 courtId: court.id,
@@ -452,58 +486,109 @@ export default function BookingConfirmation() {
                                                 </div>
                                             </div>
                                         ) : (
-                                            <div className="animate-in fade-in slide-in-from-top-2 space-y-3.5">
-                                                <div className="space-y-1.5">
-                                                    <label className="text-[10px] font-bold uppercase tracking-widest text-gray-500 dark:text-gray-400 ml-1">
-                                                        Número do Cartão
-                                                    </label>
-                                                    <div className="relative">
-                                                        <input 
-                                                            type="text" 
-                                                            placeholder="0000 0000 0000 0000" 
-                                                            className="w-full bg-white dark:bg-background border border-gray-200 dark:border-gray-800 focus:border-[#8CE600] rounded-xl text-sm py-3 pl-11 pr-3 transition-colors outline-none text-gray-900 dark:text-white shadow-sm"
-                                                        />
-                                                        <CreditCard className="w-5 h-5 text-gray-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+                                            <div className="animate-in fade-in slide-in-from-top-2 space-y-4">
+                                                {/* Visual Card Preview */}
+                                                <div className="perspective-1000 w-full h-40 mt-2 mb-4 group">
+                                                    <div className={`relative w-full h-full transition-transform duration-500 transform-style-3d ${isFlipped ? 'rotate-y-180' : ''}`}>
+                                                        {/* Front */}
+                                                        <div className="absolute inset-0 w-full h-full bg-gradient-to-br from-gray-900 to-gray-800 dark:from-black dark:to-gray-900 rounded-2xl p-6 text-white shadow-xl backface-hidden flex flex-col justify-between border border-white/10">
+                                                            <div className="flex justify-between items-start">
+                                                                <div className="w-10 h-7 bg-amber-400/80 rounded-md opacity-80" />
+                                                                <span className="text-xs font-black italic opacity-60 uppercase tracking-widest">{getCardType(cardNumber)}</span>
+                                                            </div>
+                                                            <div className="text-lg font-mono tracking-[0.2em] py-2">
+                                                                {cardNumber || '•••• •••• •••• ••••'}
+                                                            </div>
+                                                            <div className="flex justify-between items-end">
+                                                                <div className="flex flex-col">
+                                                                    <span className="text-[8px] uppercase opacity-50 font-black">{t('confirmation.cardHolder')}</span>
+                                                                    <span className="text-xs font-bold truncate max-w-[150px] uppercase">{cardName || 'NOME NO CARTÃO'}</span>
+                                                                </div>
+                                                                <div className="flex flex-col items-end">
+                                                                    <span className="text-[8px] uppercase opacity-50 font-black">{t('confirmation.expires')}</span>
+                                                                    <span className="text-xs font-bold">{cardExpiry || 'MM/AA'}</span>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        {/* Back */}
+                                                        <div className="absolute inset-0 w-full h-full bg-gradient-to-br from-gray-800 to-gray-900 dark:from-gray-900 dark:to-black rounded-2xl text-white shadow-xl rotate-y-180 backface-hidden flex flex-col justify-between border border-white/10 py-6">
+                                                            <div className="w-full h-10 bg-black/50" />
+                                                            <div className="px-6 flex flex-col items-end gap-2">
+                                                                <span className="text-[8px] uppercase opacity-50 font-black">CVV</span>
+                                                                <div className="w-12 h-8 bg-white/10 rounded-md flex items-center justify-center font-mono text-sm">
+                                                                    {cardCvv || '•••'}
+                                                                </div>
+                                                            </div>
+                                                            <div className="px-6 text-[8px] opacity-30 font-medium">
+                                                                Este cartão é para uso exclusivo em transações autorizadas pela rede PlayHub.
+                                                            </div>
+                                                        </div>
                                                     </div>
                                                 </div>
-                                                <div className="space-y-1.5">
-                                                    <label className="text-[10px] font-bold uppercase tracking-widest text-gray-500 dark:text-gray-400 ml-1">
-                                                        Nome Impresso
-                                                    </label>
-                                                    <input 
-                                                        type="text" 
-                                                        placeholder="NOME NO CARTÃO" 
-                                                        className="w-full bg-white dark:bg-background border border-gray-200 dark:border-gray-800 focus:border-[#8CE600] rounded-xl text-sm py-3 px-4 transition-colors outline-none text-gray-900 dark:text-white uppercase shadow-sm"
-                                                    />
-                                                </div>
-                                                <div className="grid grid-cols-2 gap-3">
+
+                                                <div className="space-y-4">
                                                     <div className="space-y-1.5">
-                                                        <label className="text-[10px] font-bold uppercase tracking-widest text-gray-500 dark:text-gray-400 ml-1">
-                                                            Validade
+                                                        <label className="text-[10px] font-black uppercase tracking-widest text-gray-400 ml-1">
+                                                            {t('confirmation.cardNumber', 'Número do Cartão')}
+                                                        </label>
+                                                        <div className="relative group">
+                                                            <input 
+                                                                type="text" 
+                                                                placeholder="0000 0000 0000 0000" 
+                                                                value={cardNumber}
+                                                                onChange={(e) => setCardNumber(formatCardNumber(e.target.value).substring(0, 19))}
+                                                                onFocus={() => setIsFlipped(false)}
+                                                                className="w-full bg-white dark:bg-background border border-gray-200 dark:border-gray-800 focus:border-[#8CE600] rounded-2xl text-sm py-4 pl-12 pr-4 transition-all outline-none text-gray-900 dark:text-white shadow-sm font-mono focus:ring-4 focus:ring-[#8CE600]/10"
+                                                            />
+                                                            <CreditCard className="w-5 h-5 text-gray-400 absolute left-4 top-1/2 -translate-y-1/2 group-focus-within:text-[#8CE600] transition-colors" />
+                                                        </div>
+                                                    </div>
+
+                                                    <div className="space-y-1.5">
+                                                        <label className="text-[10px] font-black uppercase tracking-widest text-gray-400 ml-1">
+                                                            {t('confirmation.cardName', 'Nome no Cartão')}
                                                         </label>
                                                         <input 
                                                             type="text" 
-                                                            placeholder="MM/AA" 
-                                                            className="w-full bg-white dark:bg-background border border-gray-200 dark:border-gray-800 focus:border-[#8CE600] rounded-xl text-sm py-3 px-4 transition-colors outline-none text-gray-900 dark:text-white shadow-sm"
+                                                            placeholder="NOME IMPRESSO" 
+                                                            value={cardName}
+                                                            onChange={(e) => setCardName(e.target.value.toUpperCase())}
+                                                            onFocus={() => setIsFlipped(false)}
+                                                            className="w-full bg-white dark:bg-background border border-gray-200 dark:border-gray-800 focus:border-[#8CE600] rounded-2xl text-sm py-4 px-5 transition-all outline-none text-gray-900 dark:text-white uppercase shadow-sm font-bold tracking-wider focus:ring-4 focus:ring-[#8CE600]/10"
                                                         />
                                                     </div>
-                                                    <div className="space-y-1.5">
-                                                        <label className="text-[10px] font-bold uppercase tracking-widest text-gray-500 dark:text-gray-400 ml-1">
-                                                            CVV
-                                                        </label>
-                                                        <input 
-                                                            type="text" 
-                                                            placeholder="123" 
-                                                            maxLength={4}
-                                                            className="w-full bg-white dark:bg-background border border-gray-200 dark:border-gray-800 focus:border-[#8CE600] rounded-xl text-sm py-3 px-4 transition-colors outline-none text-gray-900 dark:text-white shadow-sm"
-                                                        />
+
+                                                    <div className="grid grid-cols-2 gap-4">
+                                                        <div className="space-y-1.5">
+                                                            <label className="text-[10px] font-black uppercase tracking-widest text-gray-400 ml-1">
+                                                                {t('confirmation.cardExpiry', 'Validade')}
+                                                            </label>
+                                                            <input 
+                                                                type="text" 
+                                                                placeholder="MM/AA" 
+                                                                value={cardExpiry}
+                                                                onChange={(e) => setCardExpiry(formatExpiry(e.target.value))}
+                                                                onFocus={() => setIsFlipped(false)}
+                                                                maxLength={5}
+                                                                className="w-full bg-white dark:bg-background border border-gray-200 dark:border-gray-800 focus:border-[#8CE600] rounded-2xl text-sm py-4 px-5 transition-all outline-none text-gray-900 dark:text-white shadow-sm font-bold focus:ring-4 focus:ring-[#8CE600]/10"
+                                                            />
+                                                        </div>
+                                                        <div className="space-y-1.5">
+                                                            <label className="text-[10px] font-black uppercase tracking-widest text-gray-400 ml-1">
+                                                                CVV
+                                                            </label>
+                                                            <input 
+                                                                type="text" 
+                                                                placeholder="123" 
+                                                                value={cardCvv}
+                                                                onChange={(e) => setCardCvv(e.target.value.replace(/[^0-9]/g, '').substring(0, 4))}
+                                                                onFocus={() => setIsFlipped(true)}
+                                                                onBlur={() => setIsFlipped(false)}
+                                                                maxLength={4}
+                                                                className="w-full bg-white dark:bg-background border border-gray-200 dark:border-gray-800 focus:border-[#8CE600] rounded-2xl text-sm py-4 px-5 transition-all outline-none text-gray-900 dark:text-white shadow-sm font-bold focus:ring-4 focus:ring-[#8CE600]/10"
+                                                            />
+                                                        </div>
                                                     </div>
-                                                </div>
-                                                <div className="flex items-center gap-2.5 pt-2 ml-1">
-                                                    <input type="checkbox" id="save-card" className="rounded-sm text-[#8CE600] focus:ring-[#8CE600] bg-white dark:bg-background border-gray-300 dark:border-gray-700 w-4 h-4 cursor-pointer" />
-                                                    <label htmlFor="save-card" className="text-xs text-gray-600 dark:text-gray-400 cursor-pointer font-medium select-none">
-                                                        Salvar cartão para a próxima reserva
-                                                    </label>
                                                 </div>
                                             </div>
                                         )}

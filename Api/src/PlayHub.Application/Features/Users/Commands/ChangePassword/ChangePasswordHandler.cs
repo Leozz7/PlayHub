@@ -25,6 +25,9 @@ public class ChangePasswordHandler : IRequestHandler<ChangePasswordCommand, bool
         if (user == null)
             return false;
 
+        if (!_passwordHasher.Verify(request.CurrentPassword, user.PasswordHash))
+            return false;
+
         var newHash = _passwordHasher.Hash(request.NewPassword);
         user.SetNewPasswordHash(newHash);
         user.RevokeRefreshToken();

@@ -15,5 +15,7 @@ public class PaymentDto
     public PaymentMethod Method { get; set; }
     public DateTime? PaymentDate { get; set; }
     public string? TransactionId { get; set; }
+    public string? CourtName { get; set; }
+    public string? CourtSport { get; set; }
     public DateTime Created { get; set; }
 }
