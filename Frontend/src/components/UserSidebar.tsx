@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useCallback, useMemo } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import {
@@ -39,7 +39,7 @@ export function UserSidebar() {
   const { user, logout } = useAuthStore();
   const phToast = usePlayHubToast();
 
-  const NAV_SECTIONS: { title: string; items: NavItem[] }[] = [
+  const NAV_SECTIONS: { title: string; items: NavItem[] }[] = useMemo(() => [
     {
       title: t('user.sidebar.sections.general'),
       items: [
@@ -63,7 +63,9 @@ export function UserSidebar() {
         { label: t('user.sidebar.items.settings'), icon: Settings, href: '/config' },
       ],
     },
-  ];
+  ], [t]);
+
+  const toggleCollapsed = useCallback(() => setCollapsed(prev => !prev), []);
 
   const handleLogout = () => {
     logout();
@@ -80,7 +82,7 @@ export function UserSidebar() {
       <div className="absolute top-0 left-0 right-0 h-64 bg-gradient-to-b from-[#8CE600]/5 to-transparent pointer-events-none" />
 
       <button
-        onClick={() => setCollapsed(!collapsed)}
+        onClick={toggleCollapsed}
         className="absolute -right-3 top-6 z-20 w-6 h-6 rounded-full bg-white dark:bg-card border border-gray-200 dark:border-white/10 flex items-center justify-center shadow-md hover:shadow-lg hover:border-[#8CE600]/50 transition-all duration-300 group"
         aria-label={collapsed ? t('user.sidebar.expand') : t('user.sidebar.collapse')}
       >

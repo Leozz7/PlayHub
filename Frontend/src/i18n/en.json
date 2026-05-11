@@ -3,6 +3,9 @@
     "cover": "Cover",
     "other": "Other",
     "user": "User",
+    "at": "at",
+    "close": "Close",
+    "confirm": "Confirm",
     "actions": {
       "login": "Login",
       "register": "Create Account",
@@ -700,7 +703,9 @@
     "successDesc1": "Your booking at",
     "successDesc2": "for",
     "successDesc3": "was successfully placed. You will receive a confirmation email shortly.",
-    "emailNotice": "A receipt has been sent to your registered email address."
+    "emailNotice": "A receipt has been sent to your registered email address.",
+    "cardHolder": "Card Holder",
+    "expires": "Expires"
   },
   "forgotPassword": {
     "title": "Recover password",
@@ -1115,6 +1120,91 @@
         "previous": "Previous",
         "next": "Next"
       }
+    },
+    "payments": {
+      "title": "Financial Management",
+      "subtitle": "Track and manage booking payments.",
+      "stats": {
+        "totalRevenue": "Total Revenue",
+        "pending": "Pending Payments",
+        "approved": "Approved Payments",
+        "failed": "Failures / Refunds"
+      },
+      "filters": {
+        "searchPlaceholder": "Search by ID or Transaction...",
+        "statusPlaceholder": "Status",
+        "allStatus": "All Status",
+        "pending": "Pending",
+        "approved": "Approved",
+        "failed": "Failed",
+        "refunded": "Refunded"
+      },
+      "table": {
+        "id": "ID",
+        "transaction": "Transaction",
+        "method": "Method",
+        "dateTime": "Date & Time",
+        "amount": "Amount",
+        "status": "Status",
+        "actions": "Actions"
+      },
+      "status": {
+        "pending": "Pending",
+        "approved": "Approved",
+        "failed": "Failed",
+        "refunded": "Refunded",
+        "unknown": "Unknown"
+      },
+      "methods": {
+        "credit": "Credit Card",
+        "debit": "Debit Card",
+        "pix": "PIX",
+        "cash": "Cash",
+        "other": "Other"
+      },
+      "modal": {
+        "processTitle": "Process Payment",
+        "processDesc": "Enter the gateway transaction ID to approve this payment manually.",
+        "transactionId": "Transaction ID",
+        "confirmBtn": "Approve Payment",
+        "deleteTitle": "Delete Record",
+        "deleteDesc": "Are you sure you want to remove the payment record for {{amount}}? This action cannot be undone.",
+        "detailsTitle": "Payment Details",
+        "detailsDesc": "Complete information about the transaction and associated booking.",
+        "sections": {
+          "reservation": "Booking Information",
+          "payment": "Payment Information",
+          "customer": "Customer Information"
+        },
+        "labels": {
+          "court": "Court / Arena",
+          "sport": "Sport",
+          "schedule": "Reserved Time",
+          "customer": "Customer",
+          "cpfPhone": "CPF / Phone",
+          "methodId": "Method & Payment ID",
+          "date": "Payment Date",
+          "reservationId": "Booking ID"
+        }
+      },
+      "toasts": {
+        "processSuccess": "Payment processed successfully!",
+        "processError": "Error processing payment.",
+        "deleteSuccess": "Record deleted successfully!",
+        "deleteError": "Error deleting record."
+      },
+      "messages": {
+        "processSuccessTitle": "Payment Processed",
+        "processSuccessMsg": "The payment has been confirmed and the booking is now active.",
+        "processErrorTitle": "Processing Error",
+        "processErrorMsg": "Could not confirm this payment at this time.",
+        "deleteSuccessTitle": "Record Removed",
+        "deleteSuccessMsg": "The financial record has been permanently deleted.",
+        "deleteErrorTitle": "Deletion Error",
+        "deleteErrorMsg": "Could not remove this financial record.",
+        "deleteConfirmTitle": "Delete Record?",
+        "deleteConfirmDesc": "This action will permanently remove this financial record from the system. This may affect your reports."
+      }
     }
   },
   "gestor": {
@@ -1138,6 +1228,7 @@
     },
     "dashboard": {
       "greeting": "Manager Panel, {{name}}",
+      "subtitle": "Manage your courts, schedules and track your performance in real time.",
       "managerBadge": "Manager",
       "newCourt": "New Court",
       "stats": {
@@ -1182,7 +1273,13 @@
         "clients": "Clients today"
       },
       "quickActions": "Quick Actions",
-      "quickActionsDesc": "Manage your courts with agility"
+      "quickActionsDesc": "Manage your courts with agility",
+      "emptyState": {
+        "title": "No recent reservations",
+        "subtitle": "When there are reservations for your courts, they will appear here.",
+        "scheduleTitle": "Free schedule today",
+        "scheduleSubtitle": "No confirmed reservations for today."
+      }
     },
     "schedule": {
       "title": "Courts Schedule",
@@ -1347,6 +1444,12 @@
     "reservations": {
       "title": "Booking Management",
       "subtitle": "View and manage all bookings for your courts.",
+      "stats": {
+        "total": "Total Bookings",
+        "confirmed": "Confirmed",
+        "pending": "Pending",
+        "revenue": "Revenue"
+      },
       "searchPlaceholder": "Search by client, court or ID...",
       "allCourts": "All Courts",
       "allStatuses": "All Statuses",
@@ -1377,14 +1480,22 @@
       "occupancy": "Occupancy Rate",
       "totalReservations": "Total Bookings",
       "uniqueClients": "Active Clients",
+      "avgTicket": "Average Ticket",
       "revenueByCourt": "Revenue by Court",
       "reservationsByDay": "Bookings by Day",
       "courtPerformance": "Court Performance",
-      "generatingPdf": "Generating PDF..."
+      "generatingPdf": "Generating PDF...",
+      "comingSoon": "Coming soon"
     },
     "clients": {
       "title": "My Clients",
       "subtitle": "View the clients who use your courts and their history.",
+      "stats": {
+        "total": "Total Clients",
+        "new": "New Clients",
+        "revenue": "Revenue per Client",
+        "avg": "Average Ticket"
+      },
       "searchPlaceholder": "Search by name or email...",
       "table": {
         "name": "Client",
@@ -1400,6 +1511,12 @@
     "payments": {
       "title": "Financial Control",
       "subtitle": "Track payments and receivables for your courts.",
+      "stats": {
+        "revenue": "Total Revenue",
+        "pending": "Pending Revenue",
+        "successful": "Successful",
+        "failed": "Failed"
+      },
       "searchPlaceholder": "Search by transaction ID or client...",
       "allMethods": "All Methods",
       "table": {
@@ -1411,7 +1528,35 @@
         "status": "Status",
         "date": "Date"
       },
-      "noResults": "No payments found"
+      "noResults": "No payments found",
+      "methods": {
+        "credit": "Credit Card",
+        "debit": "Debit Card",
+        "pix": "PIX",
+        "cash": "Cash",
+        "other": "Other"
+      },
+      "statusLabels": {
+        "completed": "Completed",
+        "failed": "Failed",
+        "pending": "Pending"
+      },
+      "modal": {
+        "detailsTitle": "Payment Details",
+        "detailsDesc": "Complete information about the payment and booking.",
+        "labels": {
+          "status": "Status",
+          "totalAmount": "Total Amount",
+          "reservationInfo": "Booking Information",
+          "arena": "Arena / Court",
+          "schedule": "Scheduled Time",
+          "client": "Client",
+          "cpfPhone": "ID / Phone",
+          "methodId": "Method & Payment ID",
+          "date": "Payment Date",
+          "reservationId": "Booking ID"
+        }
+      }
     },
     "notifications": {
       "title": "Notification Center",

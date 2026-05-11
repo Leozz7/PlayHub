@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { Moon, Sun, User as UserIcon, LayoutDashboard, Settings, LogOut, ChevronDown, CalendarDays, Heart, ArrowUpRight, Loader2 } from 'lucide-react';
 import { useTheme } from '@/components/ui/theme-provider';
@@ -126,7 +126,6 @@ function DesktopUserMenu({ user, logout }: { user: any, logout: () => void }) {
   const phToast = usePlayHubToast();
   const initials = getInitials(user?.name);
   const favCount = useFavoritesStore(s => s.count);
-  // Sincroniza favoritos com a API ao montar o menu
   useMyFavorites();
 
   const handleLogout = () => {
@@ -225,11 +224,11 @@ export function Header() {
 
   const { isAuthenticated, user, logout } = useAuthStore();
 
-  const NAV_LINKS = [
+  const NAV_LINKS = useMemo(() => [
     { label: t('footer.navigation.courts'), href: '/catalog' },
     { label: t('footer.institutional.about'), href: '/about' },
     { label: t('footer.bottom.contactUs'), href: '/contact' },
-  ];
+  ], [t]);
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 20);
@@ -241,7 +240,13 @@ export function Header() {
     setMobileOpen(false);
   }, [location]);
 
-  const toggleTheme = () => setTheme(theme === 'dark' ? 'light' : 'dark');
+  const toggleTheme = useCallback(() => setTheme(theme === 'dark' ? 'light' : 'dark'), [theme, setTheme]);
+  const toggleMobileOpen = useCallback(() => setMobileOpen(prev => !prev), []);
+  const handleLogoutAction = useCallback(() => {
+    logout();
+    phToast.logoutSuccess();
+    navigate('/login');
+  }, [logout, phToast, navigate]);
 
   return (
     <div className="fixed top-0 left-0 right-0 z-[100] flex justify-center w-full pointer-events-none pt-4 md:pt-6 px-4 transition-all duration-500">
@@ -268,14 +273,14 @@ export function Header() {
 
             <nav className="hidden md:flex items-center gap-8" aria-label="Navegação principal">
               {NAV_LINKS.map((link) => (
-                <a
+                <Link
                   key={link.label}
-                  href={link.href}
+                  to={link.href}
                   className="relative text-sm font-bold text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors group"
                 >
                   {link.label}
                   <span className="absolute -bottom-1.5 left-0 w-0 h-0.5 bg-[#8CE600] transition-all duration-300 group-hover:w-full rounded-full"></span>
-                </a>
+                </Link>
               ))}
             </nav>
 
@@ -288,7 +293,7 @@ export function Header() {
                 {theme === 'dark' ? <Sun className="h-[1.15rem] w-[1.15rem]" strokeWidth={1.5} /> : <Moon className="h-[1.15rem] w-[1.15rem]" strokeWidth={1.5} />}
               </button>
 
-              {/* Favoritos — popover estilo carrinho */}
+              {/* Favoritos */}
               {isAuthenticated && <FavoritesPopover />}
 
               <div className="w-[1px] h-6 bg-gray-200 dark:bg-gray-800 mx-1"></div>
@@ -332,7 +337,7 @@ export function Header() {
 
               <button
                 id="header-mobile-menu-btn"
-                onClick={() => setMobileOpen(!mobileOpen)}
+                onClick={toggleMobileOpen}
                 className="p-2 text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors focus:outline-none"
                 aria-label="Abrir menu"
                 aria-expanded={mobileOpen}
@@ -351,15 +356,15 @@ export function Header() {
           className={`md:hidden overflow-hidden transition-all duration-500 ease-in-out bg-white/40 dark:bg-background/40 backdrop-blur-md ${mobileOpen ? 'max-h-[500px] opacity-100 border-t border-gray-200/50 dark:border-white/10/50' : 'max-h-0 opacity-0'
             }`}
         >
-          <div className="px-6 pb-6 pt-4 flex flex-col gap-2">
+            <div className="px-6 pb-6 pt-4 flex flex-col gap-2">
             {NAV_LINKS.map((link) => (
-              <a
+              <Link
                 key={link.label}
-                href={link.href}
+                to={link.href}
                 className="px-4 py-3 text-sm font-bold text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-white/60 dark:hover:bg-white/5 hover:pl-6 rounded-xl transition-all duration-300"
               >
                 {link.label}
-              </a>
+              </Link>
             ))}
             <div className="flex flex-col gap-3 mt-4 pt-4 border-t border-gray-200/50 dark:border-white/10/50">
               {isAuthenticated ? (
@@ -384,7 +389,7 @@ export function Header() {
                     {t('header.userMenu.generalSettings', 'Configurações Gerais')}
                   </Link>
                   <button
-                    onClick={() => { logout(); phToast.logoutSuccess(); navigate('/login'); }}
+                    onClick={handleLogoutAction}
                     className="px-4 py-3 text-center text-sm font-bold text-red-600 hover:bg-red-50 dark:hover:bg-red-950/30 rounded-xl transition-all"
                   >
                     {t('common.actions.logout')}
