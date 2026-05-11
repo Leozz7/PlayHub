@@ -90,6 +90,7 @@ public class Court : BaseEntity
         State = state;
     }
 
+    // verificação de validade
     public void UpdateSchedule(int openingHour, int closingHour)
     {
         OpeningHour = openingHour;
