@@ -110,6 +110,7 @@ public class UpdateCourtHandler : IRequestHandler<UpdateCourtCommand, bool>
         return result.ModifiedCount > 0;
     }
 
+    // tirando prefixo da base64
     private string ExtractBase64(string base64WithPrefix)
     {
         if (string.IsNullOrEmpty(base64WithPrefix)) return string.Empty;

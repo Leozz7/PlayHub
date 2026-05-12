@@ -31,6 +31,7 @@ public class SubmitReviewHandler : IRequestHandler<SubmitReviewCommand, ReviewDt
             Builders<Review>.Filter.Eq(r => r.UserId, request.UserId)
         );
 
+        // verificando se o usuário ja avaliou a quadra
         var existing = await _db.Reviews.Find(existingFilter).FirstOrDefaultAsync(cancellationToken);
         if (existing != null)
             throw new ConflictException("Você já avaliou esta quadra.");
@@ -64,6 +65,7 @@ public class SubmitReviewHandler : IRequestHandler<SubmitReviewCommand, ReviewDt
         };
     }
 
+    // pegando iniciais do nome
     private static string GetInitials(string name)
     {
         if (string.IsNullOrWhiteSpace(name)) return "??";

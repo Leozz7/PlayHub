@@ -31,6 +31,7 @@ public class PasswordHasher
         return Argon2.Hash(config);
     }
 
+    // verifica se a senha esta certa
     public bool Verify(string password, string encodedHash)
     {
         return Argon2.Verify(encodedHash, password);

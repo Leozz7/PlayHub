@@ -127,4 +127,4 @@ public class User : BaseEntity
         ResetPasswordToken = null;
         ResetPasswordTokenExpiry = null;
     }
-}
+}

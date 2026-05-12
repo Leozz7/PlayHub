@@ -135,6 +135,7 @@ public class CreateCourtHandler : IRequestHandler<CreateCourtCommand, CourtDto>
         };
     }
 
+    // tirando prefixo da base64 
     private string ExtractBase64(string base64WithPrefix)
     {
         if (string.IsNullOrEmpty(base64WithPrefix)) return string.Empty;
