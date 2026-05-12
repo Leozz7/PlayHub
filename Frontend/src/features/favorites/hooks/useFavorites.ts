@@ -50,10 +50,8 @@ export function useToggleFavorite() {
       }
     },
 
-    // Optimistic update — atualiza o store instantaneamente
     onMutate: async (courtId: string) => {
-      // Cancela refetches em andamento para não sobrescrever o estado otimista
-      await queryClient.cancelQueries({ queryKey: FAVORITES_QUERY_KEY });
+      await queryClient.cancelQueries({ queryKey: [FAVORITES_QUERY_KEY] });
 
       const wasFavorite = isFavorite(courtId);
 
@@ -63,11 +61,9 @@ export function useToggleFavorite() {
         addFavorite(courtId);
       }
 
-      // Retorna o estado anterior para rollback
       return { wasFavorite };
     },
 
-    // Em caso de erro, restaura o estado anterior
     onError: (_err, courtId, context) => {
       const user = useAuthStore.getState().user;
       if (context) {
@@ -80,7 +76,6 @@ export function useToggleFavorite() {
       queryClient.invalidateQueries({ queryKey: [FAVORITES_QUERY_KEY, user?.id] });
     },
 
-    // Sempre revalida após sucesso para garantir sincronia com o servidor
     onSuccess: () => {
       const user = useAuthStore.getState().user;
       queryClient.invalidateQueries({ queryKey: [FAVORITES_QUERY_KEY, user?.id] });

@@ -56,8 +56,8 @@ export default function Register() {
 
       const response = await api.post('/auth/register', payload);
 
-      if (response.data?.accessToken && response.data?.user) {
-        setAuth(response.data.user, response.data.accessToken);
+      if (response.data?.user) {
+        setAuth(response.data.user);
         phToast.registerSuccess();
 
         if (response.data.user.role === 'Admin' || response.data.user.role === 'Manager') {
