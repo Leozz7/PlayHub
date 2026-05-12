@@ -26,17 +26,14 @@ public class CreateReservationHandler : IRequestHandler<CreateReservationCommand
 
     public async Task<ReservationDto> Handle(CreateReservationCommand request, CancellationToken cancellationToken)
     {
-        // Busca a quadra
         var court = await _context.Courts
             .Find(c => c.Id == request.CourtId)
             .FirstOrDefaultAsync(cancellationToken)
             ?? throw new NotFoundException(nameof(Court), request.CourtId);
 
-        // Disponibilidade
         if (!court.CanBeBooked())
             throw new ConflictException($"A quadra '{court.Name}' não está disponível para reservas no momento.");
 
-        // Conflito de horário
         var hasConflict = await _context.Reservations
             .Find(r => r.CourtId == request.CourtId
                     && r.Status != ReservationStatus.Cancelled
@@ -47,7 +44,7 @@ public class CreateReservationHandler : IRequestHandler<CreateReservationCommand
         if (hasConflict)
             throw new ConflictException("Esta quadra já está reservada para o horário selecionado.");
 
-        // Calculo preço
+        // calculo preço da reserva
         var totalPrice = court.CalculateTotalPrice(request.StartTime, request.EndTime);
 
         var reservation = new Reservation(
@@ -60,7 +57,7 @@ public class CreateReservationHandler : IRequestHandler<CreateReservationCommand
 
         await _context.Reservations.InsertOneAsync(reservation, cancellationToken: cancellationToken);
 
-        // SignalR
+        // notificação
         await _notificationService.NotifyReservationCreated(
             reservation.CourtId.ToString(),
             reservation.StartTime.ToString("o"));
@@ -78,6 +75,8 @@ public class CreateReservationHandler : IRequestHandler<CreateReservationCommand
             UserId      = reservation.UserId,
             UserName    = user?.Name,
             UserEmail   = user?.Email is not null ? _encryptionService.Decrypt(user.Email) : null,
+            UserPhone   = user?.Phone is not null ? _encryptionService.Decrypt(user.Phone) : null,
+            UserCpf     = user?.Cpf is not null ? _encryptionService.Decrypt(user.Cpf) : null,
             StartTime   = reservation.StartTime,
             EndTime     = reservation.EndTime,
             Status      = reservation.Status,
