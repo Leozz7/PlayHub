@@ -62,7 +62,7 @@ export const courtService = {
     const response = await api.get<PagedResult<Court>>('/courts/management', { params });
     return response.data;
   },
-  
+
   getCourtsFilters: async (): Promise<CourtsFilters> => {
     const response = await api.get<CourtsFilters>('/courts/filters');
     return response.data;

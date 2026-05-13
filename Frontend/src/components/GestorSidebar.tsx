@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useCallback, useMemo } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import {
   LayoutDashboard,
@@ -45,7 +45,7 @@ export function GestorSidebar() {
   const { theme, setTheme } = useTheme();
   const { t } = useTranslation();
 
-  const NAV_SECTIONS: { title: string; items: NavItem[] }[] = [
+  const NAV_SECTIONS: { title: string; items: NavItem[] }[] = useMemo(() => [
     {
       title: t('gestor.sidebar.main'),
       items: [
@@ -70,7 +70,10 @@ export function GestorSidebar() {
         { label: t('gestor.sidebar.settings'), icon: Settings, href: '/lz_gestor/settings' },
       ],
     },
-  ];
+  ], [t]);
+
+  const toggleCollapsed = useCallback(() => setCollapsed(prev => !prev), []);
+  const toggleTheme = useCallback(() => setTheme(theme === 'dark' ? 'light' : 'dark'), [theme, setTheme]);
 
   const handleLogout = () => {
     logout();
@@ -88,7 +91,7 @@ export function GestorSidebar() {
 
       {/* Toggle Button */}
       <button
-        onClick={() => setCollapsed(!collapsed)}
+        onClick={toggleCollapsed}
         className="absolute -right-3 top-6 z-20 w-6 h-6 rounded-full bg-white dark:bg-card border border-gray-200 dark:border-white/10 flex items-center justify-center shadow-md hover:shadow-lg hover:border-[#8CE600]/50 transition-all duration-300 group"
         aria-label={collapsed ? t('gestor.sidebar.expand') : t('gestor.sidebar.collapse')}
       >
@@ -181,7 +184,7 @@ export function GestorSidebar() {
         {collapsed ? (
           <div className="flex flex-col items-center gap-2">
             <button
-              onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
+              onClick={toggleTheme}
               className="w-10 h-10 rounded-xl flex items-center justify-center text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-white/10 transition-all"
               title={theme === 'dark' ? t('gestor.sidebar.lightTheme') : t('gestor.sidebar.darkTheme')}
             >
@@ -208,7 +211,7 @@ export function GestorSidebar() {
             </div>
             <div className="flex items-center gap-2">
               <button
-                onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
+                onClick={toggleTheme}
                 className="w-10 h-10 rounded-xl flex items-center justify-center text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-white/10 transition-all shrink-0"
                 title={theme === 'dark' ? t('gestor.sidebar.lightTheme') : t('gestor.sidebar.darkTheme')}
               >
