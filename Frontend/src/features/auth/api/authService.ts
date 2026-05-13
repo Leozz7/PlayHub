@@ -4,7 +4,7 @@ import { AuthResponse, LoginCredentials } from '../types/auth.types';
 export interface IAuthService {
   login(credentials: LoginCredentials): Promise<AuthResponse>;
   logout(): Promise<void>;
-  refreshToken(): Promise<{ accessToken: string }>;
+  refreshToken(): Promise<void>;
 }
 
 export const authService: IAuthService = {
@@ -20,8 +20,7 @@ export const authService: IAuthService = {
     await api.post('/auth/logout');
   },
 
-  refreshToken: async (): Promise<{ accessToken: string }> => {
-    const { data } = await api.post<{ accessToken: string }>('/auth/refresh');
-    return data;
+  refreshToken: async (): Promise<void> => {
+    await api.post('/auth/refresh');
   },
 };

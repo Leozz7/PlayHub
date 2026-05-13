@@ -1,8 +1,7 @@
 import React from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { 
   Trash2, 
-  X, 
   Loader2, 
   CheckCircle2, 
   AlertCircle,

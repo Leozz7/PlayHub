@@ -7,7 +7,7 @@ import {
   FileText, Search, Filter, ShieldAlert, Activity, Monitor,
   Terminal, User, Clock, AlertCircle, ArrowDownToLine,
   RefreshCcw, Database, ShieldCheck, HeartPulse, ChevronLeft, ChevronRight,
-  Eye, Info, AlertTriangle, XCircle, Skull, HardDrive, Network
+  Eye, AlertTriangle
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Input } from '@/components/ui/input';
@@ -26,9 +26,6 @@ import {
 import {
   Dialog,
   DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
 } from "@/components/ui/dialog";
 import { Separator } from "@/components/ui/separator";
 import { ScrollArea } from "@/components/ui/scroll-area";

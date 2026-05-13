@@ -3,26 +3,22 @@ import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import {
   Building2, CalendarDays, CreditCard, CheckCircle2,
-  XCircle, Clock, ArrowUpRight, MoreHorizontal,
-  Activity, Users, Plus, CalendarCheck
+  XCircle, Clock, ArrowUpRight, Activity, Users, Plus, CalendarCheck, TrendingUp, LayoutDashboard
 } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { useAuthStore } from '@/data/useAuthStore';
 import { useReservations } from '@/features/reservations/hooks/useReservations';
 import { useDashboardStats, useDashboardTopCourts } from '@/features/dashboard/hooks/useDashboard';
+import { Skeleton } from '@/components/ui/skeleton';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 
 const STATUS_CONFIG = {
-  2: { key: 'confirmed', icon: CheckCircle2, className: 'text-emerald-600 bg-emerald-50 dark:bg-emerald-950/40 dark:text-emerald-400' },
-  1: { key: 'pending',   icon: Clock,         className: 'text-amber-600 bg-amber-50 dark:bg-amber-950/40 dark:text-amber-400' },
-  3: { key: 'cancelled', icon: XCircle,       className: 'text-red-500 bg-red-50 dark:bg-red-950/40 dark:text-red-400' },
-  4: { key: 'completed', icon: CalendarCheck, className: 'text-blue-500 bg-blue-50 dark:bg-blue-950/40 dark:text-blue-400' }
+  2: { key: 'confirmed', icon: CheckCircle2, className: 'bg-emerald-500/10 text-emerald-500 border-emerald-500/20' },
+  1: { key: 'pending',   icon: Clock,         className: 'bg-amber-500/10 text-amber-500 border-amber-500/20' },
+  3: { key: 'cancelled', icon: XCircle,       className: 'bg-red-500/10 text-red-500 border-red-500/20' },
+  4: { key: 'completed', icon: CalendarCheck, className: 'bg-blue-500/10 text-blue-500 border-blue-500/20' }
 } as const;
-
-const COLOR_MAP = {
-  blue:   { bg: 'bg-blue-500/10',   border: 'border-blue-500/20',   text: 'text-blue-500',   glow: 'shadow-blue-500/20' },
-  green:  { bg: 'bg-[#8CE600]/10',  border: 'border-[#8CE600]/20',  text: 'text-[#6aad00] dark:text-[#8CE600]', glow: 'shadow-[#8CE600]/20' },
-  violet: { bg: 'bg-violet-500/10', border: 'border-violet-500/20', text: 'text-violet-500', glow: 'shadow-violet-500/20' },
-  amber:  { bg: 'bg-amber-500/10',  border: 'border-amber-500/20',  text: 'text-amber-500',  glow: 'shadow-amber-500/20' },
-};
 
 function formatValue(value: number, isCurrency: boolean, locale: string) {
   if (isCurrency) {
@@ -31,63 +27,29 @@ function formatValue(value: number, isCurrency: boolean, locale: string) {
   return value.toLocaleString(locale);
 }
 
-function StatCard({ stat, t, locale }: { stat: { color: string; icon: React.ElementType; value: number; isCurrency: boolean; id: string }, t: (key: string) => string, locale: string }) {
-  const col = COLOR_MAP[stat.color as keyof typeof COLOR_MAP];
-
+function StatCard({ stat, t, locale, i }: { stat: any, t: any, locale: string, i: number }) {
+  const Icon = stat.icon;
   return (
-    <div className="group relative bg-white dark:bg-white/[0.03] border border-gray-100 dark:border-white/[0.06] rounded-2xl p-5 hover:shadow-xl hover:shadow-gray-200/30 dark:hover:shadow-black/30 transition-all duration-300 hover:-translate-y-0.5 overflow-hidden">
-      <div className={`absolute inset-0 bg-gradient-to-br from-transparent to-transparent group-hover:from-${stat.color}-50/20 dark:group-hover:from-${stat.color}-950/10 transition-all duration-500 pointer-events-none`} />
-      
-      <div className="flex items-start justify-between mb-4">
-        <div className={`w-10 h-10 rounded-xl ${col.bg} border ${col.border} flex items-center justify-center shadow-lg ${col.glow}`}>
-          <stat.icon className={`w-5 h-5 ${col.text}`} strokeWidth={1.75} />
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ delay: i * 0.1 }}
+      className="bg-white dark:bg-card border border-gray-100 dark:border-white/10 p-5 rounded-3xl shadow-sm hover:shadow-xl hover:shadow-black/5 transition-all group"
+    >
+      <div className="flex items-center justify-between mb-4">
+        <div className={`p-2.5 rounded-2xl bg-gray-50 dark:bg-white/5 ${stat.color}`}>
+          <Icon className="w-6 h-6" />
+        </div>
+        <div className="flex items-center gap-1 px-2 py-1 bg-emerald-500/10 rounded-lg">
+          <TrendingUp className="w-3 h-3 text-emerald-500" />
+          <span className="text-[10px] font-black text-emerald-500">+12%</span>
         </div>
       </div>
-
-      <p className="text-2xl font-black tracking-tight text-gray-900 dark:text-white mb-1">
+      <p className="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-widest leading-none mb-2">{t(`gestor.dashboard.stats.${stat.id}`)}</p>
+      <p className="text-2xl font-black text-gray-900 dark:text-white leading-none tracking-tight">
         {formatValue(stat.value, stat.isCurrency, locale)}
       </p>
-      <p className="text-xs font-semibold text-gray-500 dark:text-gray-400">{t(`gestor.dashboard.stats.${stat.id}`)}</p>
-    </div>
-  );
-}
-
-function ReservationRow({ r, t, locale }: { r: { id: string; status: number; userName?: string; courtName?: string; startTime: string; endTime: string; totalPrice: number }, t: (key: string) => string, locale: string }) {
-  const cfg = STATUS_CONFIG[r.status as keyof typeof STATUS_CONFIG] || STATUS_CONFIG[1];
-  
-  let statusLabel = t('admin.dashboard.resPending');
-  if (r.status === 2) statusLabel = t('admin.dashboard.resConfirmed');
-  if (r.status === 3) statusLabel = t('admin.dashboard.resCancelled');
-  if (r.status === 4) statusLabel = t('admin.dashboard.resCompleted');
-
-  return (
-    <tr className="group hover:bg-gray-50/80 dark:hover:bg-white/[0.02] transition-colors">
-      <td className="px-4 py-3">
-        <span className="text-xs font-mono font-bold text-gray-400">{r.id.split('-')[0].toUpperCase()}</span>
-      </td>
-      <td className="px-4 py-3">
-        <span className="text-sm font-semibold text-gray-900 dark:text-white">{r.userName || t('gestor.clients.deletedUser')}</span>
-      </td>
-      <td className="px-4 py-3">
-        <div>
-          <p className="text-sm text-gray-700 dark:text-gray-300 font-medium">{r.courtName || t('gestor.dashboard.deletedCourt')}</p>
-        </div>
-      </td>
-      <td className="px-4 py-3">
-        <span className="text-xs text-gray-500 dark:text-gray-400">
-          {new Date(r.startTime).toLocaleDateString(locale)} • {new Date(r.startTime).getHours()}h–{new Date(r.endTime).getHours()}h
-        </span>
-      </td>
-      <td className="px-4 py-3">
-        <span className="text-sm font-bold text-gray-900 dark:text-white">R$ {r.totalPrice.toFixed(2)}</span>
-      </td>
-      <td className="px-4 py-3">
-        <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-bold ${cfg.className}`}>
-          <cfg.icon className="w-3 h-3" />
-          {statusLabel}
-        </span>
-      </td>
-    </tr>
+    </motion.div>
   );
 }
 
@@ -104,200 +66,238 @@ export default function ManagerDashboard() {
 
   const firstName = user?.name?.split(' ')[0] ?? 'Gestor';
 
-  const { data: statsData } = useDashboardStats();
-  const { data: topCourtsData } = useDashboardTopCourts();
+  const { data: statsData,    isLoading: statsLoading    } = useDashboardStats();
+  const { data: topCourtsData, isLoading: topCourtsLoading } = useDashboardTopCourts();
   
-  const { data: recentResData } = useReservations({ pageSize: 6 });
+  const { data: recentResData,  isLoading: recentResLoading  } = useReservations({ pageSize: 6 });
   const recentReservations = recentResData?.items || [];
 
   const todayStr = new Date().toISOString().split('T')[0];
-  const { data: todayResData } = useReservations({ date: todayStr, pageSize: 50 });
+  const { data: todayResData, isLoading: todayResLoading } = useReservations({ date: todayStr, pageSize: 50 });
   const scheduleToday = todayResData?.items || [];
 
-  const topCourts = topCourtsData || [];
-
   const stats = [
-    { id: 'managedCourts', value: statsData?.managedCourts || 0, icon: Building2, color: 'green', isCurrency: false },
-    { id: 'reservationsMonth', value: statsData?.reservationsMonth || 0, icon: CalendarDays, color: 'violet', isCurrency: false },
-    { id: 'uniqueClients', value: statsData?.uniqueClients || 0, icon: Users, color: 'blue', isCurrency: false },
-    { id: 'monthlyRevenue', value: statsData?.monthlyRevenue || 0, icon: CreditCard, color: 'amber', isCurrency: true },
+    { id: 'managedCourts',     value: statsData?.managedCourts     || 0, icon: Building2,   color: 'text-[#8CE600]', isCurrency: false },
+    { id: 'reservationsMonth', value: statsData?.reservationsMonth  || 0, icon: CalendarDays, color: 'text-blue-500', isCurrency: false },
+    { id: 'uniqueClients',     value: statsData?.uniqueClients      || 0, icon: Users,        color: 'text-purple-500', isCurrency: false },
+    { id: 'monthlyRevenue',    value: statsData?.monthlyRevenue     || 0, icon: CreditCard,   color: 'text-amber-500', isCurrency: true  },
   ];
 
-
   return (
-    <>
-        <header className="sticky top-0 z-10 bg-gray-50/80 dark:bg-background/80 backdrop-blur-xl border-b border-gray-100 dark:border-white/[0.05] px-6 py-4 flex items-center justify-between">
-          <div>
-            <h1 className="text-lg font-black text-gray-900 dark:text-white tracking-tight">
-              {t('gestor.dashboard.greeting', { name: firstName })}
-            </h1>
-            <p className="text-xs text-gray-400 mt-0.5 capitalize">{now}</p>
+    <div className="p-8 space-y-8 animate-in fade-in duration-700">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
+        <div>
+          <div className="flex items-center gap-2 mb-2">
+            <span className="text-[10px] font-black uppercase tracking-widest text-[#8CE600] bg-[#8CE600]/10 px-3 py-1 rounded-full">{t('gestor.dashboard.managerBadge')}</span>
+            <span className="text-[10px] font-black uppercase tracking-widest text-gray-400">{now}</span>
           </div>
-          <div className="flex items-center gap-3">
-            <div className="flex items-center gap-1.5 px-3 py-1.5 bg-blue-500/10 border border-blue-500/20 rounded-full">
-              <span className="w-1.5 h-1.5 bg-blue-500 rounded-full animate-pulse" />
-              <span className="text-[10px] font-black uppercase tracking-widest text-blue-500">{t('gestor.dashboard.managerBadge')}</span>
+          <h1 className="text-3xl font-black tracking-tight text-gray-900 dark:text-white mb-2 flex items-center gap-3">
+            <div className="w-12 h-12 rounded-2xl bg-[#8CE600]/10 border border-[#8CE600]/20 flex items-center justify-center text-[#8CE600]">
+              <LayoutDashboard className="w-6 h-6" />
             </div>
-            <Link to="/manager/courts/new"
-              className="flex items-center gap-1.5 px-3 py-1.5 bg-[#8CE600] text-gray-950 rounded-full text-xs font-black hover:bg-[#7bc400] transition-all shadow-md shadow-[#8CE600]/20">
-              <Plus className="w-3.5 h-3.5" /> {t('gestor.dashboard.newCourt')}
-            </Link>
-          </div>
-        </header>
+            {t('gestor.dashboard.greeting', { name: firstName })}
+          </h1>
+          <p className="text-gray-500 dark:text-gray-400">{t('gestor.dashboard.subtitle')}</p>
+        </div>
+        <Link to="/lz_gestor/courts">
+          <Button className="bg-[#8CE600] text-gray-950 hover:opacity-90 font-black px-6 py-6 rounded-2xl shadow-lg shadow-[#8CE600]/20">
+            <Plus className="w-5 h-5 mr-2" />
+            {t('gestor.dashboard.newCourt')}
+          </Button>
+        </Link>
+      </div>
 
-        <div className="px-6 py-8 space-y-8 max-w-[1400px] mx-auto">
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
-            {stats.map(s => <StatCard key={s.id} stat={s} t={t} locale={locale} />)}
-          </div>
-
-          <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
-
-            <div className="xl:col-span-2 bg-white dark:bg-white/[0.03] border border-gray-100 dark:border-white/[0.06] rounded-2xl overflow-hidden">
-              <div className="flex items-center gap-1 p-4 border-b border-gray-100 dark:border-white/[0.06]">
-                <button onClick={() => setActiveTab('reservations')}
-                  className={`px-4 py-2 rounded-xl text-xs font-bold transition-all ${activeTab === 'reservations' ? 'bg-[#8CE600] text-gray-950' : 'text-gray-500 hover:bg-gray-100 dark:hover:bg-white/5'}`}>
-                  {t('gestor.dashboard.tabs.recentReservations')}
-                </button>
-                <button onClick={() => setActiveTab('schedule')}
-                  className={`px-4 py-2 rounded-xl text-xs font-bold transition-all ${activeTab === 'schedule' ? 'bg-[#8CE600] text-gray-950' : 'text-gray-500 hover:bg-gray-100 dark:hover:bg-white/5'}`}>
-                  {t('gestor.dashboard.tabs.todaysSchedule')}
-                </button>
-                <div className="ml-auto">
-                  <button className="p-2 rounded-xl text-gray-400 hover:bg-gray-100 dark:hover:bg-white/5 transition-colors">
-                    <MoreHorizontal className="w-4 h-4" />
-                  </button>
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        {statsLoading ? (
+            Array.from({ length: 4 }).map((_, i) => (
+                <div key={i} className="bg-white dark:bg-card border border-gray-100 dark:border-white/10 p-5 rounded-3xl shadow-sm">
+                    <Skeleton className="h-10 w-10 rounded-2xl mb-4" />
+                    <Skeleton className="h-4 w-24 mb-2" />
+                    <Skeleton className="h-8 w-32" />
                 </div>
-              </div>
+            ))
+        ) : (
+            stats.map((s, i) => <StatCard key={s.id} stat={s} t={t} locale={locale} i={i} />)
+        )}
+      </div>
 
-              {activeTab === 'reservations' && (
-                <div className="overflow-x-auto">
-                  <table className="w-full text-left">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <div className="lg:col-span-2 space-y-6">
+          <div className="bg-white dark:bg-card border border-gray-100 dark:border-white/10 rounded-[2.5rem] overflow-hidden shadow-xl shadow-black/5 dark:shadow-none">
+            <div className="p-6 border-b border-gray-100 dark:border-white/10 flex items-center justify-between">
+              <div className="flex gap-2">
+                {['reservations', 'schedule'].map((tab) => (
+                  <button
+                    key={tab}
+                    onClick={() => setActiveTab(tab as any)}
+                    className={`px-6 py-2.5 rounded-2xl text-xs font-black uppercase tracking-widest transition-all ${
+                      activeTab === tab
+                        ? 'bg-[#8CE600] text-gray-950'
+                        : 'text-gray-400 hover:text-gray-900 dark:hover:text-white'
+                    }`}
+                  >
+                    {t(`gestor.dashboard.tabs.${tab === 'reservations' ? 'recentReservations' : 'todaysSchedule'}`)}
+                  </button>
+                ))}
+              </div>
+              <Link to="/lz_gestor/reservations" className="text-[10px] font-black uppercase tracking-widest text-gray-400 hover:text-[#8CE600] transition-colors flex items-center gap-1">
+                {t('gestor.dashboard.viewAll')} <ArrowUpRight className="w-3 h-3" />
+              </Link>
+            </div>
+
+            <div className="overflow-x-auto">
+              <AnimatePresence mode="wait">
+                {activeTab === 'reservations' ? (
+                  <motion.table
+                    key="res"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    className="w-full text-left"
+                  >
                     <thead>
-                      <tr className="border-b border-gray-100 dark:border-white/[0.06]">
-                        {['id', 'client', 'court', 'time', 'value', 'status'].map(h => (
-                          <th key={h} className="px-4 py-3 text-[10px] font-black uppercase tracking-wider text-gray-400">{t(`gestor.dashboard.table.${h}`)}</th>
+                      <tr className="border-b border-gray-100 dark:border-white/10">
+                        {['client', 'court', 'time', 'value', 'status'].map(h => (
+                          <th key={h} className="px-6 py-4 text-[10px] font-black uppercase tracking-widest text-gray-400">{t(`gestor.dashboard.table.${h}`)}</th>
                         ))}
                       </tr>
                     </thead>
-                    <tbody className="divide-y divide-gray-100 dark:divide-white/[0.04]">
-                      {recentReservations.length > 0 ? recentReservations.map((r) => (
-                        <ReservationRow key={r.id} r={r as any} t={t} locale={locale} />
-                      )) : (
-                        <tr><td colSpan={6} className="text-center py-4 text-xs text-gray-500">{t('gestor.dashboard.table.noResults')}</td></tr>
+                    <tbody className="divide-y divide-gray-50 dark:divide-white/5">
+                      {recentResLoading ? (
+                        Array.from({ length: 4 }).map((_, i) => (
+                          <tr key={i}>
+                            <td className="px-6 py-4"><Skeleton className="h-10 w-32 rounded-lg" /></td>
+                            <td className="px-6 py-4"><Skeleton className="h-10 w-24 rounded-lg" /></td>
+                            <td className="px-6 py-4"><Skeleton className="h-10 w-32 rounded-lg" /></td>
+                            <td className="px-6 py-4"><Skeleton className="h-10 w-16 rounded-lg" /></td>
+                            <td className="px-6 py-4"><Skeleton className="h-10 w-24 rounded-lg" /></td>
+                          </tr>
+                        ))
+                      ) : recentReservations.length === 0 ? (
+                        <tr>
+                          <td colSpan={5} className="py-20 text-center text-gray-400 font-bold">{t('gestor.dashboard.emptyState.title')}</td>
+                        </tr>
+                      ) : (
+                        recentReservations.map((r: any) => {
+                          const cfg = STATUS_CONFIG[r.status as keyof typeof STATUS_CONFIG] || STATUS_CONFIG[1];
+                          return (
+                            <tr key={r.id} className="hover:bg-gray-50 dark:hover:bg-white/5 transition-colors group">
+                              <td className="px-6 py-4">
+                                <span className="font-black text-sm text-gray-900 dark:text-white">{r.userName || 'Cliente'}</span>
+                              </td>
+                              <td className="px-6 py-4 text-sm font-bold text-gray-500">{r.courtName}</td>
+                              <td className="px-6 py-4 text-xs font-bold text-gray-400">
+                                {new Date(r.startTime).toLocaleDateString(locale)} • {new Date(r.startTime).getHours()}h
+                              </td>
+                              <td className="px-6 py-4 text-sm font-black text-[#8CE600]">R$ {r.totalPrice}</td>
+                              <td className="px-6 py-4">
+                                <Badge className={`rounded-full font-black text-[10px] uppercase tracking-widest ${cfg.className}`}>
+                                  <cfg.icon className="w-3 h-3 mr-1.5" />
+                                  {t(`admin.dashboard.res${cfg.key.charAt(0).toUpperCase() + cfg.key.slice(1)}`)}
+                                </Badge>
+                              </td>
+                            </tr>
+                          );
+                        })
                       )}
                     </tbody>
-                  </table>
-                </div>
-              )}
-
-              {activeTab === 'schedule' && (
-                <div className="divide-y divide-gray-100 dark:divide-white/[0.04]">
-                  {scheduleToday.length > 0 ? scheduleToday.map((item, i: number) => {
-                    const cfg = STATUS_CONFIG[item.status as keyof typeof STATUS_CONFIG] || STATUS_CONFIG[1];
-                    let statusLabel = t('admin.dashboard.resPending');
-                    if (item.status === 2) statusLabel = t('admin.dashboard.resConfirmed');
-                    if (item.status === 3) statusLabel = t('admin.dashboard.resCancelled');
-                    if (item.status === 4) statusLabel = t('admin.dashboard.resCompleted');
-
-                    return (
-                      <div key={i} className="flex items-center gap-4 px-4 py-3.5 hover:bg-gray-50 dark:hover:bg-white/[0.02] transition-colors">
-                        <div className="w-20 shrink-0">
-                          <span className="text-xs font-black text-[#6aad00] dark:text-[#8CE600]">{new Date(item.startTime).getHours()}h–{new Date(item.endTime).getHours()}h</span>
-                        </div>
-                        <div className="flex-1 min-w-0">
-                          <p className="text-sm font-bold text-gray-900 dark:text-white">{item.courtName}</p>
-                          <p className="text-xs text-gray-400">{item.userName}</p>
-                        </div>
-                        <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-bold ${cfg.className} shrink-0`}>
-                          <cfg.icon className="w-3 h-3" />{statusLabel}
-                        </span>
-                      </div>
-                    );
-                  }) : (
-                     <div className="text-center py-4 text-xs text-gray-500">{t('gestor.dashboard.table.noResults')}</div>
-                  )}
-                </div>
-              )}
-
-              <div className="p-4 border-t border-gray-100 dark:border-white/[0.06]">
-                <Link to="/manager/reservations" className="text-xs font-bold text-[#6aad00] dark:text-[#8CE600] hover:opacity-70 flex items-center gap-1 transition-opacity">
-                  {t('gestor.dashboard.viewAll')} <ArrowUpRight className="w-3 h-3" />
-                </Link>
-              </div>
-            </div>
-
-            <div className="space-y-4">
-
-              {topCourts.length > 0 && (
-                  <div className="bg-white dark:bg-white/[0.03] border border-gray-100 dark:border-white/[0.06] rounded-2xl p-5">
-                    <div className="flex items-center gap-2 mb-4">
-                      <Activity className="w-4 h-4 text-[#8CE600]" strokeWidth={2} />
-                      <h3 className="text-sm font-black text-gray-900 dark:text-white">{t('gestor.dashboard.revenueByCourt')}</h3>
-                    </div>
-                    <div className="space-y-3">
-                      {topCourts.slice(0, 5).map((court) => {
-                        const maxRev = topCourts[0]?.revenue || 1;
-                        const pct = Math.round((court.revenue / maxRev) * 100);
+                  </motion.table>
+                ) : (
+                  <motion.div
+                    key="sch"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    className="divide-y divide-gray-50 dark:divide-white/5"
+                  >
+                    {todayResLoading ? (
+                        Array.from({ length: 4 }).map((_, i) => (
+                            <div key={i} className="px-6 py-4 flex gap-4">
+                                <Skeleton className="h-12 w-20 rounded-xl" />
+                                <Skeleton className="h-12 flex-1 rounded-xl" />
+                                <Skeleton className="h-12 w-32 rounded-xl" />
+                            </div>
+                        ))
+                    ) : scheduleToday.length === 0 ? (
+                        <div className="py-20 text-center text-gray-400 font-bold">{t('gestor.dashboard.emptyState.scheduleTitle')}</div>
+                    ) : (
+                      scheduleToday.map((item: any, i: number) => {
+                        const cfg = STATUS_CONFIG[item.status as keyof typeof STATUS_CONFIG] || STATUS_CONFIG[1];
                         return (
-                          <div key={court.id}>
-                            <div className="flex justify-between mb-1">
-                              <span className="text-xs text-gray-600 dark:text-gray-400 truncate max-w-[130px]">{court.name.split(' ').slice(0, 2).join(' ')}</span>
-                              <span className="text-xs font-bold text-gray-900 dark:text-white">{formatValue(court.revenue, true, locale)}</span>
+                          <div key={i} className="flex items-center gap-6 px-6 py-4 hover:bg-gray-50 dark:hover:bg-white/5 transition-colors">
+                            <div className="w-16 shrink-0 font-black text-xs text-[#8CE600] bg-[#8CE600]/10 px-2 py-1 rounded-lg text-center">
+                              {new Date(item.startTime).getHours()}h
                             </div>
-                            <div className="h-1.5 bg-gray-100 dark:bg-white/[0.06] rounded-full overflow-hidden">
-                              <div className="h-full bg-[#8CE600] rounded-full" style={{ width: `${pct}%` }} />
+                            <div className="flex-1 min-w-0">
+                              <p className="text-sm font-black text-gray-900 dark:text-white truncate">{item.courtName}</p>
+                              <p className="text-xs text-gray-400 font-bold">{item.userName}</p>
                             </div>
+                            <Badge className={`rounded-full font-black text-[10px] uppercase tracking-widest ${cfg.className}`}>
+                                {t(`admin.dashboard.res${cfg.key.charAt(0).toUpperCase() + cfg.key.slice(1)}`)}
+                            </Badge>
                           </div>
                         );
-                      })}
-                    </div>
-                  </div>
-              )}
-
-              <div className="bg-white dark:bg-white/[0.03] border border-gray-100 dark:border-white/[0.06] rounded-2xl p-5">
-                <h3 className="text-sm font-black text-gray-900 dark:text-white mb-4">{t('gestor.dashboard.todaySummary')}</h3>
-                <div className="space-y-3">
-                  {[
-                    { label: t('gestor.dashboard.todayStats.reservations'), value: scheduleToday.length, icon: CalendarDays },
-                    { label: t('gestor.dashboard.todayStats.revenue'), value: formatValue(scheduleToday.reduce((s: number, r) => s + r.totalPrice, 0), true, locale), icon: CreditCard },
-                    { label: t('gestor.dashboard.todayStats.clients'), value: new Set(scheduleToday.map((r) => r.userId)).size, icon: Users },
-                  ].map(item => (
-                    <div key={item.label} className="flex items-center gap-3">
-                      <div className="w-8 h-8 rounded-xl bg-[#8CE600]/10 border border-[#8CE600]/20 flex items-center justify-center shrink-0">
-                        <item.icon className="w-4 h-4 text-[#8CE600]" strokeWidth={1.75} />
-                      </div>
-                      <div className="flex-1">
-                        <p className="text-xs text-gray-500 dark:text-gray-400">{item.label}</p>
-                      </div>
-                      <span className="text-sm font-black text-gray-900 dark:text-white">{item.value}</span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              <div className="bg-gradient-to-br from-[#8CE600] to-[#6aad00] rounded-2xl p-5">
-                <h3 className="text-sm font-black text-gray-950 mb-1">{t('gestor.dashboard.quickActions')}</h3>
-                <p className="text-[11px] text-gray-950/60 mb-3">{t('gestor.dashboard.quickActionsDesc')}</p>
-                <div className="space-y-2">
-                  {[
-                    { label: t('gestor.dashboard.actions.blockTime'), href: '/manager/schedule' },
-                    { label: t('gestor.dashboard.actions.viewRequests'), href: '/manager/reservations' },
-                    { label: t('gestor.dashboard.actions.editCourt'), href: '/manager/courts' },
-                  ].map(a => (
-                    <Link key={a.label} to={a.href}
-                      className="flex items-center justify-between w-full px-3 py-2.5 bg-black/10 hover:bg-black/20 rounded-xl transition-all group">
-                      <span className="text-xs font-bold text-gray-950">{a.label}</span>
-                      <ArrowUpRight className="w-3.5 h-3.5 text-gray-950/60 group-hover:text-gray-950 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
-                    </Link>
-                  ))}
-                </div>
-              </div>
-
+                      })
+                    )}
+                  </motion.div>
+                )}
+              </AnimatePresence>
             </div>
           </div>
-
         </div>
-    </>
+
+        <div className="space-y-8">
+            <div className="bg-white dark:bg-card border border-gray-100 dark:border-white/10 rounded-[2.5rem] p-6 shadow-xl shadow-black/5 dark:shadow-none">
+                <div className="flex items-center justify-between mb-6">
+                    <h3 className="text-sm font-black uppercase tracking-widest text-gray-900 dark:text-white">{t('gestor.dashboard.revenueByCourt')}</h3>
+                    <Activity className="w-4 h-4 text-[#8CE600]" />
+                </div>
+                <div className="space-y-5">
+                    {topCourtsLoading ? (
+                        Array.from({ length: 4 }).map((_, i) => <Skeleton key={i} className="h-10 w-full rounded-xl" />)
+                    ) : (
+                        topCourtsData?.slice(0, 5).map((court: any) => {
+                            const maxRev = topCourtsData[0]?.revenue || 1;
+                            const pct = Math.round((court.revenue / maxRev) * 100);
+                            return (
+                                <div key={court.id} className="space-y-2">
+                                    <div className="flex justify-between text-xs font-bold">
+                                        <span className="text-gray-500">{court.name}</span>
+                                        <span className="text-gray-900 dark:text-white">R$ {court.revenue.toLocaleString()}</span>
+                                    </div>
+                                    <div className="h-1.5 bg-gray-50 dark:bg-white/5 rounded-full overflow-hidden">
+                                        <motion.div 
+                                            initial={{ width: 0 }}
+                                            animate={{ width: `${pct}%` }}
+                                            transition={{ duration: 1, ease: "easeOut" }}
+                                            className="h-full bg-[#8CE600] rounded-full" 
+                                        />
+                                    </div>
+                                </div>
+                            );
+                        })
+                    )}
+                </div>
+            </div>
+
+            <div className="bg-gray-950 dark:bg-[#8CE600] rounded-[2.5rem] p-8 shadow-xl shadow-black/20 text-white dark:text-gray-950">
+                <h3 className="text-xl font-black mb-1">{t('gestor.dashboard.quickActions')}</h3>
+                <p className="text-xs font-medium opacity-60 mb-6">{t('gestor.dashboard.quickActionsDesc')}</p>
+                <div className="space-y-3">
+                    {[
+                        { label: t('gestor.dashboard.actions.blockTime'),    href: '/lz_gestor/schedule' },
+                        { label: t('gestor.dashboard.actions.viewRequests'), href: '/lz_gestor/reservations' },
+                        { label: t('gestor.dashboard.actions.editCourt'),    href: '/lz_gestor/courts' },
+                    ].map(a => (
+                        <Link key={a.label} to={a.href} className="flex items-center justify-between w-full px-5 py-4 bg-white/10 dark:bg-black/5 hover:bg-white/20 dark:hover:bg-black/10 rounded-2xl transition-all group">
+                            <span className="text-xs font-black uppercase tracking-widest">{a.label}</span>
+                            <ArrowUpRight className="w-4 h-4 group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" />
+                        </Link>
+                    ))}
+                </div>
+            </div>
+        </div>
+      </div>
+    </div>
   );
 }

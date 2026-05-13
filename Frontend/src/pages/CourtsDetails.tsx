@@ -14,6 +14,7 @@ import { useCourt, useCourtReviews, useSubmitReview } from '@/features/courts/ho
 import { useCourtAvailability } from '@/features/courts/hooks/useCourtAvailability';
 import { useQueryClient } from '@tanstack/react-query';
 import { signalRService } from '@/lib/signalr';
+import { SEO } from '@/components/SEO';
 
 import { Court } from './CatalogData';
 
@@ -165,13 +166,7 @@ export default function CourtsDetails() {
     const { data: court, isLoading: isCourtLoading, isError: isCourtError } = useCourt(id || '');
     const { isAuthenticated, user } = useAuthStore();
 
-    useEffect(() => {
-        if (court) {
-            document.title = `${court.name} - PlayHub`;
-        } else {
-            document.title = 'PlayHub';
-        }
-    }, [court]);
+    // Dynamic document title handled by SEO component
 
     const navigate = useNavigate();
     const [selectedDay, setSelectedDay] = useState<Date>(new Date());
@@ -201,7 +196,7 @@ export default function CourtsDetails() {
 
                 // Verificamos se o horário reservado conflita com a seleção atual
                 // Convertemos a string ISO para data e pegamos a hora
-                const reservedHour = new Date(data.startTime).getUTCHours();
+                const reservedHour = new Date(data.startTime).getHours();
 
                 setSelectedSlots(prev => {
                     if (prev.includes(reservedHour)) {
@@ -366,6 +361,12 @@ export default function CourtsDetails() {
 
     return (
         <div className="min-h-screen bg-white dark:bg-background text-gray-900 dark:text-gray-100 font-sans antialiased flex flex-col">
+            <SEO
+                title={court.name}
+                description={`${court.name} em ${court.city} - ${court.neighborhood}. Agende agora sua partida de ${court.sports.join(', ')}. Preço: R$ ${court.price}/h.`}
+                ogImage={allImages[0]}
+                ogType="article"
+            />
             <Header />
 
             {/* Galeria de imagens */}
@@ -557,10 +558,10 @@ export default function CourtsDetails() {
                                         onClick={() => handleDaySelect(day)}
                                         disabled={isUnavail}
                                         className={`shrink-0 flex flex-col items-center rounded-2xl px-4 py-3 border-2 transition-all duration-200 min-w-[64px] ${isUnavail
-                                                ? 'border-gray-100 dark:border-white/10 bg-gray-50 dark:bg-background/50 text-gray-300 dark:text-gray-600 cursor-not-allowed'
-                                                : isSelected
-                                                    ? 'border-[#8CE600] bg-[#8CE600] text-gray-950 shadow-lg shadow-[#8CE600]/30'
-                                                    : 'border-gray-200 dark:border-gray-700 bg-white dark:bg-background hover:border-[#8CE600] text-gray-700 dark:text-gray-300'
+                                            ? 'border-gray-100 dark:border-white/10 bg-gray-50 dark:bg-background/50 text-gray-300 dark:text-gray-600 cursor-not-allowed'
+                                            : isSelected
+                                                ? 'border-[#8CE600] bg-[#8CE600] text-gray-950 shadow-lg shadow-[#8CE600]/30'
+                                                : 'border-gray-200 dark:border-gray-700 bg-white dark:bg-background hover:border-[#8CE600] text-gray-700 dark:text-gray-300'
                                             }`}
                                     >
                                         <span className="text-[10px] font-bold uppercase tracking-widest">{format(day, 'EEE', { locale: ptBR })}</span>
@@ -573,8 +574,8 @@ export default function CourtsDetails() {
                             <button
                                 onClick={() => setShowDatePicker(true)}
                                 className={`relative shrink-0 flex flex-col items-center justify-center rounded-2xl px-2 py-3 border-2 transition-all duration-200 min-w-[64px] ${!isSelectedInDays
-                                        ? 'border-[#8CE600] bg-[#8CE600] text-gray-950 shadow-lg shadow-[#8CE600]/30'
-                                        : 'border-gray-200 dark:border-gray-700 bg-white dark:bg-background hover:border-[#8CE600] text-gray-700 dark:text-gray-300'
+                                    ? 'border-[#8CE600] bg-[#8CE600] text-gray-950 shadow-lg shadow-[#8CE600]/30'
+                                    : 'border-gray-200 dark:border-gray-700 bg-white dark:bg-background hover:border-[#8CE600] text-gray-700 dark:text-gray-300'
                                     }`}
                             >
                                 <Calendar className={`w-5 h-5 mb-1 ${!isSelectedInDays ? 'text-gray-950' : 'text-gray-400 dark:text-gray-500'}`} />
@@ -619,12 +620,12 @@ export default function CourtsDetails() {
                                                         setShowDatePicker(false);
                                                     }}
                                                     className={`h-10 w-full rounded-xl flex items-center justify-center text-sm transition-all ${isSelected
-                                                            ? 'bg-[#8CE600] text-gray-950 font-black shadow-md shadow-[#8CE600]/20'
-                                                            : isPast
-                                                                ? 'text-gray-200 dark:text-gray-800 cursor-not-allowed'
-                                                                : isCurrentMonth
-                                                                    ? 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 font-bold'
-                                                                    : 'text-gray-400 dark:text-gray-600 hover:bg-gray-100 dark:hover:bg-gray-800'
+                                                        ? 'bg-[#8CE600] text-gray-950 font-black shadow-md shadow-[#8CE600]/20'
+                                                        : isPast
+                                                            ? 'text-gray-200 dark:text-gray-800 cursor-not-allowed'
+                                                            : isCurrentMonth
+                                                                ? 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 font-bold'
+                                                                : 'text-gray-400 dark:text-gray-600 hover:bg-gray-100 dark:hover:bg-gray-800'
                                                         }`}
                                                 >
                                                     {format(day, 'd')}
@@ -656,7 +657,11 @@ export default function CourtsDetails() {
                                         </div>
                                     ) : (
                                         hours.map(hour => {
-                                            const isBusy = busySlots.includes(hour);
+                                            const now = new Date();
+                                            const isToday = isSameDay(selectedDay, now);
+                                            const hasPassed = isToday && hour <= now.getHours();
+
+                                            const isBusy = busySlots.includes(hour) || hasPassed;
                                             const isSelected = selectedSlots.includes(hour);
 
                                             // Se o horário ficou ocupado enquanto estava selecionado, removemos da seleção

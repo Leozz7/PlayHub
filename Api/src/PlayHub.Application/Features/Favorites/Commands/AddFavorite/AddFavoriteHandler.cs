@@ -27,10 +27,9 @@ public class AddFavoriteHandler : IRequestHandler<AddFavoriteCommand, bool>
 
         if (!courtExists) return false;
 
-        // O método de domínio garante idempotência
         var changed = user.AddFavorite(request.CourtId);
 
-        if (!changed) return true; // Já era favorito — retorna sucesso sem re-salvar
+        if (!changed) return true;
 
         var result = await _context.Users.ReplaceOneAsync(
             u => u.Id == request.UserId,

@@ -6,6 +6,7 @@ import { queryClient } from '@/lib/queryClient';
 import { ThemeProvider } from '@/components/ui/theme-provider';
 import { useAuthStore } from '@/data/useAuthStore';
 import { Toaster } from '@/components/ui/sonner';
+import { api } from '@/lib/api';
 
 import { useSignalR } from '@/hooks/useSignalR';
 
@@ -45,7 +46,7 @@ const GestorSettings = lazy(() => import('@/pages/gestor/GestorSettings'));
 const UserDashboard = lazy(() => import('@/pages/user/UserDashboard'));
 const UserProfile = lazy(() => import('@/pages/user/UserProfile'));
 const UserFavorites = lazy(() => import('@/pages/user/UserFavorites'));
-const ConfigUser = lazy(() => import('@/ConfigUser').then(m => ({ default: m.ConfigUser })));
+const ConfigUser = lazy(() => import('@/pages/user/ConfigUser').then(m => ({ default: m.ConfigUser })));
 
 const LazyUserLayout = lazy(() => import('@/pages/user/UserLayout'));
 const LazyGestorLayout = lazy(() => import('@/pages/gestor/GestorLayout'));
@@ -77,8 +78,32 @@ const GlobalAuthListener = () => {
   return null;
 };
 
+const InitialSessionCheck = () => {
+  const { isAuthenticated, user, setAuth, logout } = useAuthStore();
+
+  useEffect(() => {
+    const fetchUser = async () => {
+      if (isAuthenticated && !user) {
+        try {
+          const response = await api.get('/Auth/me');
+          setAuth(response.data);
+        } catch (error) {
+          console.error("Failed to fetch user session:", error);
+          logout();
+        }
+      }
+    };
+
+    fetchUser();
+  }, [isAuthenticated, user, setAuth, logout]);
+
+  return null;
+};
+
 const ProtectedRoute = () => {
-  const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
+  const { isAuthenticated, user } = useAuthStore();
+
+  if (isAuthenticated && !user) return <PageLoader />;
   if (!isAuthenticated) return <Navigate to="/login" replace />;
   return <Outlet />;
 };
@@ -89,6 +114,8 @@ interface RoleProtectedRouteProps {
 
 const RoleProtectedRoute = ({ allowedRoles }: RoleProtectedRouteProps) => {
   const { user, isAuthenticated } = useAuthStore();
+
+  if (isAuthenticated && !user) return <PageLoader />;
 
   if (!isAuthenticated || !user) return <Navigate to="/login" replace />;
 
@@ -112,6 +139,7 @@ export default function App() {
         <BrowserRouter>
           <ScrollToTop />
           <GlobalAuthListener />
+          <InitialSessionCheck />
           <Suspense fallback={<PageLoader />}>
             <Routes>
               <Route path="/" element={<Index />} />
@@ -130,40 +158,46 @@ export default function App() {
               <Route element={<ProtectedRoute />}>
                 <Route element={<UserLayoutShell />}>
                   <Route path="/my-bookings" element={<MyBookings />} />
-                  <Route path="/lz_user/dashboard" element={<UserDashboard />} />
-                  <Route path="/lz_user/profile" element={<UserProfile />} />
-                  <Route path="/lz_user/favorites" element={<UserFavorites />} />
+                  <Route path="/lz_user">
+                    <Route index element={<Navigate to="dashboard" replace />} />
+                    <Route path="dashboard" element={<UserDashboard />} />
+                    <Route path="profile" element={<UserProfile />} />
+                    <Route path="favorites" element={<UserFavorites />} />
+                  </Route>
                 </Route>
                 <Route path="/config" element={<ConfigUser />} />
               </Route>
 
-              <Route element={<RoleProtectedRoute allowedRoles={["Manager", "Admin"]} />}>
+              {/* Rotas do Gestor */}
+              <Route path="/lz_gestor" element={<RoleProtectedRoute allowedRoles={["Manager", "Admin"]} />}>
                 <Route element={<GestorLayoutShell />}>
-                  <Route path="/lz_gestor/dashboard" element={<GestorDashboard />} />
-                  <Route path="/lz_gestor/courts" element={<GestorCourt />} />
-                  <Route path="/lz_gestor/schedule" element={<GestorSchedule />} />
-                  <Route path="/lz_gestor/reservations" element={<GestorReservations />} />
-                  <Route path="/lz_gestor/reports" element={<GestorReports />} />
-                  <Route path="/lz_gestor/clients" element={<GestorClients />} />
-                  <Route path="/lz_gestor/payments" element={<GestorPayments />} />
-                  <Route path="/lz_gestor/notifications" element={<GestorNotifications />} />
-                  <Route path="/lz_gestor/settings" element={<GestorSettings />} />
+                  <Route index element={<Navigate to="dashboard" replace />} />
+                  <Route path="dashboard" element={<GestorDashboard />} />
+                  <Route path="courts" element={<GestorCourt />} />
+                  <Route path="schedule" element={<GestorSchedule />} />
+                  <Route path="reservations" element={<GestorReservations />} />
+                  <Route path="reports" element={<GestorReports />} />
+                  <Route path="clients" element={<GestorClients />} />
+                  <Route path="payments" element={<GestorPayments />} />
+                  <Route path="notifications" element={<GestorNotifications />} />
+                  <Route path="settings" element={<GestorSettings />} />
                 </Route>
-
               </Route>
 
-              <Route element={<RoleProtectedRoute allowedRoles={["Admin"]} />}>
+              {/* Rotas do Admin */}
+              <Route path="/lz_admin" element={<RoleProtectedRoute allowedRoles={["Admin"]} />}>
                 <Route element={<AdminLayoutShell />}>
-                  <Route path="/lz_admin/dashboard" element={<AdminDashboard />} />
-                  <Route path="/lz_admin/activity" element={<AdminActivities />} />
-                  <Route path="/lz_admin/reports" element={<AdminReport />} />
-                  <Route path="/lz_admin/users" element={<AdminUsers />} />
-                  <Route path="/lz_admin/courts" element={<AdminCourt />} />
-                  <Route path="/lz_admin/bookings" element={<AdminBookings />} />
-                  <Route path="/lz_admin/payments" element={<AdminPayments />} />
-                  <Route path="/lz_admin/settings" element={<AdminConfig />} />
-                  <Route path="/lz_admin/logs" element={<AdminLogs />} />
-                  <Route path="/lz_admin/notifications" element={<AdminNotification />} />
+                  <Route index element={<Navigate to="dashboard" replace />} />
+                  <Route path="dashboard" element={<AdminDashboard />} />
+                  <Route path="activity" element={<AdminActivities />} />
+                  <Route path="reports" element={<AdminReport />} />
+                  <Route path="users" element={<AdminUsers />} />
+                  <Route path="courts" element={<AdminCourt />} />
+                  <Route path="bookings" element={<AdminBookings />} />
+                  <Route path="payments" element={<AdminPayments />} />
+                  <Route path="settings" element={<AdminConfig />} />
+                  <Route path="logs" element={<AdminLogs />} />
+                  <Route path="notifications" element={<AdminNotification />} />
                 </Route>
               </Route>
 

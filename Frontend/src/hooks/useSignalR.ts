@@ -3,11 +3,11 @@ import { signalRService } from '@/lib/signalr';
 import { useAuthStore } from '@/data/useAuthStore';
 
 export function useSignalR() {
-  const token = useAuthStore((state) => state.token);
+  const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
 
   useEffect(() => {
-    if (token) {
-      signalRService.startConnection(token);
+    if (isAuthenticated) {
+      signalRService.startConnection();
     } else {
       signalRService.stopConnection();
     }
@@ -15,7 +15,7 @@ export function useSignalR() {
     return () => {
       signalRService.stopConnection();
     };
-  }, [token]);
+  }, [isAuthenticated]);
 
   return { connection: signalRService.connection };
 }

@@ -81,6 +81,9 @@ public class GetReservationsHandler : IRequestHandler<GetReservationsQuery, Page
         var courts = await _context.Courts.Find(c => courtIds.Contains(c.Id)).ToListAsync(cancellationToken);
         var users = await _context.Users.Find(u => userIds.Contains(u.Id)).ToListAsync(cancellationToken);
 
+        var reservationIds = reservations.Select(r => r.Id).ToList();
+        var payments = await _context.Payments.Find(p => reservationIds.Contains(p.ReservationId)).ToListAsync(cancellationToken);
+
         var items = reservations.Select(reservation => new ReservationDto
         {
             Id = reservation.Id,
@@ -97,6 +100,7 @@ public class GetReservationsHandler : IRequestHandler<GetReservationsQuery, Page
             Status = reservation.Status,
             TotalPrice = reservation.TotalPrice,
             PaymentId = reservation.PaymentId,
+            PaymentMethod = payments.FirstOrDefault(p => p.ReservationId == reservation.Id)?.Method,
             Created = reservation.Created
         }).ToList();
 

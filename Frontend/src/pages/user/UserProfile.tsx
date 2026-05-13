@@ -85,8 +85,8 @@ function FeedbackBanner({ feedback }: { feedback: Feedback }) {
   if (!feedback.type) return null;
   return (
     <div className={`flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium border ${feedback.type === 'success'
-        ? 'bg-emerald-50 dark:bg-emerald-950/30 border-emerald-200 dark:border-emerald-800/30 text-emerald-700 dark:text-emerald-400'
-        : 'bg-red-50 dark:bg-red-950/30 border-red-200 dark:border-red-800/30 text-red-700 dark:text-red-400'
+      ? 'bg-emerald-50 dark:bg-emerald-950/30 border-emerald-200 dark:border-emerald-800/30 text-emerald-700 dark:text-emerald-400'
+      : 'bg-red-50 dark:bg-red-950/30 border-red-200 dark:border-red-800/30 text-red-700 dark:text-red-400'
       }`}>
       {feedback.type === 'success'
         ? <CheckCircle2 className="w-4 h-4 shrink-0" />
@@ -196,7 +196,7 @@ function SectionCard({ title, subtitle, icon: Icon, children, iconColor = 'text-
 
 export default function UserProfile() {
   const { t } = useTranslation();
-  const { user, setAuth, token } = useAuthStore();
+  const { user, updateUser, logout } = useAuthStore();
   const navigate = useNavigate();
   const avatarInputRef = useRef<HTMLInputElement>(null);
 
@@ -235,7 +235,7 @@ export default function UserProfile() {
       setInfoFeedback({ type: null, message: '' });
       const cleanPhone = phone.replace(/\D/g, '');
       const cleanCpf = cpf.replace(/\D/g, '');
-      
+
       if (cleanCpf && !isValidCpf(cleanCpf)) {
         setInfoFeedback({ type: 'error', message: t('userProfile.feedbacks.cpfInvalid') });
         setInfoLoading(false);
@@ -249,8 +249,8 @@ export default function UserProfile() {
         cpf: cleanCpf || null
       });
 
-      if (user && token) {
-        setAuth({ ...user, name, email, phone: cleanPhone || undefined, cpf: cleanCpf || undefined }, token);
+      if (user) {
+        updateUser({ ...user, name, email, phone: cleanPhone || undefined, cpf: cleanCpf || undefined });
       }
       setInfoFeedback({ type: 'success', message: t('userProfile.feedbacks.updateSuccess') });
     } catch (error) {
@@ -272,12 +272,33 @@ export default function UserProfile() {
     if (newPassword !== confirmPassword) {
       setPassFeedback({ type: 'error', message: t('userProfile.feedbacks.passMismatch') }); return;
     }
-    setPassLoading(true);
-    setPassFeedback({ type: null, message: '' });
-    await new Promise(r => setTimeout(r, 900));
-    setCurrentPassword(''); setNewPassword(''); setConfirmPassword('');
-    setPassFeedback({ type: 'success', message: t('userProfile.feedbacks.passSuccess') });
-    setPassLoading(false);
+
+    try {
+      setPassLoading(true);
+      setPassFeedback({ type: null, message: '' });
+
+      await api.post('/auth/change-password', {
+        currentPassword,
+        newPassword
+      });
+
+      setPassFeedback({ type: 'success', message: t('userProfile.feedbacks.passSuccess') });
+      setCurrentPassword('');
+      setNewPassword('');
+      setConfirmPassword('');
+
+      setTimeout(() => {
+        logout();
+        navigate('/login');
+      }, 2000);
+
+    } catch (error: any) {
+      console.error(error);
+      const errorMessage = error.response?.data?.message || t('userProfile.feedbacks.updateError');
+      setPassFeedback({ type: 'error', message: errorMessage });
+    } finally {
+      setPassLoading(false);
+    }
   };
 
   return (

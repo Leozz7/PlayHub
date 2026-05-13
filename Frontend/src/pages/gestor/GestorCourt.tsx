@@ -506,7 +506,12 @@ export default function GestorCourt() {
         <div className="p-8 space-y-8 animate-in fade-in duration-700">
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
                 <div>
-                    <h1 className="text-3xl font-black tracking-tight text-gray-900 dark:text-white mb-2">{t('gestor.courts.title')}</h1>
+                    <h1 className="text-3xl font-black tracking-tight text-gray-900 dark:text-white mb-2 flex items-center gap-3">
+                        <div className="w-12 h-12 rounded-2xl bg-[#8CE600]/10 border border-[#8CE600]/20 flex items-center justify-center text-[#8CE600]">
+                            <Building2 className="w-6 h-6" />
+                        </div>
+                        {t('gestor.courts.title')}
+                    </h1>
                     <p className="text-gray-500 dark:text-gray-400">{t('gestor.courts.subtitle')}</p>
                 </div>
                 <Button onClick={handleOpenCreate} className="bg-[#8CE600] text-gray-950 hover:opacity-90 font-black px-6 py-6 rounded-2xl shadow-lg shadow-[#8CE600]/20">

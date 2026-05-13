@@ -7,7 +7,7 @@ import {
   Users, Building2, CalendarDays, CreditCard,
   MoreHorizontal, ArrowUpRight, CheckCircle2,
   XCircle, Clock, AlertTriangle, Activity, Star,
-  CalendarCheck
+  CalendarCheck, LayoutDashboard
 } from 'lucide-react';
 import { useAuthStore } from '@/data/useAuthStore';
 import { useEffect } from 'react';
@@ -222,7 +222,10 @@ export default function AdminDashboard() {
     <>
       <header className="sticky top-0 z-10 bg-gray-50/80 dark:bg-background/80 backdrop-blur-xl border-b border-gray-100 dark:border-white/[0.05] px-6 py-4 flex items-center justify-between">
         <div>
-          <h1 className="text-lg font-black text-gray-900 dark:text-white tracking-tight">
+          <h1 className="text-lg font-black text-gray-900 dark:text-white tracking-tight flex items-center gap-2">
+            <div className="w-8 h-8 rounded-lg bg-[#8CE600]/10 border border-[#8CE600]/20 flex items-center justify-center text-[#8CE600]">
+              <LayoutDashboard className="w-4 h-4" />
+            </div>
             {t('admin.dashboard.greeting', { name: firstName })}
           </h1>
           <p className="text-xs text-gray-400 mt-0.5 capitalize">{now}</p>

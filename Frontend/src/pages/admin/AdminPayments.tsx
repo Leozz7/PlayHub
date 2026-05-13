@@ -1,10 +1,11 @@
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useSearchParams } from 'react-router-dom';
 import { toast } from 'sonner';
 import { 
   CreditCard, Search, Filter, CheckCircle2, XCircle, Clock, 
   MoreHorizontal, Trash2, ArrowUpRight, DollarSign, Wallet,
-  Eye, Calendar, User, Hash, Tag, Activity
+  Eye, Calendar, User, Hash, Tag, Activity, Building2
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Input } from '@/components/ui/input';
@@ -35,10 +36,13 @@ import {
     DialogTitle,
     DialogDescription,
 } from "@/components/ui/dialog";
-import { ConfirmDeleteModal, StatusModal, ActionModal } from '@/components/ui/PremiumModal';
+import { ConfirmDeleteModal, StatusModal } from '@/components/ui/PremiumModal';
 import { usePayments, useProcessPayment, useDeletePayment } from '@/features/payments/hooks/usePayments';
 
 export default function AdminPayments() {
+  const { t, i18n } = useTranslation();
+  const locale = i18n.language.startsWith('pt') ? 'pt-BR' : i18n.language.startsWith('es') ? 'es-ES' : 'en-US';
+
   const [searchParams, setSearchParams] = useSearchParams();
   const search = searchParams.get('search') || '';
   const selectedStatus = searchParams.get('status') || 'all';
@@ -93,21 +97,21 @@ export default function AdminPayments() {
 
   const getStatusBadge = (status: number) => {
     switch(status) {
-      case 1: return <Badge className="rounded-full font-black text-[10px] uppercase tracking-widest bg-amber-500/10 text-amber-500 border-amber-500/20 px-3 py-1.5"><Clock className="w-3.5 h-3.5 mr-1.5" /> Pendente</Badge>;
-      case 2: return <Badge className="rounded-full font-black text-[10px] uppercase tracking-widest bg-[#8CE600]/10 text-[#6aad00] dark:text-[#8CE600] border border-[#8CE600]/20 px-3 py-1.5"><CheckCircle2 className="w-3.5 h-3.5 mr-1.5" /> Aprovado</Badge>;
-      case 3: return <Badge className="rounded-full font-black text-[10px] uppercase tracking-widest bg-red-500/10 text-red-500 border-red-500/20 px-3 py-1.5"><XCircle className="w-3.5 h-3.5 mr-1.5" /> Falhou</Badge>;
-      case 4: return <Badge className="rounded-full font-black text-[10px] uppercase tracking-widest bg-blue-500/10 text-blue-500 border-blue-500/20 px-3 py-1.5"><ArrowUpRight className="w-3.5 h-3.5 mr-1.5" /> Estornado</Badge>;
-      default: return <Badge className="rounded-full font-black text-[10px] uppercase tracking-widest bg-gray-500/10 text-gray-500 border-gray-500/20 px-3 py-1.5">Desconhecido</Badge>;
+      case 1: return <Badge className="rounded-full font-black text-[10px] uppercase tracking-widest bg-amber-500/10 text-amber-500 border-amber-500/20 px-3 py-1.5"><Clock className="w-3.5 h-3.5 mr-1.5" /> {t('admin.payments.status.pending')}</Badge>;
+      case 2: return <Badge className="rounded-full font-black text-[10px] uppercase tracking-widest bg-[#8CE600]/10 text-[#6aad00] dark:text-[#8CE600] border border-[#8CE600]/20 px-3 py-1.5"><CheckCircle2 className="w-3.5 h-3.5 mr-1.5" /> {t('admin.payments.status.approved')}</Badge>;
+      case 3: return <Badge className="rounded-full font-black text-[10px] uppercase tracking-widest bg-red-500/10 text-red-500 border-red-500/20 px-3 py-1.5"><XCircle className="w-3.5 h-3.5 mr-1.5" /> {t('admin.payments.status.failed')}</Badge>;
+      case 4: return <Badge className="rounded-full font-black text-[10px] uppercase tracking-widest bg-blue-500/10 text-blue-500 border-blue-500/20 px-3 py-1.5"><ArrowUpRight className="w-3.5 h-3.5 mr-1.5" /> {t('admin.payments.status.refunded')}</Badge>;
+      default: return <Badge className="rounded-full font-black text-[10px] uppercase tracking-widest bg-gray-500/10 text-gray-500 border-gray-500/20 px-3 py-1.5">{t('admin.payments.status.unknown')}</Badge>;
     }
   };
 
   const getMethodText = (method: number) => {
       switch(method) {
-          case 1: return 'Cartão de Crédito';
-          case 2: return 'Cartão de Débito';
-          case 3: return 'PIX';
-          case 4: return 'Dinheiro';
-          default: return 'Outro';
+          case 1: return t('admin.payments.methods.credit');
+          case 2: return t('admin.payments.methods.debit');
+          case 3: return t('admin.payments.methods.pix');
+          case 4: return t('admin.payments.methods.cash');
+          default: return t('admin.payments.methods.other');
       }
   };
 
@@ -121,18 +125,18 @@ export default function AdminPayments() {
             <div className="w-12 h-12 rounded-2xl bg-[#8CE600]/10 border border-[#8CE600]/20 flex items-center justify-center text-[#8CE600]">
               <CreditCard className="w-6 h-6" />
             </div>
-            Gestão Financeira
+            {t('admin.payments.title')}
           </h1>
-          <p className="text-gray-500 dark:text-gray-400">Acompanhe e gerencie os pagamentos das reservas.</p>
+          <p className="text-gray-500 dark:text-gray-400">{t('admin.payments.subtitle')}</p>
         </div>
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         {[
-          { label: 'Receita Total', value: `R$ ${totalRevenue.toFixed(2).replace('.', ',')}`, icon: DollarSign, color: 'text-[#8CE600]' },
-          { label: 'Pagamentos Pendentes', value: payments.filter(p => p.status === 1).length, icon: Clock, color: 'text-amber-500' },
-          { label: 'Pagamentos Aprovados', value: payments.filter(p => p.status === 2).length, icon: CheckCircle2, color: 'text-blue-500' },
-          { label: 'Falhas / Estornos', value: payments.filter(p => p.status === 3 || p.status === 4).length, icon: XCircle, color: 'text-red-500' },
+          { label: t('admin.payments.stats.totalRevenue'), value: `R$ ${totalRevenue.toFixed(2).replace('.', ',')}`, icon: DollarSign, color: 'text-[#8CE600]' },
+          { label: t('admin.payments.stats.pending'), value: payments.filter(p => p.status === 1).length, icon: Clock, color: 'text-amber-500' },
+          { label: t('admin.payments.stats.approved'), value: payments.filter(p => p.status === 2).length, icon: CheckCircle2, color: 'text-blue-500' },
+          { label: t('admin.payments.stats.failed'), value: payments.filter(p => p.status === 3 || p.status === 4).length, icon: XCircle, color: 'text-red-500' },
         ].map((stat, i) => (
           <motion.div 
             initial={{ opacity: 0, y: 20 }}
@@ -157,7 +161,7 @@ export default function AdminPayments() {
           <div className="relative flex-1 w-full">
             <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
             <Input
-              placeholder="Buscar por ID ou Transação..."
+              placeholder={t('admin.payments.filters.searchPlaceholder')}
               value={search}
               onChange={(e) => updateFilters('search', e.target.value)}
               className="pl-11 h-12 bg-gray-50 dark:bg-white/5 border-none rounded-2xl focus-visible:ring-2 focus-visible:ring-[#8CE600]/50"
@@ -167,14 +171,14 @@ export default function AdminPayments() {
             <Select value={selectedStatus} onValueChange={(v) => updateFilters('status', v)}>
               <SelectTrigger className="h-12 bg-gray-50 dark:bg-white/5 border-none rounded-2xl focus:ring-2 focus:ring-[#8CE600]/50">
                 <Filter className="w-4 h-4 mr-2 text-gray-400" />
-                <SelectValue placeholder="Status" />
+                <SelectValue placeholder={t('admin.payments.filters.statusPlaceholder')} />
               </SelectTrigger>
               <SelectContent className="rounded-2xl border-gray-100 dark:border-white/10">
-                <SelectItem value="all">Todos os Status</SelectItem>
-                <SelectItem value="1">Pendentes</SelectItem>
-                <SelectItem value="2">Aprovados</SelectItem>
-                <SelectItem value="3">Falhou</SelectItem>
-                <SelectItem value="4">Estornados</SelectItem>
+                <SelectItem value="all">{t('admin.payments.filters.allStatus')}</SelectItem>
+                <SelectItem value="1">{t('admin.payments.filters.pending')}</SelectItem>
+                <SelectItem value="2">{t('admin.payments.filters.approved')}</SelectItem>
+                <SelectItem value="3">{t('admin.payments.filters.failed')}</SelectItem>
+                <SelectItem value="4">{t('admin.payments.filters.refunded')}</SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -184,12 +188,12 @@ export default function AdminPayments() {
           <Table>
             <TableHeader>
               <TableRow className="border-b border-gray-100 dark:border-white/10 hover:bg-transparent">
-                <TableHead className="px-6 py-4 font-black text-xs uppercase tracking-widest text-gray-400">ID</TableHead>
-                <TableHead className="px-6 py-4 font-black text-xs uppercase tracking-widest text-gray-400">Transação</TableHead>
-                <TableHead className="px-6 py-4 font-black text-xs uppercase tracking-widest text-gray-400">Método</TableHead>
-                <TableHead className="px-6 py-4 font-black text-xs uppercase tracking-widest text-gray-400">Data e Hora</TableHead>
-                <TableHead className="px-6 py-4 font-black text-xs uppercase tracking-widest text-gray-400">Valor</TableHead>
-                <TableHead className="px-6 py-4 font-black text-xs uppercase tracking-widest text-gray-400">Status</TableHead>
+                <TableHead className="px-6 py-4 font-black text-xs uppercase tracking-widest text-gray-400">{t('admin.payments.table.id')}</TableHead>
+                <TableHead className="px-6 py-4 font-black text-xs uppercase tracking-widest text-gray-400">{t('admin.payments.table.transaction')}</TableHead>
+                <TableHead className="px-6 py-4 font-black text-xs uppercase tracking-widest text-gray-400">{t('admin.payments.table.method')}</TableHead>
+                <TableHead className="px-6 py-4 font-black text-xs uppercase tracking-widest text-gray-400">{t('admin.payments.table.dateTime')}</TableHead>
+                <TableHead className="px-6 py-4 font-black text-xs uppercase tracking-widest text-gray-400">{t('admin.payments.table.amount')}</TableHead>
+                <TableHead className="px-6 py-4 font-black text-xs uppercase tracking-widest text-gray-400">{t('admin.payments.table.status')}</TableHead>
                 <TableHead className="px-6 py-4 text-right"></TableHead>
               </TableRow>
             </TableHeader>
@@ -235,7 +239,7 @@ export default function AdminPayments() {
                         <div className="flex items-center gap-2">
                           <div className={`w-2 h-2 rounded-full ${p.transactionId ? 'bg-[#8CE600]' : 'bg-amber-400 animate-pulse'}`} />
                           <span className={`text-sm font-black ${p.transactionId ? 'text-gray-900 dark:text-white' : 'text-amber-500 italic font-bold'}`}>
-                            {p.transactionId || 'Aguardando...'}
+                            {p.transactionId || t('admin.payments.filters.pending')}
                           </span>
                         </div>
                       </TableCell>
@@ -245,10 +249,10 @@ export default function AdminPayments() {
                       <TableCell className="px-6 py-4">
                         <div className="flex flex-col">
                           <span className="text-sm font-bold text-gray-700 dark:text-gray-300">
-                            {new Date(p.created).toLocaleDateString('pt-BR')}
+                            {new Date(p.created).toLocaleDateString(locale)}
                           </span>
                           <span className="text-[11px] text-gray-400 font-medium">
-                            {new Date(p.created).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}
+                            {new Date(p.created).toLocaleTimeString(locale, { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false })}
                           </span>
                         </div>
                       </TableCell>
@@ -281,11 +285,11 @@ export default function AdminPayments() {
                               </Button>
                             </DropdownMenuTrigger>
                             <DropdownMenuContent align="end" className="w-48 bg-white dark:bg-background border border-gray-100 dark:border-white/10 rounded-2xl shadow-xl p-2">
-                              <DropdownMenuLabel className="text-[10px] font-black uppercase tracking-widest text-gray-400 px-2 pb-2">Ações</DropdownMenuLabel>
+                              <DropdownMenuLabel className="text-[10px] font-black uppercase tracking-widest text-gray-400 px-2 pb-2">{t('admin.payments.table.actions')}</DropdownMenuLabel>
                               
                               {p.status === 1 && (
                                 <DropdownMenuItem onClick={() => handleProcess(p.id)} className="flex items-center gap-2 text-xs font-bold py-2.5 px-3 rounded-xl cursor-pointer hover:bg-[#8CE600]/10 hover:text-[#8CE600] transition-colors">
-                                  <CheckCircle2 className="w-3.5 h-3.5" /> Processar Manual
+                                  <CheckCircle2 className="w-3.5 h-3.5" /> {t('admin.payments.modal.processTitle')}
                                 </DropdownMenuItem>
                               )}
 
@@ -295,7 +299,7 @@ export default function AdminPayments() {
                                 onClick={() => handleDelete(p)}
                                 className="flex items-center gap-2 text-xs font-bold text-red-500 py-2.5 px-3 rounded-xl cursor-pointer hover:bg-red-500/10 transition-colors"
                               >
-                                <Trash2 className="w-3.5 h-3.5" /> Excluir Registro
+                                <Trash2 className="w-3.5 h-3.5" /> {t('admin.payments.modal.deleteTitle')}
                               </DropdownMenuItem>
                             </DropdownMenuContent>
                           </DropdownMenu>
@@ -320,8 +324,8 @@ export default function AdminPayments() {
                 <Activity className="w-6 h-6" />
               </div>
               <div>
-                <DialogTitle className="text-xl font-bold tracking-tight text-gray-900 dark:text-white">Detalhes do Pagamento</DialogTitle>
-                <DialogDescription className="text-[10px] font-bold uppercase tracking-widest text-gray-500">Transação Financeira Registrada</DialogDescription>
+                <DialogTitle className="text-xl font-bold tracking-tight text-gray-900 dark:text-white">{t('admin.payments.modal.detailsTitle')}</DialogTitle>
+                <DialogDescription className="text-[10px] font-bold uppercase tracking-widest text-gray-500">{t('admin.payments.modal.detailsDesc')}</DialogDescription>
               </div>
             </div>
           </DialogHeader>
@@ -330,23 +334,44 @@ export default function AdminPayments() {
             <div className="px-8 pb-8 space-y-6">
               <div className="grid grid-cols-2 gap-4">
                 <div className="bg-gray-50 dark:bg-white/5 p-4 rounded-2xl border border-gray-100 dark:border-white/5">
-                  <p className="text-[10px] font-black uppercase tracking-widest text-gray-400 mb-1">Status do Pagamento</p>
+                  <p className="text-[10px] font-black uppercase tracking-widest text-gray-400 mb-1">{t('admin.payments.table.status')}</p>
                   <div className="mt-1">{getStatusBadge(selectedPayment.status)}</div>
                 </div>
                 <div className="bg-gray-50 dark:bg-white/5 p-4 rounded-2xl border border-gray-100 dark:border-white/5">
-                  <p className="text-[10px] font-black uppercase tracking-widest text-gray-400 mb-1">Valor Total</p>
+                  <p className="text-[10px] font-black uppercase tracking-widest text-gray-400 mb-1">{t('admin.payments.table.amount')}</p>
                   <p className="text-xl font-black text-[#8CE600]">R$ {selectedPayment.amount.toFixed(2).replace('.', ',')}</p>
                 </div>
               </div>
 
               <div className="space-y-4">
-                <h4 className="text-[11px] font-black uppercase tracking-widest text-gray-400 border-b border-gray-100 dark:border-white/10 pb-2">Informações Gerais</h4>
+                <h4 className="text-[11px] font-black uppercase tracking-widest text-gray-400 border-b border-gray-100 dark:border-white/10 pb-2">{t('admin.payments.modal.detailsDesc')}</h4>
                 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-y-4 gap-x-8">
                   <div className="flex items-start gap-3">
+                    <Building2 className="w-4 h-4 text-gray-400 mt-0.5" />
+                    <div>
+                      <p className="text-[10px] font-bold uppercase tracking-tight text-gray-500">{t('admin.payments.modal.labels.court')}</p>
+                      <p className="text-xs font-bold text-gray-900 dark:text-white">{selectedPayment.courtName || 'N/A'}</p>
+                      <p className="text-[10px] text-gray-500">{selectedPayment.courtSport}</p>
+                    </div>
+                  </div>
+
+                  <div className="flex items-start gap-3">
+                    <User className="w-4 h-4 text-gray-400 mt-0.5" />
+                    <div className="flex-1 min-w-0">
+                      <p className="text-[10px] font-bold uppercase tracking-tight text-gray-500">{t('admin.payments.modal.labels.customer')}</p>
+                      <p className="text-xs font-bold text-gray-900 dark:text-white truncate">
+                        {selectedPayment.userName || 'N/A'}
+                      </p>
+                      <p className="text-[11px] text-gray-500 dark:text-gray-400 truncate">
+                        {selectedPayment.userEmail || 'Não informado'}
+                      </p>
+                    </div>
+                  </div>
+                  <div className="flex items-start gap-3">
                     <Hash className="w-4 h-4 text-gray-400 mt-0.5" />
                     <div>
-                      <p className="text-[10px] font-bold uppercase tracking-tight text-gray-500">ID do Pagamento</p>
+                      <p className="text-[10px] font-bold uppercase tracking-tight text-gray-500">{t('admin.payments.table.id')}</p>
                       <p className="text-xs font-mono font-medium text-gray-900 dark:text-gray-300 break-all">{selectedPayment.id}</p>
                     </div>
                   </div>
@@ -354,9 +379,9 @@ export default function AdminPayments() {
                   <div className="flex items-start gap-3">
                     <Tag className="w-4 h-4 text-gray-400 mt-0.5" />
                     <div>
-                      <p className="text-[10px] font-bold uppercase tracking-tight text-gray-500">ID da Transação</p>
+                      <p className="text-[10px] font-bold uppercase tracking-tight text-gray-500">{t('admin.payments.table.transaction')}</p>
                       <p className={`text-xs font-black ${selectedPayment.transactionId ? 'text-gray-900 dark:text-white' : 'text-amber-500 italic'}`}>
-                        {selectedPayment.transactionId || 'Pendente de processamento'}
+                        {selectedPayment.transactionId || t('admin.payments.filters.pending')}
                       </p>
                     </div>
                   </div>
@@ -364,9 +389,9 @@ export default function AdminPayments() {
                   <div className="flex items-start gap-3">
                     <Calendar className="w-4 h-4 text-gray-400 mt-0.5" />
                     <div>
-                      <p className="text-[10px] font-bold uppercase tracking-tight text-gray-500">Data de Criação</p>
+                      <p className="text-[10px] font-bold uppercase tracking-tight text-gray-500">{t('admin.payments.table.dateTime')}</p>
                       <p className="text-xs font-bold text-gray-900 dark:text-gray-300">
-                        {new Date(selectedPayment.created).toLocaleDateString('pt-BR')} às {new Date(selectedPayment.created).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}
+                        {new Date(selectedPayment.created).toLocaleDateString(locale)} {t('common.at')} {new Date(selectedPayment.created).toLocaleTimeString(locale, { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false })}
                       </p>
                     </div>
                   </div>
@@ -374,52 +399,57 @@ export default function AdminPayments() {
                   <div className="flex items-start gap-3">
                     <CreditCard className="w-4 h-4 text-gray-400 mt-0.5" />
                     <div>
-                      <p className="text-[10px] font-bold uppercase tracking-tight text-gray-500">Método de Pagamento</p>
+                      <p className="text-[10px] font-bold uppercase tracking-tight text-gray-500">{t('admin.payments.table.method')}</p>
                       <p className="text-xs font-bold text-gray-900 dark:text-gray-300">{getMethodText(selectedPayment.method)}</p>
-                    </div>
-                  </div>
-
-                  <div className="flex items-start gap-3">
-                    <User className="w-4 h-4 text-gray-400 mt-0.5" />
-                    <div className="flex-1 min-w-0">
-                      <p className="text-[10px] font-bold uppercase tracking-tight text-gray-500">Cliente / Pagador</p>
-                      <p className="text-xs font-bold text-gray-900 dark:text-white truncate">
-                        {selectedPayment.userName || selectedPayment.UserName || 'N/A'}
-                      </p>
-                      <p className="text-[11px] text-gray-500 dark:text-gray-400 truncate">
-                        {selectedPayment.userEmail || selectedPayment.UserEmail || 'Não informado'}
-                      </p>
                     </div>
                   </div>
 
                   <div className="flex items-start gap-3">
                     <Hash className="w-4 h-4 text-gray-400 mt-0.5" />
                     <div>
-                      <p className="text-[10px] font-bold uppercase tracking-tight text-gray-500">ID da Reserva</p>
+                      <p className="text-[10px] font-bold uppercase tracking-tight text-gray-500">{t('admin.payments.modal.labels.reservationId')}</p>
                       <p className="text-xs font-mono font-medium text-gray-900 dark:text-gray-300 break-all">{selectedPayment.reservationId}</p>
+                    </div>
+                  </div>
+
+                  <div className="flex items-start gap-3">
+                    <Hash className="w-4 h-4 text-gray-400 mt-0.5" />
+                    <div>
+                      <p className="text-[10px] font-bold uppercase tracking-tight text-gray-500">{t('admin.payments.table.id')}</p>
+                      <p className="text-xs font-mono font-medium text-gray-900 dark:text-gray-300 break-all">{selectedPayment.id}</p>
                     </div>
                   </div>
                 </div>
               </div>
 
-              <div className="pt-4 flex gap-3">
+              <div className="pt-4 flex flex-col sm:flex-row gap-3">
                 {selectedPayment.status === 1 && (
                   <Button 
-                    className="flex-1 h-12 rounded-xl bg-[#8CE600] text-gray-950 font-bold text-xs uppercase tracking-widest hover:opacity-90 transition-all"
+                    className="flex-1 h-12 rounded-xl bg-[#8CE600] text-gray-950 font-bold text-xs uppercase tracking-widest hover:opacity-90 transition-all order-2 sm:order-1"
                     onClick={() => {
                       setIsDetailsOpen(false);
                       handleProcess(selectedPayment.id);
                     }}
                   >
-                    <CheckCircle2 className="w-4 h-4 mr-2" /> Processar Agora
+                    <CheckCircle2 className="w-4 h-4 mr-2" /> {t('admin.payments.modal.processTitle')}
                   </Button>
                 )}
                 <Button 
                   variant="outline"
-                  className="flex-1 h-12 rounded-xl border-gray-100 dark:border-white/10 font-bold text-xs uppercase tracking-widest hover:bg-gray-50 dark:hover:bg-white/5"
+                  className="flex-1 h-12 rounded-xl border-red-100 dark:border-red-500/10 text-red-500 font-bold text-xs uppercase tracking-widest hover:bg-red-50 dark:hover:bg-red-500/5 order-3 sm:order-2"
+                  onClick={() => {
+                    setIsDetailsOpen(false);
+                    handleDelete(selectedPayment);
+                  }}
+                >
+                  <Trash2 className="w-4 h-4 mr-2" /> {t('common.actions.delete', 'Excluir')}
+                </Button>
+                <Button 
+                  variant="outline"
+                  className="flex-1 h-12 rounded-xl border-gray-100 dark:border-white/10 font-bold text-xs uppercase tracking-widest hover:bg-gray-50 dark:hover:bg-white/5 order-1 sm:order-3"
                   onClick={() => setIsDetailsOpen(false)}
                 >
-                  Fechar Detalhes
+                  {t('common.close')}
                 </Button>
               </div>
             </div>
@@ -434,8 +464,8 @@ export default function AdminPayments() {
             <div className="w-14 h-14 rounded-2xl bg-[#8CE600]/10 text-[#8CE600] mb-4 flex items-center justify-center">
               <CheckCircle2 className="w-7 h-7" />
             </div>
-            <h2 className="text-xl font-bold tracking-tight text-gray-900 dark:text-white mb-2">Processar Pagamento</h2>
-            <p className="text-gray-500 dark:text-gray-400 text-sm font-medium mb-6">Insira o ID da transação (PIX ou Recibo) para confirmar este pagamento.</p>
+            <h2 className="text-xl font-bold tracking-tight text-gray-900 dark:text-white mb-2">{t('admin.payments.modal.processTitle')}</h2>
+            <p className="text-gray-500 dark:text-gray-400 text-sm font-medium mb-6">{t('admin.payments.modal.processDesc')}</p>
             
             <Input 
               value={transactionIdInput}
@@ -445,7 +475,7 @@ export default function AdminPayments() {
             />
 
             <div className="grid grid-cols-2 gap-2 w-full">
-              <Button variant="ghost" onClick={() => setProcessModalOpen(false)} className="h-12 font-bold rounded-xl">Cancelar</Button>
+              <Button variant="ghost" onClick={() => setProcessModalOpen(false)} className="h-12 font-bold rounded-xl">{t('common.actions.cancel')}</Button>
               <Button 
                 disabled={!transactionIdInput || processMutation.isPending}
                 onClick={() => {
@@ -456,26 +486,26 @@ export default function AdminPayments() {
                         setStatusModal({
                           isOpen: true,
                           status: 'success',
-                          title: 'Pagamento Processado',
-                          message: 'O pagamento foi confirmado e a reserva está liberada.'
+                          title: t('admin.payments.messages.processSuccessTitle'),
+                          message: t('admin.payments.messages.processSuccessMsg')
                         });
-                        toast.success('Pagamento processado com sucesso!');
+                        toast.success(t('admin.payments.toasts.processSuccess'));
                       },
                       onError: () => {
                         setStatusModal({
                           isOpen: true,
                           status: 'error',
-                          title: 'Erro no Processamento',
-                          message: 'Não foi possível confirmar este pagamento no momento.'
+                          title: t('admin.payments.messages.processErrorTitle'),
+                          message: t('admin.payments.messages.processErrorMsg')
                         });
-                        toast.error('Erro ao processar pagamento.');
+                        toast.error(t('admin.payments.toasts.processError'));
                       }
                     });
                   }
                 }}
                 className="h-12 bg-[#8CE600] text-gray-950 font-bold rounded-xl transition-all active:scale-95"
               >
-                {processMutation.isPending ? 'Processando...' : 'Confirmar'}
+                {processMutation.isPending ? t('common.actions.processing') : t('common.confirm')}
               </Button>
             </div>
           </div>
@@ -492,25 +522,25 @@ export default function AdminPayments() {
             setStatusModal({
               isOpen: true,
               status: 'success',
-              title: 'Registro Removido',
-              message: 'O registro financeiro foi excluído permanentemente.'
+              title: t('admin.payments.messages.deleteSuccessTitle'),
+              message: t('admin.payments.messages.deleteSuccessMsg')
             });
-            toast.success('Registro excluído com sucesso!');
+            toast.success(t('admin.payments.toasts.deleteSuccess'));
           },
           onError: () => {
             setDeleteModalOpen(false);
             setStatusModal({
               isOpen: true,
               status: 'error',
-              title: 'Erro na Exclusão',
-              message: 'Não foi possível remover este registro financeiro.'
+              title: t('admin.payments.messages.deleteErrorTitle'),
+              message: t('admin.payments.messages.deleteErrorMsg')
             });
-            toast.error('Erro ao excluir registro.');
+            toast.error(t('admin.payments.toasts.deleteError'));
           }
         })}
         isLoading={deleteMutation.isPending}
-        title="Excluir Registro?"
-        description="Esta ação removerá permanentemente este registro financeiro do sistema. Isso pode afetar seus relatórios."
+        title={t('admin.payments.messages.deleteConfirmTitle')}
+        description={t('admin.payments.messages.deleteConfirmDesc')}
         itemName={paymentToDelete ? `R$ ${paymentToDelete.amount.toFixed(2)}` : undefined}
       />
 

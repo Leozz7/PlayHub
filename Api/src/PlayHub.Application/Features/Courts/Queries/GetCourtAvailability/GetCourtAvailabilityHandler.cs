@@ -28,16 +28,18 @@ public class GetCourtAvailabilityHandler : IRequestHandler<GetCourtAvailabilityQ
 
         if (court == null)
         {
-            throw new Exception("Court not found");
+            throw new Exception("Quadra não encontrada");
         }
 
-        var startOfDay = request.Date.Date;
-        var endOfDay = startOfDay.AddDays(1);
+        var targetDate = request.Date.Date;
+        var startUtcSearch = targetDate.AddDays(-1);
+        var endUtcSearch = targetDate.AddDays(2);
 
+        // criando filtro por data
         var filterBuilder = Builders<Reservation>.Filter;
         var filter = filterBuilder.Eq(r => r.CourtId, request.CourtId) &
-                     filterBuilder.Gte(r => r.StartTime, startOfDay) &
-                     filterBuilder.Lt(r => r.StartTime, endOfDay) &
+                     filterBuilder.Gte(r => r.StartTime, startUtcSearch) &
+                     filterBuilder.Lt(r => r.StartTime, endUtcSearch) &
                      filterBuilder.Ne(r => r.Status, PlayHub.Domain.Enums.ReservationStatus.Cancelled);
 
         var reservations = await _context.Reservations
@@ -45,11 +47,19 @@ public class GetCourtAvailabilityHandler : IRequestHandler<GetCourtAvailabilityQ
             .ToListAsync(cancellationToken);
 
         var busySlots = new HashSet<int>();
+
+        // preenchendo horarios ocupados
         foreach (var reservation in reservations)
         {
-            for (int hour = reservation.StartTime.Hour; hour < reservation.EndTime.Hour; hour++)
+            var localStart = reservation.StartTime.AddHours(-3);
+            var localEnd = reservation.EndTime.AddHours(-3);
+
+            for (var slot = localStart; slot < localEnd; slot = slot.AddHours(1))
             {
-                busySlots.Add(hour);
+                if (slot.Date == targetDate)
+                {
+                    busySlots.Add(slot.Hour);
+                }
             }
         }
 

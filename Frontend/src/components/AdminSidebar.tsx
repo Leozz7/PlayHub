@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useCallback, useMemo } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import {
@@ -47,7 +47,7 @@ export function AdminSidebar() {
   const phToast = usePlayHubToast();
   const { theme, setTheme } = useTheme();
 
-  const NAV_SECTIONS: { title: string; items: NavItem[] }[] = [
+  const NAV_SECTIONS: { title: string; items: NavItem[] }[] = useMemo(() => [
     {
       title: t('admin.sidebar.main'),
       items: [
@@ -73,7 +73,10 @@ export function AdminSidebar() {
         { label: t('admin.sidebar.settings'), icon: Settings, href: '/lz_admin/settings' },
       ],
     },
-  ];
+  ], [t]);
+
+  const toggleCollapsed = useCallback(() => setCollapsed(prev => !prev), []);
+  const toggleTheme = useCallback(() => setTheme(theme === 'dark' ? 'light' : 'dark'), [theme, setTheme]);
 
   const handleLogout = () => {
     logout();
@@ -90,7 +93,7 @@ export function AdminSidebar() {
       <div className="absolute top-0 left-0 right-0 h-64 bg-gradient-to-b from-[#8CE600]/5 to-transparent pointer-events-none" />
 
       <button
-        onClick={() => setCollapsed(!collapsed)}
+        onClick={toggleCollapsed}
         className="absolute -right-3 top-6 z-20 w-6 h-6 rounded-full bg-white dark:bg-card border border-gray-200 dark:border-white/10 flex items-center justify-center shadow-md hover:shadow-lg hover:border-[#8CE600]/50 transition-all duration-300 group"
         aria-label={collapsed ? t('admin.sidebar.expand') : t('admin.sidebar.collapse')}
       >
@@ -182,7 +185,7 @@ export function AdminSidebar() {
         {collapsed ? (
           <div className="flex flex-col items-center gap-2">
             <button
-              onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
+              onClick={toggleTheme}
               className="w-10 h-10 rounded-xl flex items-center justify-center text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-white/10 transition-all"
               title={theme === 'dark' ? t('admin.sidebar.lightTheme') : t('admin.sidebar.darkTheme')}
             >
@@ -209,7 +212,7 @@ export function AdminSidebar() {
             </div>
             <div className="flex items-center gap-2">
               <button
-                onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
+                onClick={toggleTheme}
                 className="w-10 h-10 rounded-xl flex items-center justify-center text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-white/10 transition-all shrink-0"
                 title={theme === 'dark' ? t('admin.sidebar.lightTheme') : t('admin.sidebar.darkTheme')}
               >

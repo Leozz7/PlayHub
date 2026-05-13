@@ -19,5 +19,6 @@ public class ReservationDto
     public ReservationStatus Status { get; set; }
     public decimal TotalPrice { get; set; }
     public Guid? PaymentId { get; set; }
+    public PaymentMethod? PaymentMethod { get; set; }
     public DateTime Created { get; set; }
 }

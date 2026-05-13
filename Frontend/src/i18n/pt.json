@@ -3,6 +3,9 @@
     "cover": "Capa",
     "other": "Outro",
     "user": "Usuário",
+    "at": "às",
+    "close": "Fechar",
+    "confirm": "Confirmar",
     "actions": {
       "login": "Entrar",
       "register": "Criar Conta",
@@ -700,7 +703,9 @@
     "successDesc1": "Sua reserva em",
     "successDesc2": "para",
     "successDesc3": "foi realizada com sucesso. Você receberá um e-mail de confirmação em breve.",
-    "emailNotice": "Um comprovante foi enviado para o seu e-mail cadastrado."
+    "emailNotice": "Um comprovante foi enviado para o seu e-mail cadastrado.",
+    "cardHolder": "Titular do Cartão",
+    "expires": "Validade"
   },
   "forgotPassword": {
     "title": "Recuperar senha",
@@ -1115,6 +1120,91 @@
         "previous": "Anterior",
         "next": "Próximo"
       }
+    },
+    "payments": {
+      "title": "Gestão Financeira",
+      "subtitle": "Acompanhe e gerencie os pagamentos das reservas.",
+      "stats": {
+        "totalRevenue": "Receita Total",
+        "pending": "Pagamentos Pendentes",
+        "approved": "Pagamentos Aprovados",
+        "failed": "Falhas / Estornos"
+      },
+      "filters": {
+        "searchPlaceholder": "Buscar por ID ou Transação...",
+        "statusPlaceholder": "Status",
+        "allStatus": "Todos os Status",
+        "pending": "Pendentes",
+        "approved": "Aprovados",
+        "failed": "Falhou",
+        "refunded": "Estornados"
+      },
+      "table": {
+        "id": "ID",
+        "transaction": "Transação",
+        "method": "Método",
+        "dateTime": "Data e Hora",
+        "amount": "Valor",
+        "status": "Status",
+        "actions": "Ações"
+      },
+      "status": {
+        "pending": "Pendente",
+        "approved": "Aprovado",
+        "failed": "Falhou",
+        "refunded": "Estornado",
+        "unknown": "Desconhecido"
+      },
+      "methods": {
+        "credit": "Cartão de Crédito",
+        "debit": "Cartão de Débito",
+        "pix": "PIX",
+        "cash": "Dinheiro",
+        "other": "Outro"
+      },
+      "modal": {
+        "processTitle": "Processar Pagamento",
+        "processDesc": "Insira o ID da transação do gateway para aprovar este pagamento manualmente.",
+        "transactionId": "ID da Transação",
+        "confirmBtn": "Aprovar Pagamento",
+        "deleteTitle": "Excluir Registro",
+        "deleteDesc": "Tem certeza que deseja remover o registro de pagamento de {{amount}}? Esta ação não pode ser desfeita.",
+        "detailsTitle": "Detalhes do Pagamento",
+        "detailsDesc": "Informações completas sobre a transação e reserva associada.",
+        "sections": {
+          "reservation": "Informações da Reserva",
+          "payment": "Informações do Pagamento",
+          "customer": "Informações do Cliente"
+        },
+        "labels": {
+          "court": "Quadra / Arena",
+          "sport": "Modalidade",
+          "schedule": "Horário Reservado",
+          "customer": "Cliente",
+          "cpfPhone": "CPF / Telefone",
+          "methodId": "Método e Pagamento ID",
+          "date": "Data do Pagamento",
+          "reservationId": "ID da Reserva"
+        }
+      },
+      "toasts": {
+        "processSuccess": "Pagamento processado com sucesso!",
+        "processError": "Erro ao processar pagamento.",
+        "deleteSuccess": "Registro excluído com sucesso!",
+        "deleteError": "Erro ao excluir registro."
+      },
+      "messages": {
+        "processSuccessTitle": "Pagamento Processado",
+        "processSuccessMsg": "O pagamento foi confirmado e a reserva está liberada.",
+        "processErrorTitle": "Erro no Processamento",
+        "processErrorMsg": "Não foi possível confirmar este pagamento no momento.",
+        "deleteSuccessTitle": "Registro Removido",
+        "deleteSuccessMsg": "O registro financeiro foi excluído permanentemente.",
+        "deleteErrorTitle": "Erro na Exclusão",
+        "deleteErrorMsg": "Não foi possível remover este registro financeiro.",
+        "deleteConfirmTitle": "Excluir Registro?",
+        "deleteConfirmDesc": "Esta ação removerá permanentemente este registro financeiro do sistema. Isso pode afetar seus relatórios."
+      }
     }
   },
   "gestor": {
@@ -1140,6 +1230,7 @@
     },
     "dashboard": {
       "greeting": "Painel do Gestor, {{name}}",
+      "subtitle": "Gerencie suas quadras, agendamentos e acompanhe seu desempenho em tempo real.",
       "managerBadge": "Gestor",
       "newCourt": "Nova Quadra",
       "stats": {
@@ -1184,7 +1275,13 @@
         "clients": "Clientes hoje"
       },
       "quickActions": "Ações Rápidas",
-      "quickActionsDesc": "Gerencie suas quadras com agilidade"
+      "quickActionsDesc": "Gerencie suas quadras com agilidade",
+      "emptyState": {
+        "title": "Nenhuma reserva recente",
+        "subtitle": "Quando houver reservas nas suas quadras, elas aparecerão aqui.",
+        "scheduleTitle": "Agenda livre hoje",
+        "scheduleSubtitle": "Não há reservas confirmadas para hoje."
+      }
     },
     "schedule": {
       "title": "Agenda das Quadras",
@@ -1349,6 +1446,12 @@
     "reservations": {
       "title": "Gestão de Reservas",
       "subtitle": "Visualize e gerencie todos os agendamentos das suas quadras.",
+      "stats": {
+        "total": "Total de Reservas",
+        "confirmed": "Confirmadas",
+        "pending": "Pendentes",
+        "revenue": "Faturamento"
+      },
       "searchPlaceholder": "Buscar por cliente, quadra ou ID...",
       "allCourts": "Todas as Quadras",
       "allStatuses": "Todos os Status",
@@ -1379,14 +1482,22 @@
       "occupancy": "Taxa de Ocupação",
       "totalReservations": "Total de Reservas",
       "uniqueClients": "Clientes Ativos",
+      "avgTicket": "Ticket Médio",
       "revenueByCourt": "Receita por Quadra",
       "reservationsByDay": "Reservas por Dia",
       "courtPerformance": "Desempenho por Quadra",
-      "generatingPdf": "Gerando PDF..."
+      "generatingPdf": "Gerando PDF...",
+      "comingSoon": "Em breve"
     },
     "clients": {
       "title": "Meus Clientes",
       "subtitle": "Visualize os clientes que utilizam suas quadras e seu histórico.",
+      "stats": {
+        "total": "Total de Clientes",
+        "new": "Novos Clientes",
+        "revenue": "Receita por Cliente",
+        "avg": "Ticket Médio"
+      },
       "searchPlaceholder": "Buscar por nome ou email...",
       "table": {
         "name": "Cliente",
@@ -1402,6 +1513,12 @@
     "payments": {
       "title": "Controle Financeiro",
       "subtitle": "Acompanhe os pagamentos e recebíveis das suas quadras.",
+      "stats": {
+        "revenue": "Receita Total",
+        "pending": "Receita Pendente",
+        "successful": "Pagos com Sucesso",
+        "failed": "Pagamentos Falhos"
+      },
       "searchPlaceholder": "Buscar por ID da transação ou cliente...",
       "allMethods": "Todos os Métodos",
       "table": {
@@ -1413,7 +1530,35 @@
         "status": "Status",
         "date": "Data"
       },
-      "noResults": "Nenhum pagamento encontrado"
+      "noResults": "Nenhum pagamento encontrado",
+      "methods": {
+        "credit": "Cartão de Crédito",
+        "debit": "Cartão de Débito",
+        "pix": "PIX",
+        "cash": "Dinheiro",
+        "other": "Outro"
+      },
+      "statusLabels": {
+        "completed": "Concluído",
+        "failed": "Falhou",
+        "pending": "Pendente"
+      },
+      "modal": {
+        "detailsTitle": "Detalhes do Pagamento",
+        "detailsDesc": "Informações completas sobre o pagamento e a reserva.",
+        "labels": {
+          "status": "Status",
+          "totalAmount": "Valor Total",
+          "reservationInfo": "Informações da Reserva",
+          "arena": "Arena / Quadra",
+          "schedule": "Horário Reservado",
+          "client": "Cliente",
+          "cpfPhone": "CPF / Telefone",
+          "methodId": "Método e Pagamento ID",
+          "date": "Data do Pagamento",
+          "reservationId": "ID da Reserva"
+        }
+      }
     },
     "notifications": {
       "title": "Central de Notificações",

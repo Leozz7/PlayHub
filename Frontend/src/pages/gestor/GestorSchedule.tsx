@@ -1,5 +1,5 @@
-import { useState, useMemo } from 'react';
-import { format, startOfDay } from 'date-fns';
+import React, { useState, useMemo } from 'react';
+import { format } from 'date-fns';
 import { ptBR, enUS, es } from 'date-fns/locale';
 import { useTranslation } from 'react-i18next';
 import { Calendar, Clock, User, CheckCircle2, Building2, Search, ArrowRight, Lock, Unlock, AlertCircle, Phone } from 'lucide-react';
@@ -12,8 +12,8 @@ import { useReservations } from '@/features/reservations/hooks/useReservations';
 import { useAuthStore } from '@/data/useAuthStore';
 import { api } from '@/lib/api';
 import { usePlayHubToast } from '@/hooks/usePlayHubToast';
+import { Input } from '@/components/ui/input';
 
-// Modal de Agenda da Quadra
 function CourtScheduleModal({ court, isOpen, onClose }: { court: any, isOpen: boolean, onClose: () => void }) {
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
   const { user } = useAuthStore();
@@ -27,7 +27,6 @@ function CourtScheduleModal({ court, isOpen, onClose }: { court: any, isOpen: bo
   
   const dateLocale = i18n.language === 'pt' ? ptBR : i18n.language === 'es' ? es : enUS;
 
-  // Busca as reservas APENAS da quadra selecionada e do dia selecionado
   const { data: reservationsData, isLoading, refetch } = useReservations({
     courtId: court?.id,
     date: format(selectedDate, 'yyyy-MM-dd'), 
@@ -36,7 +35,6 @@ function CourtScheduleModal({ court, isOpen, onClose }: { court: any, isOpen: bo
 
   const reservations = reservationsData?.items || [];
 
-  // Gera os horários de funcionamento da quadra (ex: 6h as 23h)
   const hours = Array.from(
     { length: (court?.closingHour || 23) - (court?.openingHour || 6) },
     (_, i) => (court?.openingHour || 6) + i
@@ -48,10 +46,10 @@ function CourtScheduleModal({ court, isOpen, onClose }: { court: any, isOpen: bo
     setIsBlocking(true);
     try {
       const start = new Date(selectedDate);
-      start.setUTCHours(slotToBlock, 0, 0, 0);
+      start.setHours(slotToBlock, 0, 0, 0);
       
       const end = new Date(selectedDate);
-      end.setUTCHours(slotToBlock + 1, 0, 0, 0);
+      end.setHours(slotToBlock + 1, 0, 0, 0);
 
       const payload = {
         courtId: court.id,
@@ -159,8 +157,7 @@ function CourtScheduleModal({ court, isOpen, onClose }: { court: any, isOpen: bo
                 {hours.map(hour => {
                   const reservation = reservations.find((r: any) => {
                     const resDate = new Date(r.startTime);
-                    // Usamos getUTCHours() pois salvamos em UTC no backend (setUTCHours)
-                    return resDate.getUTCHours() === hour && r.status !== 3; 
+                    return resDate.getHours() === hour && r.status !== 3; 
                   });
 
                   const isOccupied = !!reservation;
@@ -301,7 +298,7 @@ function CourtScheduleModal({ court, isOpen, onClose }: { court: any, isOpen: bo
                 <div className="p-4 bg-gray-50 dark:bg-white/5 rounded-2xl border border-gray-100 dark:border-white/5">
                   <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">{t('gestor.schedule.modal.details.time')}</p>
                   <p className="text-sm font-black text-gray-900 dark:text-white">
-                    {selectedReservation && new Date(selectedReservation.startTime).getUTCHours()}:00 – {selectedReservation && new Date(selectedReservation.startTime).getUTCHours() + 1}:00
+                    {selectedReservation && new Date(selectedReservation.startTime).getHours()}:00 – {selectedReservation && new Date(selectedReservation.startTime).getHours() + 1}:00
                   </p>
                 </div>
                 <div className="p-4 bg-gray-50 dark:bg-white/5 rounded-2xl border border-gray-100 dark:border-white/5">
@@ -382,7 +379,6 @@ function CourtScheduleModal({ court, isOpen, onClose }: { court: any, isOpen: bo
   );
 }
 
-// Componente de Card de Quadra
 function CourtCard({ court, onOpenSchedule }: { court: any, onOpenSchedule: () => void }) {
   const { t } = useTranslation();
   return (
@@ -438,97 +434,76 @@ function CourtCard({ court, onOpenSchedule }: { court: any, onOpenSchedule: () =
 
 // Página Principal
 export default function GestorSchedule() {
-  const [searchTerm, setSearchTerm] = useState('');
-  const { data: pagedData, isLoading } = useManagementCourts({ pageSize: 100 });
-  const [selectedCourt, setSelectedCourt] = useState<any | null>(null);
-  const { t } = useTranslation();
+    const [searchTerm, setSearchTerm] = useState('');
+    const { data: pagedData, isLoading } = useManagementCourts({ pageSize: 100 });
+    const [selectedCourt, setSelectedCourt] = useState<any | null>(null);
+    const { t } = useTranslation();
 
-  const courts = pagedData?.items || [];
-  
-  const filteredCourts = useMemo(() => {
-    return courts.filter((c: any) => 
-      c.name.toLowerCase().includes(searchTerm.toLowerCase()) || 
-      c.sport.toLowerCase().includes(searchTerm.toLowerCase())
-    );
-  }, [courts, searchTerm]);
+    const courts = pagedData?.items || [];
 
-  return (
-    <div className="min-h-screen bg-gray-50 dark:bg-background">
-      {/* Header Section */}
-      <div className="bg-white dark:bg-white/[0.02] border-b border-gray-100 dark:border-white/5 pt-12 pb-12">
-        <div className="max-w-[1400px] mx-auto px-8">
-          <div className="flex flex-col md:flex-row md:items-end justify-between gap-8">
-            <div className="space-y-2">
-              <div className="flex items-center gap-2">
-                <div className="w-8 h-8 rounded-xl bg-[#8CE600]/10 flex items-center justify-center">
-                  <Calendar className="w-4 h-4 text-[#8CE600]" />
+    const filteredCourts = useMemo(() => {
+        return courts.filter((c: any) =>
+            c.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            c.sport.toLowerCase().includes(searchTerm.toLowerCase())
+        );
+    }, [courts, searchTerm]);
+
+    return (
+        <div className="p-8 space-y-8 animate-in fade-in duration-700">
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
+                <div>
+                    <h1 className="text-3xl font-black tracking-tight text-gray-900 dark:text-white mb-2 flex items-center gap-3">
+                        <div className="w-12 h-12 rounded-2xl bg-[#8CE600]/10 border border-[#8CE600]/20 flex items-center justify-center text-[#8CE600]">
+                            <Clock className="w-6 h-6" />
+                        </div>
+                        {t('gestor.schedule.title')}
+                    </h1>
+                    <p className="text-gray-500 dark:text-gray-400">{t('gestor.schedule.subtitle')}</p>
                 </div>
-                <span className="text-[10px] font-black uppercase tracking-widest text-gray-500">{t('gestor.schedule.management')}</span>
-              </div>
-              <h1 className="text-4xl font-black tracking-tight text-gray-900 dark:text-white">
-                {t('gestor.schedule.title')}
-              </h1>
-              <p className="text-gray-500 dark:text-gray-400 text-sm max-w-lg">
-                {t('gestor.schedule.subtitle')}
-              </p>
+                <div className="relative w-full max-w-md">
+                    <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                    <Input
+                        placeholder={t('gestor.schedule.searchPlaceholder')}
+                        className="pl-11 h-12 bg-white dark:bg-card border border-gray-100 dark:border-white/10 rounded-2xl focus-visible:ring-2 focus-visible:ring-[#8CE600]/50"
+                        value={searchTerm}
+                        onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSearchTerm(e.target.value)}
+                    />
+                </div>
             </div>
 
-            {/* Search */}
-            <div className="relative w-full md:w-80 group">
-              <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 group-focus-within:text-[#8CE600] transition-colors" />
-              <input 
-                type="text" 
-                placeholder={t('gestor.schedule.searchPlaceholder')}
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full pl-11 pr-4 py-4 bg-gray-100 dark:bg-white/5 border-none rounded-2xl text-sm font-bold text-gray-900 dark:text-white focus:ring-2 focus:ring-[#8CE600] transition-all outline-none"
-              />
-            </div>
-          </div>
+            {isLoading ? (
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
+                    {[1, 2, 3, 4].map(i => (
+                        <div key={i} className="h-[400px] bg-white dark:bg-card border border-gray-100 dark:border-white/10 rounded-[2.5rem] animate-pulse" />
+                    ))}
+                </div>
+            ) : filteredCourts.length === 0 ? (
+                <div className="flex flex-col items-center justify-center py-24 text-center">
+                    <div className="w-20 h-20 rounded-3xl bg-gray-50 dark:bg-white/5 flex items-center justify-center mb-6">
+                        <Building2 className="w-10 h-10 text-gray-300" />
+                    </div>
+                    <h3 className="text-xl font-black text-gray-900 dark:text-white mb-2">{t('gestor.schedule.noCourts')}</h3>
+                    <p className="text-gray-500 max-w-sm">{t('gestor.schedule.noCourtsDesc')}</p>
+                </div>
+            ) : (
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
+                    {filteredCourts.map((court: any) => (
+                        <CourtCard
+                            key={court.id}
+                            court={court}
+                            onOpenSchedule={() => setSelectedCourt(court)}
+                        />
+                    ))}
+                </div>
+            )}
+
+            {selectedCourt && (
+                <CourtScheduleModal
+                    court={selectedCourt}
+                    isOpen={!!selectedCourt}
+                    onClose={() => setSelectedCourt(null)}
+                />
+            )}
         </div>
-      </div>
-
-      {/* Main Content */}
-      <div className="max-w-[1400px] mx-auto px-8 py-12">
-        {isLoading ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
-            {[1, 2, 3, 4].map(i => (
-              <div key={i} className="h-[400px] bg-white dark:bg-white/5 rounded-[2rem] border border-gray-100 dark:border-white/5 animate-pulse" />
-            ))}
-          </div>
-        ) : filteredCourts.length === 0 ? (
-          <div className="flex flex-col items-center justify-center py-24 text-center">
-            <div className="w-20 h-20 rounded-3xl bg-gray-100 dark:bg-white/5 flex items-center justify-center mb-6">
-              <Building2 className="w-10 h-10 text-gray-300" />
-            </div>
-            <h3 className="text-xl font-black text-gray-900 dark:text-white mb-2">{t('gestor.schedule.noCourts')}</h3>
-            <p className="text-gray-500 max-w-sm">
-              {searchTerm 
-                ? t('gestor.schedule.noCourtsDesc') 
-                : t('gestor.schedule.noCourtsDesc')}
-            </p>
-          </div>
-        ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
-            {filteredCourts.map((court: any) => (
-              <CourtCard 
-                key={court.id} 
-                court={court} 
-                onOpenSchedule={() => setSelectedCourt(court)} 
-              />
-            ))}
-          </div>
-        )}
-      </div>
-
-      {/* Modal */}
-      {selectedCourt && (
-        <CourtScheduleModal 
-          court={selectedCourt} 
-          isOpen={!!selectedCourt} 
-          onClose={() => setSelectedCourt(null)} 
-        />
-      )}
-    </div>
-  );
+    );
 }

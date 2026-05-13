@@ -1,24 +1,21 @@
-import { useState, useMemo, memo, useEffect } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Link, useLocation, useSearchParams } from 'react-router-dom';
+import { useLocation, useSearchParams } from 'react-router-dom';
 import { Header } from '@/components/Header';
 import { Footer } from '@/components/Footer';
-import { Stars } from '@/components/ui/Stars';
 import { Input } from '@/components/ui/input';
 import { DatePicker } from '@/components/ui/date-picker';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
-import { SPORTS_LIST as HARDCODED_SPORTS, CITIES as HARDCODED_CITIES, type Court } from '@/pages/CatalogData';
+import { SPORTS_LIST as HARDCODED_SPORTS, CITIES as HARDCODED_CITIES } from '@/pages/CatalogData';
 import { useCourts, useCourtsFilters } from '@/features/courts/hooks/useCourts';
 import { SPORT_ICONS } from '@/components/SportIcons';
-import { FavoriteButton } from '@/components/FavoriteButton';
 import { CourtCard, CourtRow } from '@/components/CourtCard';
+import { SEO } from '@/components/SEO';
 
 import { 
     Search, 
     Filter, 
-    MapPin, 
-    Clock, 
     X, 
     LayoutGrid, 
     List, 
@@ -27,8 +24,6 @@ import {
 
 const SearchIcon = () => <Search className="w-4 h-4" strokeWidth={1.5} />;
 const FilterIcon = () => <Filter className="w-4 h-4" strokeWidth={1.5} />;
-const LocationIcon = () => <MapPin className="w-3.5 h-3.5" strokeWidth={1.5} />;
-const ClockIcon = () => <Clock className="w-3.5 h-3.5" strokeWidth={1.5} />;
 const XIcon = () => <X className="w-3.5 h-3.5" strokeWidth={1.5} />;
 const GridIcon = () => <LayoutGrid className="w-4 h-4" strokeWidth={1.5} />;
 const ListIcon = () => <List className="w-4 h-4" strokeWidth={1.5} />;
@@ -226,6 +221,13 @@ export default function Catalog() {
 
     return (
         <div className="min-h-screen bg-white dark:bg-background text-gray-900 dark:text-gray-100 font-sans antialiased transition-colors duration-500 flex flex-col">
+            <SEO 
+                title={t('catalog.seo.title', 'Catálogo de Quadras - PlayHub')}
+                description={t('catalog.seo.description', 'Encontre e reserve as melhores quadras de {{sports}} em {{cities}}. Filtre por preço, avaliação e disponibilidade.', { 
+                    sports: selectedSports.length > 0 ? selectedSports.join(', ') : 'todos os esportes',
+                    cities: selectedCities.length > 0 ? selectedCities.join(', ') : 'sua região'
+                })}
+            />
             <Header />
 
             <section className="relative pt-28 pb-10 border-b border-gray-100 dark:border-white/5 bg-gray-50/50 dark:bg-background overflow-hidden">

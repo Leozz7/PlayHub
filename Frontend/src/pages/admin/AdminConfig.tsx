@@ -19,7 +19,7 @@ import { usePlayHubToast } from '@/hooks/usePlayHubToast';
 export default function AdminConfig() {
   const { t } = useTranslation();
   const { theme, setTheme } = useTheme();
-  const { user, setAuth, token } = useAuthStore();
+  const { user, updateUser } = useAuthStore();
   const phToast = usePlayHubToast();
   
   const [siteName, setSiteName] = useState('PlayHub');
@@ -49,12 +49,12 @@ export default function AdminConfig() {
     });
 
     setTimeout(() => {
-      if (user && token) {
-        setAuth({
+      if (user) {
+        updateUser({
           ...user,
           phone: adminPhone,
           cpf: adminCpf
-        }, token);
+        });
       }
 
       setIsSaving(false);

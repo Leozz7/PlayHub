@@ -23,6 +23,17 @@ export function HeroBackground() {
             <div className="absolute inset-0 bg-[radial-gradient(ellipse_60%_70%_at_50%_50%,transparent_0%,#f9fafb_100%)] dark:bg-[radial-gradient(ellipse_60%_70%_at_50%_50%,transparent_0%,rgba(3,7,18,1)_100%)]" />
 
             <style>{`
+        @media (min-width: 768px) and (prefers-reduced-motion: no-preference) {
+          .hero-animate-float {
+            animation: heroFloat var(--dur) ease-in-out var(--delay) infinite;
+            will-change: transform;
+          }
+          .hero-animate-sink {
+            animation: heroSink var(--dur) ease-in-out var(--delay) infinite;
+            will-change: transform;
+          }
+        }
+
         @keyframes heroFloat {
           0%, 100% { transform: translateY(0px); }
           50%       { transform: translateY(-16px); }
@@ -38,11 +49,15 @@ export function HeroBackground() {
                 return (
                     <div
                         key={i}
-                        className={`absolute text-[#8CE600] ${pos.size} ${pos.rot} ${pos.opacity} dark:opacity-[0.05] transition-all duration-1000`}
+                        className={`absolute text-[#8CE600] ${pos.size} ${pos.rot} ${pos.opacity} dark:opacity-[0.05] ${
+                            i % 2 === 0 ? 'hero-animate-float' : 'hero-animate-sink'
+                        }`}
                         style={{
                             top: pos.top,
                             left: pos.left,
-                            animation: `${i % 2 === 0 ? 'heroFloat' : 'heroSink'} ${pos.dur} ease-in-out ${pos.delay} infinite`,
+                            // @ts-ignore
+                            '--dur': pos.dur,
+                            '--delay': pos.delay,
                         }}
                     >
                         <IconComponent className="w-full h-full" />

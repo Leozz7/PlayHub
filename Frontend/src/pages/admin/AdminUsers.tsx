@@ -4,9 +4,9 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import { api } from '@/lib/api';
 import { toast } from 'sonner';
-import { 
-  Users, Search, Filter, ShieldAlert, User as UserIcon, Edit2, 
-  Mail, Lock, Info, Activity, ShieldCheck, MapPin, 
+import {
+  Users, Search, Filter, ShieldAlert, User as UserIcon, Edit2,
+  Mail, Lock, Info, Activity, ShieldCheck, MapPin,
   MoreHorizontal, Trash2, Plus, Phone
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -20,20 +20,20 @@ import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
 import {
-    Table,
-    TableBody,
-    TableCell,
-    TableHead,
-    TableHeader,
-    TableRow,
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
 } from '@/components/ui/table';
 import {
-    DropdownMenu,
-    DropdownMenuContent,
-    DropdownMenuItem,
-    DropdownMenuLabel,
-    DropdownMenuSeparator,
-    DropdownMenuTrigger,
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { ConfirmDeleteModal, StatusModal } from '@/components/ui/PremiumModal';
 
@@ -48,7 +48,7 @@ type UserDto = {
   coutsId: string[];
   created: string;
 };
- 
+
 export type CourtDto = {
   id: string;
   name: string;
@@ -62,12 +62,12 @@ export default function AdminUsers() {
   const { t } = useTranslation();
   const queryClient = useQueryClient();
   const [searchParams, setSearchParams] = useSearchParams();
-  
+
   const [search, setSearch] = useState(searchParams.get('search') || '');
   const [selectedRole, setSelectedRole] = useState<string>(searchParams.get('role') || 'all');
   const [page, setPage] = useState(Number(searchParams.get('page')) || 1);
   const pageSize = 10;
-  
+
   useEffect(() => {
     const params = new URLSearchParams();
     if (search) params.set('search', search);
@@ -75,10 +75,10 @@ export default function AdminUsers() {
     if (page > 1) params.set('page', page.toString());
     setSearchParams(params, { replace: true });
   }, [search, selectedRole, page, setSearchParams]);
-  
+
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalMode, setModalMode] = useState<'create' | 'edit'>('create');
-  
+
   const [editId, setEditId] = useState('');
   const [editName, setEditName] = useState('');
   const [editEmail, setEditEmail] = useState('');
@@ -167,17 +167,17 @@ export default function AdminUsers() {
       };
       const response = await api.post('/users', payload);
       if (editRole === 'Manager' && editCourts.length > 0) {
-         const newUserId = response.data.id || response.data;
-         const updatePayload = {
-           id: newUserId,
-           name: editName,
-           email: editEmail,
-           phone: editPhone,
-           cpf: editCpf,
-           role: editRole,
-           coutsId: editCourts,
-         };
-         await api.put(`/users/${newUserId}`, updatePayload);
+        const newUserId = response.data.id || response.data;
+        const updatePayload = {
+          id: newUserId,
+          name: editName,
+          email: editEmail,
+          phone: editPhone,
+          cpf: editCpf,
+          role: editRole,
+          coutsId: editCourts,
+        };
+        await api.put(`/users/${newUserId}`, updatePayload);
       }
     },
     onSuccess: () => {
@@ -264,7 +264,7 @@ export default function AdminUsers() {
   };
 
   const toggleCourt = (courtId: string) => {
-    setEditCourts(prev => 
+    setEditCourts(prev =>
       prev.includes(courtId) ? prev.filter(id => id !== courtId) : [...prev, courtId]
     );
   };
@@ -287,7 +287,7 @@ export default function AdminUsers() {
           </h1>
           <p className="text-gray-500 dark:text-gray-400">{t('admin.users.subtitle')}</p>
         </div>
-        <button 
+        <button
           onClick={handleCreateClick}
           className="bg-[#8CE600] text-gray-950 hover:opacity-90 font-black px-6 py-6 rounded-2xl shadow-lg shadow-[#8CE600]/20 flex items-center gap-2"
         >
@@ -303,11 +303,11 @@ export default function AdminUsers() {
           { label: t('admin.users.stats.managers'), value: users.filter(u => u.role === 'Manager').length, icon: ShieldCheck, color: 'text-purple-500' },
           { label: t('admin.users.stats.athletes'), value: users.filter(u => u.role === 'User').length, icon: UserIcon, color: 'text-[#8CE600]' },
         ].map((stat, i) => (
-          <motion.div 
+          <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: i * 0.1 }}
-            key={stat.label} 
+            key={stat.label}
             className="bg-white dark:bg-card border border-gray-100 dark:border-white/10 p-5 rounded-3xl shadow-sm"
           >
             <div className="flex items-center justify-between mb-4">
@@ -387,20 +387,19 @@ export default function AdminUsers() {
               ) : (
                 <AnimatePresence>
                   {filteredUsers.map((u) => (
-                    <motion.tr 
+                    <motion.tr
                       key={u.id}
-                      initial={{ opacity: 0 }} 
-                      animate={{ opacity: 1 }} 
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
                       exit={{ opacity: 0 }}
                       className="border-b border-gray-50 dark:border-white/5 hover:bg-gray-50/50 dark:hover:bg-white/5 transition-colors group"
                     >
                       <TableCell className="px-6 py-4">
                         <div className="flex items-center gap-3">
-                          <div className={`w-10 h-10 rounded-xl flex items-center justify-center text-xs font-bold shrink-0 ${
-                            u.role === 'Admin' ? 'bg-red-500/10 text-red-500' :
+                          <div className={`w-10 h-10 rounded-xl flex items-center justify-center text-xs font-bold shrink-0 ${u.role === 'Admin' ? 'bg-red-500/10 text-red-500' :
                             u.role === 'Manager' ? 'bg-blue-500/10 text-blue-500' :
-                            'bg-[#8CE600]/10 text-[#6aad00] dark:text-[#8CE600]'
-                          }`}>
+                              'bg-[#8CE600]/10 text-[#6aad00] dark:text-[#8CE600]'
+                            }`}>
                             {(u.name || '?').charAt(0).toUpperCase()}
                           </div>
                           <span className="text-sm font-bold text-gray-900 dark:text-white group-hover:text-[#8CE600] transition-colors">{u.name || t('admin.users.noName')}</span>
@@ -439,7 +438,7 @@ export default function AdminUsers() {
                               <Edit2 className="w-3.5 h-3.5" /> {t('admin.users.actions.edit')}
                             </DropdownMenuItem>
                             <DropdownMenuSeparator className="bg-gray-100 dark:bg-white/10" />
-                            <DropdownMenuItem 
+                            <DropdownMenuItem
                               onClick={() => {
                                 setUserToDelete({ id: u.id, name: u.name });
                                 setDeleteModalOpen(true);
@@ -526,11 +525,10 @@ export default function AdminUsers() {
                   <button
                     key={item.id}
                     onClick={() => setActiveTab(item.id)}
-                    className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-bold transition-all ${
-                      activeTab === item.id 
-                        ? 'bg-[#8CE600] text-gray-950 shadow-md shadow-[#8CE600]/20' 
-                        : 'text-gray-500 hover:bg-gray-100 dark:hover:bg-white/5 hover:text-gray-900 dark:hover:text-white'
-                    }`}
+                    className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-bold transition-all ${activeTab === item.id
+                      ? 'bg-[#8CE600] text-gray-950 shadow-md shadow-[#8CE600]/20'
+                      : 'text-gray-500 hover:bg-gray-100 dark:hover:bg-white/5 hover:text-gray-900 dark:hover:text-white'
+                      }`}
                   >
                     <item.icon className="w-4 h-4" />
                     {item.label}
@@ -556,7 +554,7 @@ export default function AdminUsers() {
                 <div className="p-10">
                   <AnimatePresence mode="wait">
                     {activeTab === 'general' && (
-                      <motion.div 
+                      <motion.div
                         key="general"
                         initial={{ opacity: 0, x: 20 }}
                         animate={{ opacity: 1, x: 0 }}
@@ -573,7 +571,7 @@ export default function AdminUsers() {
                             <Label className="text-[10px] font-bold uppercase tracking-[0.2em] text-gray-400 ml-1">{t('admin.users.modals.fullName')}</Label>
                             <div className="relative">
                               <UserIcon className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-                              <Input 
+                              <Input
                                 value={editName}
                                 onChange={e => setEditName(e.target.value)}
                                 className="h-12 pl-12 bg-gray-50 dark:bg-white/5 border-none rounded-xl text-base font-bold focus-visible:ring-[#8CE600]/50"
@@ -586,7 +584,7 @@ export default function AdminUsers() {
                             <Label className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-400 ml-1">{t('admin.users.modals.emailAccess')}</Label>
                             <div className="relative">
                               <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-                              <Input 
+                              <Input
                                 value={editEmail}
                                 onChange={e => setEditEmail(e.target.value)}
                                 className="h-12 pl-12 bg-gray-50 dark:bg-white/5 border-none rounded-xl text-base font-bold focus-visible:ring-[#8CE600]/50"
@@ -599,7 +597,7 @@ export default function AdminUsers() {
                             <Label className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-400 ml-1">{t('admin.users.modals.phoneOptional')}</Label>
                             <div className="relative">
                               <Phone className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-                              <Input 
+                              <Input
                                 value={editPhone}
                                 onChange={e => setEditPhone(e.target.value)}
                                 className="h-12 pl-12 bg-gray-50 dark:bg-white/5 border-none rounded-xl text-base font-bold focus-visible:ring-[#8CE600]/50"
@@ -612,7 +610,7 @@ export default function AdminUsers() {
                             <Label className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-400 ml-1">{t('admin.users.modals.cpfOptional')}</Label>
                             <div className="relative">
                               <UserIcon className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-                              <Input 
+                              <Input
                                 value={editCpf}
                                 onChange={e => {
                                   const val = e.target.value.replace(/\D/g, '').slice(0, 11);
@@ -631,13 +629,13 @@ export default function AdminUsers() {
 
                           <div className="space-y-2 col-span-2">
                             <Label className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-400 ml-1">
-                              {t('admin.users.modals.passwordHint', { 
-                                mode: modalMode === 'edit' ? t('admin.users.modals.passwordModeEdit') : t('admin.users.modals.passwordModeCreate') 
+                              {t('admin.users.modals.passwordHint', {
+                                mode: modalMode === 'edit' ? t('admin.users.modals.passwordModeEdit') : t('admin.users.modals.passwordModeCreate')
                               })}
                             </Label>
                             <div className="relative">
                               <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-                              <Input 
+                              <Input
                                 type="password"
                                 value={editPassword}
                                 onChange={e => setEditPassword(e.target.value)}
@@ -661,7 +659,7 @@ export default function AdminUsers() {
                     )}
 
                     {activeTab === 'access' && (
-                      <motion.div 
+                      <motion.div
                         key="access"
                         initial={{ opacity: 0, x: 20 }}
                         animate={{ opacity: 1, x: 0 }}
@@ -685,11 +683,10 @@ export default function AdminUsers() {
                                 <button
                                   key={role.value}
                                   onClick={() => setEditRole(role.value)}
-                                  className={`flex items-start gap-4 p-5 rounded-2xl border text-left transition-all ${
-                                    editRole === role.value 
-                                      ? 'bg-[#8CE600]/10 border-[#8CE600] shadow-lg shadow-[#8CE600]/5 scale-[1.02]' 
-                                      : 'bg-gray-50/50 dark:bg-white/5 border-transparent hover:border-gray-200'
-                                  }`}
+                                  className={`flex items-start gap-4 p-5 rounded-2xl border text-left transition-all ${editRole === role.value
+                                    ? 'bg-[#8CE600]/10 border-[#8CE600] shadow-lg shadow-[#8CE600]/5 scale-[1.02]'
+                                    : 'bg-gray-50/50 dark:bg-white/5 border-transparent hover:border-gray-200'
+                                    }`}
                                 >
                                   <div className={`p-3 rounded-xl ${editRole === role.value ? 'bg-[#8CE600] text-gray-950' : 'bg-white dark:bg-card text-gray-400'}`}>
                                     <role.icon className="w-5 h-5" />
@@ -709,12 +706,12 @@ export default function AdminUsers() {
                                 <Label className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-400 ml-1">{t('admin.users.modals.courtAssociation')}</Label>
                                 <span className="text-[10px] font-black bg-[#8CE600] text-gray-950 px-3 py-1 rounded-full">{t('admin.users.modals.courtsSelected', { count: editCourts.length })}</span>
                               </div>
-                              
+
                               <div className="bg-gray-50 dark:bg-white/5 rounded-3xl p-6 border border-gray-100 dark:border-white/5 space-y-4">
                                 <div className="relative">
                                   <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-                                  <Input 
-                                    placeholder={t('admin.users.modals.searchCourts')} 
+                                  <Input
+                                    placeholder={t('admin.users.modals.searchCourts')}
                                     value={courtSearch}
                                     onChange={e => setCourtSearch(e.target.value)}
                                     className="h-12 pl-12 bg-white dark:bg-card border-none rounded-xl text-sm font-bold"
@@ -725,30 +722,29 @@ export default function AdminUsers() {
                                   {courts
                                     .filter((c: CourtDto) => c.name.toLowerCase().includes(courtSearch.toLowerCase()) || c.city.toLowerCase().includes(courtSearch.toLowerCase()))
                                     .map((court: CourtDto) => (
-                                    <label 
-                                      key={court.id} 
-                                      className={`flex items-center gap-4 p-4 rounded-2xl border cursor-pointer transition-all ${
-                                        editCourts.includes(court.id) 
-                                          ? 'bg-white dark:bg-white/[0.05] border-[#8CE600] shadow-sm' 
+                                      <label
+                                        key={court.id}
+                                        className={`flex items-center gap-4 p-4 rounded-2xl border cursor-pointer transition-all ${editCourts.includes(court.id)
+                                          ? 'bg-white dark:bg-white/[0.05] border-[#8CE600] shadow-sm'
                                           : 'bg-white/50 dark:bg-transparent border-transparent hover:bg-white dark:hover:bg-white/5'
-                                      }`}
-                                    >
-                                      <Checkbox 
-                                        checked={editCourts.includes(court.id)} 
-                                        onCheckedChange={() => toggleCourt(court.id)} 
-                                        className="w-5 h-5 data-[state=checked]:bg-[#8CE600] data-[state=checked]:border-[#8CE600] rounded-lg"
-                                      />
-                                      <div className="flex flex-col">
-                                        <span className={`text-sm font-black ${editCourts.includes(court.id) ? 'text-[#8CE600]' : 'text-gray-900 dark:text-white'}`}>
-                                          {court.name}
-                                        </span>
-                                        <span className="text-[10px] text-gray-400 font-bold uppercase tracking-tight flex items-center gap-2">
-                                          <MapPin className="w-2.5 h-2.5" />
-                                          {court.city} • {court.sport}
-                                        </span>
-                                      </div>
-                                    </label>
-                                  ))}
+                                          }`}
+                                      >
+                                        <Checkbox
+                                          checked={editCourts.includes(court.id)}
+                                          onCheckedChange={() => toggleCourt(court.id)}
+                                          className="w-5 h-5 data-[state=checked]:bg-[#8CE600] data-[state=checked]:border-[#8CE600] rounded-lg"
+                                        />
+                                        <div className="flex flex-col">
+                                          <span className={`text-sm font-black ${editCourts.includes(court.id) ? 'text-[#8CE600]' : 'text-gray-900 dark:text-white'}`}>
+                                            {court.name}
+                                          </span>
+                                          <span className="text-[10px] text-gray-400 font-bold uppercase tracking-tight flex items-center gap-2">
+                                            <MapPin className="w-2.5 h-2.5" />
+                                            {court.city} • {court.sport}
+                                          </span>
+                                        </div>
+                                      </label>
+                                    ))}
                                 </div>
                               </div>
                             </div>
@@ -762,8 +758,8 @@ export default function AdminUsers() {
 
               <div className="p-8 border-t border-gray-100 dark:border-white/10 bg-gray-50/30 dark:bg-white/[0.01] flex items-center justify-between">
                 <Button variant="ghost" onClick={() => setIsModalOpen(false)} className="rounded-xl font-bold text-xs uppercase tracking-widest px-8 h-12">{t('common.actions.cancel')}</Button>
-                <Button 
-                  onClick={handleSave} 
+                <Button
+                  onClick={handleSave}
                   disabled={updateMutation.isPending || createMutation.isPending}
                   className="h-12 px-12 text-xs font-bold bg-[#8CE600] hover:bg-[#7bc900] text-gray-950 rounded-xl uppercase tracking-[0.2em] transition-all active:scale-95"
                 >

@@ -11,6 +11,7 @@ import { SportCards } from '@/components/SportCards';
 import { FeaturedCourts } from '@/components/FeaturedCourts';
 import { PaymentMethods } from '@/components/PaymentMethods';
 import { STATS, STEPS, TESTIMONIALS } from '@/pages/IndexData';
+import { SEO } from '@/components/SEO';
 
 function useCountUp(target: number, duration = 1500, active = false) {
     const [count, setCount] = useState(0);
@@ -101,6 +102,11 @@ export function Index() {
 
     return (
         <div className="min-h-screen bg-white dark:bg-background text-gray-900 dark:text-gray-100 font-sans antialiased transition-colors duration-500">
+            <SEO 
+                title={t('index.seo.title', 'PlayHub - Reserve as melhores quadras')}
+                description={t('index.seo.description', 'A plataforma definitiva para agendamento de quadras esportivas. Futebol, Tênis, Beach Tênis e muito mais.')}
+                keywords="quadras, esportes, reserva, futebol, tênis, beach tênis, agendamento"
+            />
             <Header />
 
             <section className="relative h-[95vh] min-h-[700px] flex items-center justify-center z-50">

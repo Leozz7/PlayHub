@@ -20,28 +20,29 @@ namespace PlayHub.Api.Controllers;
 [Route("api/[controller]")]
 public class CourtsController : ControllerBase
 {
-    private ISender? _mediator;
-    protected ISender Mediator => _mediator ??= HttpContext.RequestServices.GetRequiredService<ISender>();
-
+    private readonly IMediator _mediator;
     private readonly ICurrentUserService _currentUserService;
+    private readonly ILogger<CourtsController> _logger;
 
-    public CourtsController(ICurrentUserService currentUserService)
+    public CourtsController(IMediator mediator, ICurrentUserService currentUserService, ILogger<CourtsController> logger)
     {
+        _mediator = mediator;
         _currentUserService = currentUserService;
+        _logger = logger;
     }
 
     [HttpGet]
     [AllowAnonymous]
     public async Task<ActionResult<PagedResult<CourtDto>>> Get([FromQuery] GetCourtsQuery query)
     {
-        return await Mediator.Send(query);
+        return await _mediator.Send(query);
     }
 
     [HttpGet("filters")]
     [AllowAnonymous]
     public async Task<ActionResult<CourtsFiltersDto>> GetFilters()
     {
-        return await Mediator.Send(new GetCourtsFiltersQuery());
+        return await _mediator.Send(new GetCourtsFiltersQuery());
     }
 
     [HttpGet("management")]
@@ -55,16 +56,17 @@ public class CourtsController : ControllerBase
             UserCourtIds = _currentUserService.CourtIds 
         };
 
-        return await Mediator.Send(enhancedQuery);
+        return await _mediator.Send(enhancedQuery);
     }
 
     [HttpGet("{id}")]
     [AllowAnonymous]
     public async Task<ActionResult<CourtDto>> GetById(Guid id)
     {
-        if (!_currentUserService.IsAuthorizedForCourt(id)) return Forbid();
+        _logger.LogInformation("Receiving GetById request for court {CourtId}. User: {UserId}, Anonymous: {IsAnonymous}", 
+            id, _currentUserService.UserId, _currentUserService.UserId == Guid.Empty);
 
-        var result = await Mediator.Send(new GetCourtByIdQuery(id));
+        var result = await _mediator.Send(new GetCourtByIdQuery(id));
         if (result == null) return NotFound();
         return Ok(result);
     }
@@ -78,7 +80,7 @@ public class CourtsController : ControllerBase
             CurrentUserId = _currentUserService.UserId,
             CurrentUserRole = _currentUserService.UserRole 
         };
-        var result = await Mediator.Send(enhancedCommand);
+        var result = await _mediator.Send(enhancedCommand);
         return CreatedAtAction(nameof(GetById), new { id = result.Id }, result);
     }
 
@@ -93,7 +95,7 @@ public class CourtsController : ControllerBase
 
         if (!_currentUserService.IsAuthorizedForCourt(id)) return Forbid();
 
-        var result = await Mediator.Send(command);
+        var result = await _mediator.Send(command);
         if (!result) return NotFound();
         return NoContent();
     }
@@ -104,7 +106,7 @@ public class CourtsController : ControllerBase
     {
         if (!_currentUserService.IsAuthorizedForCourt(id)) return Forbid();
 
-        var result = await Mediator.Send(new DeleteCourtCommand(id));
+        var result = await _mediator.Send(new DeleteCourtCommand(id));
         if (!result) return NotFound();
         return NoContent();
     }
@@ -113,17 +115,15 @@ public class CourtsController : ControllerBase
     [AllowAnonymous]
     public async Task<ActionResult<CourtAvailabilityDto>> GetAvailability(Guid id, [FromQuery] DateTime date)
     {
-        if (!_currentUserService.IsAuthorizedForCourt(id)) return Forbid();
-
         var query = new GetCourtAvailabilityQuery(id, date);
-        return await Mediator.Send(query);
+        return await _mediator.Send(query);
     }
 
     [HttpGet("{id}/reviews")]
     [AllowAnonymous]
     public async Task<ActionResult<List<ReviewDto>>> GetReviews(Guid id)
     {
-        var result = await Mediator.Send(new GetCourtReviewsQuery(id));
+        var result = await _mediator.Send(new GetCourtReviewsQuery(id));
         return Ok(result);
     }
 
@@ -136,7 +136,7 @@ public class CourtsController : ControllerBase
 
         var userName = _currentUserService.UserName ?? "Usuário";
         var command = new SubmitReviewCommand(id, userId, userName, body.Rating, body.Text);
-        var result = await Mediator.Send(command);
+        var result = await _mediator.Send(command);
         return CreatedAtAction(nameof(GetReviews), new { id }, result);
     }
 }

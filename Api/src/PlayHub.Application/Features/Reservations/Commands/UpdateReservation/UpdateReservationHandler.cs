@@ -12,10 +12,12 @@ namespace PlayHub.Application.Features.Reservations.Commands.UpdateReservation;
 public class UpdateReservationHandler : IRequestHandler<UpdateReservationCommand, bool>
 {
     private readonly IApplicationDbContext _context;
+    private readonly ICurrentUserService _currentUserService;
 
-    public UpdateReservationHandler(IApplicationDbContext context)
+    public UpdateReservationHandler(IApplicationDbContext context, ICurrentUserService currentUserService)
     {
         _context = context;
+        _currentUserService = currentUserService;
     }
 
     public async Task<bool> Handle(UpdateReservationCommand request, CancellationToken cancellationToken)
@@ -25,6 +27,19 @@ public class UpdateReservationHandler : IRequestHandler<UpdateReservationCommand
 
         if (reservation == null)
             return false;
+
+        if (!_currentUserService.IsAdmin)
+        {
+            if (_currentUserService.IsManager)
+            {
+                if (!_currentUserService.IsAuthorizedForCourt(reservation.CourtId))
+                    return false;
+            }
+            else if (reservation.UserId != _currentUserService.UserId)
+            {
+                return false; 
+            }
+        }
 
         bool updated = false;
 

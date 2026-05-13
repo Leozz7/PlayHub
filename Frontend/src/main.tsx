@@ -2,6 +2,7 @@ import React from 'react'
 import ReactDOM from 'react-dom/client'
 import App from './App'
 import './index.css'
+import { HelmetProvider } from 'react-helmet-async';
 
 import i18n from '@/i18n/i18n';
 
@@ -38,11 +39,12 @@ class GlobalErrorBoundary extends React.Component<{children: React.ReactNode}, {
     return this.props.children;
   }
 }
-
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
     <GlobalErrorBoundary>
-      <App />
+      <HelmetProvider>
+        <App />
+      </HelmetProvider>
     </GlobalErrorBoundary>
   </React.StrictMode>,
 )

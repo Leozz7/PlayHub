@@ -1,97 +1,101 @@
 import { useTranslation } from 'react-i18next';
-import { BarChart3, Download, TrendingUp, Users, DollarSign, Calendar } from 'lucide-react';
+import { BarChart3, Download, TrendingUp, Users, DollarSign, Calendar, Activity } from 'lucide-react';
 import { useReservations } from '@/features/reservations/hooks/useReservations';
 import { Button } from '@/components/ui/button';
+import { motion } from 'framer-motion';
+import { Skeleton } from '@/components/ui/skeleton';
 
 export default function GestorReports() {
-  const { t, i18n } = useTranslation();
-  const locale = i18n.language === 'pt' ? 'pt-BR' : i18n.language === 'es' ? 'es-ES' : 'en-US';
+    const { t } = useTranslation();
 
-  const { data: reservationsData } = useReservations({ pageSize: 500 });
-  const reservations = reservationsData?.items || [];
+    const { data: reservationsData, isLoading } = useReservations({ pageSize: 500 });
+    const reservations = reservationsData?.items || [];
 
-  const revenue = reservations.filter((r: any) => r.status === 2 || r.status === 4).reduce((sum: number, r: any) => sum + r.totalPrice, 0);
-  const totalReservations = reservations.length;
-  const uniqueClients = new Set(reservations.map((r: any) => r.userId)).size;
+    const revenue = reservations
+        .filter((r: any) => r.status === 2 || r.status === 4)
+        .reduce((sum: number, r: any) => sum + r.totalPrice, 0);
+    const totalReservations = reservations.length;
+    const uniqueClients = new Set(reservations.map((r: any) => r.userId)).size;
+    const avgTicket = totalReservations > 0 ? revenue / totalReservations : 0;
 
-  const handleExportPDF = () => {
-    window.print();
-  };
+    const handleExportPDF = () => {
+        window.print();
+    };
 
-  return (
-    <div className="min-h-screen bg-gray-50 dark:bg-background">
-      {/* Header Section */}
-      <div className="bg-white dark:bg-white/[0.02] border-b border-gray-100 dark:border-white/5 pt-12 pb-12">
-        <div className="max-w-[1400px] mx-auto px-8">
-          <div className="flex flex-col md:flex-row md:items-end justify-between gap-8">
-            <div className="space-y-2">
-              <div className="flex items-center gap-2">
-                <div className="w-8 h-8 rounded-xl bg-orange-500/10 flex items-center justify-center">
-                  <BarChart3 className="w-4 h-4 text-orange-500" />
+    const stats = [
+        { label: t('gestor.reports.revenue'), value: `R$ ${revenue.toLocaleString()}`, icon: DollarSign, color: 'text-[#8CE600]' },
+        { label: t('gestor.reports.totalReservations'), value: totalReservations, icon: Calendar, color: 'text-blue-500' },
+        { label: t('gestor.reports.uniqueClients'), value: uniqueClients, icon: Users, color: 'text-purple-500' },
+        { label: t('gestor.reports.avgTicket'), value: `R$ ${avgTicket.toFixed(2)}`, icon: Activity, color: 'text-amber-500' },
+    ];
+
+    return (
+        <div className="p-8 space-y-8 animate-in fade-in duration-700">
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
+                <div>
+                    <h1 className="text-3xl font-black tracking-tight text-gray-900 dark:text-white mb-2 flex items-center gap-3">
+                        <div className="w-12 h-12 rounded-2xl bg-[#8CE600]/10 border border-[#8CE600]/20 flex items-center justify-center text-[#8CE600]">
+                            <BarChart3 className="w-6 h-6" />
+                        </div>
+                        {t('gestor.reports.title')}
+                    </h1>
+                    <p className="text-gray-500 dark:text-gray-400">{t('gestor.reports.subtitle')}</p>
                 </div>
-                <span className="text-[10px] font-black uppercase tracking-widest text-gray-500">{t('gestor.sidebar.reports')}</span>
-              </div>
-              <h1 className="text-4xl font-black tracking-tight text-gray-900 dark:text-white">
-                {t('gestor.reports.title')}
-              </h1>
-              <p className="text-gray-500 dark:text-gray-400 text-sm max-w-lg">
-                {t('gestor.reports.subtitle')}
-              </p>
+                <Button 
+                    onClick={handleExportPDF} 
+                    className="bg-[#8CE600] text-gray-950 hover:opacity-90 font-black px-6 py-6 rounded-2xl shadow-lg shadow-[#8CE600]/20"
+                >
+                    <Download className="w-5 h-5 mr-2" />
+                    {t('gestor.reports.exportPdf')}
+                </Button>
             </div>
 
-            <Button onClick={handleExportPDF} className="bg-orange-500 hover:bg-orange-600 text-white px-6 py-6 rounded-2xl font-black uppercase tracking-widest text-xs shadow-lg shadow-orange-500/20 flex items-center gap-2 transition-all hover:scale-105">
-              <Download className="w-4 h-4" />
-              {t('gestor.reports.exportPdf')}
-            </Button>
-          </div>
-        </div>
-      </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                {isLoading ? (
+                    Array.from({ length: 4 }).map((_, i) => (
+                        <div key={i} className="bg-white dark:bg-card border border-gray-100 dark:border-white/10 p-5 rounded-3xl shadow-sm">
+                            <Skeleton className="h-10 w-10 rounded-2xl mb-4" />
+                            <Skeleton className="h-4 w-24 mb-2" />
+                            <Skeleton className="h-8 w-32" />
+                        </div>
+                    ))
+                ) : (
+                    stats.map((stat, i) => (
+                        <motion.div
+                            initial={{ opacity: 0, y: 20 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ delay: i * 0.1 }}
+                            key={stat.label}
+                            className="bg-white dark:bg-card border border-gray-100 dark:border-white/10 p-5 rounded-3xl shadow-sm"
+                        >
+                            <div className="flex items-center justify-between mb-4">
+                                <div className={`p-2 rounded-2xl bg-gray-50 dark:bg-white/5 ${stat.color}`}>
+                                    <stat.icon className="w-6 h-6" />
+                                </div>
+                            </div>
+                            <p className="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-widest">{stat.label}</p>
+                            <p className="text-2xl font-black text-gray-900 dark:text-white mt-1">{stat.value}</p>
+                        </motion.div>
+                    ))
+                )}
+            </div>
 
-      {/* Main Content */}
-      <div className="max-w-[1400px] mx-auto px-8 py-12 space-y-8">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <div className="bg-white dark:bg-white/[0.02] border border-gray-100 dark:border-white/5 rounded-[2rem] p-6 shadow-xl shadow-gray-200/20 dark:shadow-black/20 flex items-center gap-4 transition-all hover:shadow-gray-200/40 dark:hover:shadow-black/40 hover:-translate-y-1">
-            <div className="w-16 h-16 rounded-2xl bg-emerald-500/10 flex items-center justify-center text-emerald-500 shadow-lg shadow-emerald-500/10">
-              <DollarSign className="w-8 h-8" />
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <div className="bg-white dark:bg-card border border-gray-100 dark:border-white/10 rounded-[2.5rem] p-12 shadow-xl shadow-black/5 dark:shadow-none min-h-[400px] flex flex-col justify-center items-center text-center">
+                    <div className="w-20 h-20 rounded-[2rem] bg-gray-50 dark:bg-white/5 flex items-center justify-center mb-6">
+                        <TrendingUp className="w-10 h-10 text-gray-200 dark:text-gray-800" />
+                    </div>
+                    <h3 className="text-xl font-black text-gray-900 dark:text-white mb-2">{t('gestor.reports.revenueByCourt')}</h3>
+                    <p className="text-sm text-gray-500 max-w-xs">{t('gestor.reports.comingSoon')}</p>
+                </div>
+                <div className="bg-white dark:bg-card border border-gray-100 dark:border-white/10 rounded-[2.5rem] p-12 shadow-xl shadow-black/5 dark:shadow-none min-h-[400px] flex flex-col justify-center items-center text-center">
+                    <div className="w-20 h-20 rounded-[2rem] bg-gray-50 dark:bg-white/5 flex items-center justify-center mb-6">
+                        <BarChart3 className="w-10 h-10 text-gray-200 dark:text-gray-800" />
+                    </div>
+                    <h3 className="text-xl font-black text-gray-900 dark:text-white mb-2">{t('gestor.reports.reservationsByDay')}</h3>
+                    <p className="text-sm text-gray-500 max-w-xs">{t('gestor.reports.comingSoon')}</p>
+                </div>
             </div>
-            <div>
-              <p className="text-xs font-bold text-gray-500 uppercase tracking-widest">{t('gestor.reports.revenue')}</p>
-              <p className="text-3xl font-black text-gray-900 dark:text-white">R$ {revenue.toFixed(2)}</p>
-            </div>
-          </div>
-          <div className="bg-white dark:bg-white/[0.02] border border-gray-100 dark:border-white/5 rounded-[2rem] p-6 shadow-xl shadow-gray-200/20 dark:shadow-black/20 flex items-center gap-4 transition-all hover:shadow-gray-200/40 dark:hover:shadow-black/40 hover:-translate-y-1">
-            <div className="w-16 h-16 rounded-2xl bg-blue-500/10 flex items-center justify-center text-blue-500 shadow-lg shadow-blue-500/10">
-              <Calendar className="w-8 h-8" />
-            </div>
-            <div>
-              <p className="text-xs font-bold text-gray-500 uppercase tracking-widest">{t('gestor.reports.totalReservations')}</p>
-              <p className="text-3xl font-black text-gray-900 dark:text-white">{totalReservations}</p>
-            </div>
-          </div>
-          <div className="bg-white dark:bg-white/[0.02] border border-gray-100 dark:border-white/5 rounded-[2rem] p-6 shadow-xl shadow-gray-200/20 dark:shadow-black/20 flex items-center gap-4 transition-all hover:shadow-gray-200/40 dark:hover:shadow-black/40 hover:-translate-y-1">
-            <div className="w-16 h-16 rounded-2xl bg-violet-500/10 flex items-center justify-center text-violet-500 shadow-lg shadow-violet-500/10">
-              <Users className="w-8 h-8" />
-            </div>
-            <div>
-              <p className="text-xs font-bold text-gray-500 uppercase tracking-widest">{t('gestor.reports.uniqueClients')}</p>
-              <p className="text-3xl font-black text-gray-900 dark:text-white">{uniqueClients}</p>
-            </div>
-          </div>
         </div>
-
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <div className="bg-white dark:bg-white/[0.02] border border-gray-100 dark:border-white/5 rounded-[2rem] p-6 shadow-xl shadow-gray-200/20 dark:shadow-black/20 min-h-[400px] flex flex-col justify-center items-center">
-            <TrendingUp className="w-16 h-16 text-gray-200 dark:text-gray-800 mb-4" />
-            <p className="text-lg font-black text-gray-400">{t('gestor.reports.revenueByCourt')}</p>
-            <p className="text-xs text-gray-500">Gráfico será disponibilizado em breve</p>
-          </div>
-          <div className="bg-white dark:bg-white/[0.02] border border-gray-100 dark:border-white/5 rounded-[2rem] p-6 shadow-xl shadow-gray-200/20 dark:shadow-black/20 min-h-[400px] flex flex-col justify-center items-center">
-            <BarChart3 className="w-16 h-16 text-gray-200 dark:text-gray-800 mb-4" />
-            <p className="text-lg font-black text-gray-400">{t('gestor.reports.reservationsByDay')}</p>
-            <p className="text-xs text-gray-500">Gráfico será disponibilizado em breve</p>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
+    );
 }
