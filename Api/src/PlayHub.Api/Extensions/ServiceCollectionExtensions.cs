@@ -14,10 +14,7 @@ public static class ServiceCollectionExtensions
 {
     public static IServiceCollection AddApiServices(this IServiceCollection services, IConfiguration configuration)
     {
-        services.AddControllers(options =>
-        {
-            options.Filters.Add(new Microsoft.AspNetCore.Mvc.AutoValidateAntiforgeryTokenAttribute());
-        });
+        services.AddControllers();
 
         services.AddSignalR();
         services.AddEndpointsApiExplorer();

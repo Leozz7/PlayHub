@@ -1,15 +1,16 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.AspNetCore.Authorization;
-using MongoDB.Driver;
 using MediatR;
 using PlayHub.Application.Common.Interfaces;
-using PlayHub.Application.Common.Security;
-using PlayHub.Application.Features.Users.Queries.GetUserById;
-using PlayHub.Domain.Entities;
+using PlayHub.Application.Features.Auth.Commands.Login;
+using PlayHub.Application.Features.Auth.Commands.RefreshToken;
+using PlayHub.Application.Features.Auth.Commands.Logout;
+using PlayHub.Application.Features.Users.Commands.RegisterUser;
 using PlayHub.Application.Features.Users.Commands.ChangePassword;
 using PlayHub.Application.Features.Users.Commands.ForgotPassword;
 using PlayHub.Application.Features.Users.Commands.ResetPassword;
+using PlayHub.Application.Features.Users.Queries.GetUserById;
 
 namespace PlayHub.Api.Controllers;
 
@@ -23,30 +24,18 @@ public record ResetPasswordRequest(string Email, string Token, string NewPasswor
 [Route("api/[controller]")]
 public class AuthController : ControllerBase
 {
-    private readonly IApplicationDbContext _context;
-    private readonly IJwtTokenService _tokenService;
-    private readonly PasswordHasher _passwordHasher;
     private readonly IMediator _mediator;
-    private readonly IEncryptionService _encryptionService;
     private readonly IHostEnvironment _env;
     private readonly ICurrentUserService _currentUserService;
     private readonly ILogger<AuthController> _logger;
 
     public AuthController(
-        IApplicationDbContext context,
-        IJwtTokenService tokenService,
-        PasswordHasher passwordHasher,
         IMediator mediator,
-        IEncryptionService encryptionService,
         IHostEnvironment env,
         ICurrentUserService currentUserService,
         ILogger<AuthController> logger)
     {
-        _context = context;
-        _tokenService = tokenService;
-        _passwordHasher = passwordHasher;
         _mediator = mediator;
-        _encryptionService = encryptionService;
         _env = env;
         _currentUserService = currentUserService;
         _logger = logger;
@@ -66,46 +55,37 @@ public class AuthController : ControllerBase
         };
     }
 
+    private CookieOptions GetAccessTokenCookieOptions(DateTime? expires = null)
+    {
+        var isDev = _env.EnvironmentName == "Development";
+        return new CookieOptions
+        {
+            HttpOnly = true,
+            Secure   = !isDev,
+            SameSite = isDev ? SameSiteMode.Lax : SameSiteMode.Strict,
+            Path     = "/",
+            Expires  = expires
+        };
+    }
+
     [HttpPost("login")]
     [EnableRateLimiting("fixed")] 
     public async Task<IActionResult> Login([FromBody] LoginRequest request, CancellationToken cancellationToken)
     {
-        var emailIndex = _encryptionService.CreateBlindIndex(request.Email);
-        
-        var user = await _context.Users
-            .Find(u => u.EmailIndex == emailIndex)
-            .FirstOrDefaultAsync(cancellationToken);
+        var result = await _mediator.Send(new LoginCommand(request.Email, request.Password), cancellationToken);
 
-        if (user == null || !_passwordHasher.Verify(request.Password, user.PasswordHash))
+        if (result == null)
         {
             _logger.LogWarning("Tentativa de login falhou para o e-mail: {Email}", request.Email);
             return Unauthorized(new { message = "Usuário ou senha inválidos." });
         }
 
-        var accessToken = _tokenService.GenerateToken(user);
-        var refreshToken = _tokenService.GenerateRefreshToken();
-        var refreshTokenExpiry = DateTime.UtcNow.AddDays(7);
+        Response.Cookies.Append("refreshToken", result.RefreshToken, GetRefreshTokenCookieOptions(result.RefreshTokenExpiry));
+        Response.Cookies.Append("playhub_token", result.AccessToken, GetAccessTokenCookieOptions(DateTime.UtcNow.AddHours(2)));
 
-        user.SetRefreshToken(refreshToken, refreshTokenExpiry);
-        
-        await _context.Users.ReplaceOneAsync(u => u.Id == user.Id, user, cancellationToken: cancellationToken);
+        _logger.LogInformation("Usuário {UserId} realizou login com sucesso.", result.User.Id);
 
-        Response.Cookies.Append("refreshToken", refreshToken, GetRefreshTokenCookieOptions(refreshTokenExpiry));
-
-        _logger.LogInformation("Usuário {UserId} realizou login com sucesso.", user.Id);
-
-        return Ok(new
-        {
-            accessToken,
-            user = new { 
-                user.Id, 
-                user.Name, 
-                Email = request.Email,
-                Phone = user.Phone != null ? _encryptionService.Decrypt(user.Phone) : null,
-                Cpf = user.Cpf != null ? _encryptionService.Decrypt(user.Cpf) : null,
-                user.Role 
-            }
-        });
+        return Ok(new { user = result.User });
     }
 
     [HttpPost("refresh")]
@@ -117,44 +97,29 @@ public class AuthController : ControllerBase
             return Unauthorized(new { message = "Refresh token não encontrado no cookie." });
         }
 
-        var user = await _context.Users
-            .Find(u => u.RefreshToken == refreshToken)
-            .FirstOrDefaultAsync(cancellationToken);
+        var result = await _mediator.Send(new RefreshTokenCommand(refreshToken), cancellationToken);
 
-        if (user == null || user.RefreshTokenExpiryTime <= DateTime.UtcNow)
+        if (result == null)
         {
             return Unauthorized(new { message = "Refresh token inválido ou expirado." });
         }
 
-        var newAccessToken = _tokenService.GenerateToken(user);
-        var newRefreshToken = _tokenService.GenerateRefreshToken();
-        var newExpiry = DateTime.UtcNow.AddDays(7);
-        
-        user.SetRefreshToken(newRefreshToken, newExpiry);
-        
-        await _context.Users.ReplaceOneAsync(u => u.Id == user.Id, user, cancellationToken: cancellationToken);
+        Response.Cookies.Append("refreshToken", result.RefreshToken, GetRefreshTokenCookieOptions(result.RefreshTokenExpiry));
+        Response.Cookies.Append("playhub_token", result.AccessToken, GetAccessTokenCookieOptions(DateTime.UtcNow.AddHours(2)));
 
-        Response.Cookies.Append("refreshToken", newRefreshToken, GetRefreshTokenCookieOptions(newExpiry));
-
-        return Ok(new { accessToken = newAccessToken });
+        return Ok(new { message = "Token atualizado com sucesso." });
     }
 
     [HttpPost("logout")]
     [Authorize]
     public async Task<IActionResult> Logout(CancellationToken cancellationToken)
     {
-        var user = await _context.Users
-            .Find(u => u.Id == LoggedInUserId)
-            .FirstOrDefaultAsync(cancellationToken);
+        await _mediator.Send(new LogoutCommand(LoggedInUserId), cancellationToken);
+        
+        _logger.LogInformation("Usuário {UserId} realizou logout.", LoggedInUserId);
 
-        if (user != null)
-        {
-            user.RevokeRefreshToken();
-            await _context.Users.ReplaceOneAsync(u => u.Id == user.Id, user, cancellationToken: cancellationToken);
-            _logger.LogInformation("Usuário {UserId} realizou logout.", user.Id);
-        }
-
-        Response.Cookies.Delete("refreshToken", GetRefreshTokenCookieOptions());
+        Response.Cookies.Delete("refreshToken",   GetRefreshTokenCookieOptions());
+        Response.Cookies.Delete("playhub_token",   GetAccessTokenCookieOptions());
         return NoContent();
     }
 
@@ -175,34 +140,14 @@ public class AuthController : ControllerBase
     [EnableRateLimiting("fixed")]
     public async Task<IActionResult> Register([FromBody] RegisterRequest request, CancellationToken cancellationToken)
     {
-        var command = new PlayHub.Application.Features.Users.Commands.RegisterUser.RegisterUserCommand(request.Name, request.Email, request.Password);
-        var resultDto = await _mediator.Send(command, cancellationToken);
+        var result = await _mediator.Send(new RegisterUserCommand(request.Name, request.Email, request.Password), cancellationToken);
 
-        var user = await _context.Users
-            .Find(u => u.Id == resultDto.Id)
-            .FirstOrDefaultAsync(cancellationToken);
+        Response.Cookies.Append("refreshToken", result.RefreshToken, GetRefreshTokenCookieOptions(result.RefreshTokenExpiry));
+        Response.Cookies.Append("playhub_token", result.AccessToken, GetAccessTokenCookieOptions(DateTime.UtcNow.AddHours(2)));
 
-        var accessToken = _tokenService.GenerateToken(user);
-        var refreshToken = _tokenService.GenerateRefreshToken();
-        var refreshTokenExpiry = DateTime.UtcNow.AddDays(7);
-        user.SetRefreshToken(refreshToken, refreshTokenExpiry);
+        _logger.LogInformation("Novo usuário registrado e logado: {UserId}", result.User.Id);
 
-        await _context.Users.ReplaceOneAsync(u => u.Id == user.Id, user, cancellationToken: cancellationToken);
-
-        Response.Cookies.Append("refreshToken", refreshToken, GetRefreshTokenCookieOptions(refreshTokenExpiry));
-
-        _logger.LogInformation("Novo usuário registrado e logado: {UserId}", user.Id);
-
-        return CreatedAtAction(nameof(GetMyProfile), new
-        {
-            accessToken,
-            user = new {
-                resultDto.Id,
-                resultDto.Name,
-                resultDto.Email,
-                resultDto.Role
-            }
-        });
+        return CreatedAtAction(nameof(GetMyProfile), new { user = result.User });
     }
 
     [HttpPost("change-password")]
@@ -212,9 +157,11 @@ public class AuthController : ControllerBase
         var command = new ChangePasswordCommand(LoggedInUserId, request.CurrentPassword, request.NewPassword);
         var result = await _mediator.Send(command, cancellationToken);
 
-        if (!result) return NotFound();
+        if (!result) 
+            return BadRequest(new { message = "A senha atual está incorreta ou não foi possível atualizar." });
 
-        Response.Cookies.Delete("refreshToken", GetRefreshTokenCookieOptions());
+        Response.Cookies.Delete("refreshToken",   GetRefreshTokenCookieOptions());
+        Response.Cookies.Delete("playhub_token",   GetAccessTokenCookieOptions());
         return Ok(new { message = "Senha alterada com sucesso. Sessões anteriores foram invalidadas." });
     }
     [HttpPost("forgot-password")]
