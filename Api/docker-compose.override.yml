@@ -1,6 +1,5 @@
 # docker-compose.override.yml
 
-
 services:
   api:
     environment:
@@ -11,7 +10,3 @@ services:
       options:
         max-size: "10m"
         max-file: "3"
-
-  mongo:
-    ports:
-      - "27017:27017"

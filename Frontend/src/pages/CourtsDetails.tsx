@@ -166,8 +166,6 @@ export default function CourtsDetails() {
     const { data: court, isLoading: isCourtLoading, isError: isCourtError } = useCourt(id || '');
     const { isAuthenticated, user } = useAuthStore();
 
-    // Dynamic document title handled by SEO component
-
     const navigate = useNavigate();
     const [selectedDay, setSelectedDay] = useState<Date>(new Date());
     const [selectedSlots, setSelectedSlots] = useState<number[]>([]);
@@ -192,10 +190,9 @@ export default function CourtsDetails() {
         const handleReservationCreated = (data: { courtId: string, startTime: string }) => {
             if (data.courtId === id) {
                 // Invalidamos a busca de disponibilidade
-                queryClient.invalidateQueries({ queryKey: ['courtAvailability', id] });
+                queryClient.invalidateQueries({ queryKey: ['court-availability', id] });
 
                 // Verificamos se o horário reservado conflita com a seleção atual
-                // Convertemos a string ISO para data e pegamos a hora
                 const reservedHour = new Date(data.startTime).getHours();
 
                 setSelectedSlots(prev => {
@@ -305,9 +302,15 @@ export default function CourtsDetails() {
     function handleBook() {
         if (!court) return;
 
-        if (isAuthenticated && user && !user.cpf) {
-            setIsCpfModalOpen(true);
-            return;
+        if (isAuthenticated) {
+            if (!user) {
+                phToast.info(t('common.loading', "Carregando dados do usuário..."));
+                return;
+            }
+            if (!user.cpf) {
+                setIsCpfModalOpen(true);
+                return;
+            }
         }
 
         navigate('/booking/confirm', {
@@ -782,126 +785,8 @@ export default function CourtsDetails() {
                                     </button>
                                 )}
 
-                                {/* Reviews Modal */}
-                                {isReviewsModalOpen && (
-                                    <div className="fixed inset-0 z-[200] flex items-center justify-center p-4">
-                                        <div
-                                            className="absolute inset-0 bg-black/70 backdrop-blur-sm"
-                                            onClick={() => setIsReviewsModalOpen(false)}
-                                        />
-                                        <div className="relative z-10 w-full max-w-2xl max-h-[90vh] flex flex-col bg-white dark:bg-[#0a0f1a] rounded-[2rem] border border-gray-100 dark:border-white/10 shadow-2xl overflow-hidden animate-in fade-in slide-in-from-bottom-4 duration-300">
-                                            {/* Modal Header */}
-                                            <div className="flex items-center justify-between px-6 pt-6 pb-4 border-b border-gray-100 dark:border-white/10 shrink-0">
-                                                <div>
-                                                    <h2 className="text-lg font-black tracking-tight text-gray-900 dark:text-white">Todas as Avaliações</h2>
-                                                    <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">{court.name}</p>
-                                                </div>
-                                                <div className="flex items-center gap-3">
-                                                    <div className="flex items-center gap-1.5 bg-gray-50 dark:bg-white/5 rounded-2xl px-3 py-1.5 border border-gray-100 dark:border-white/10">
-                                                        <Star className="w-4 h-4" fill="#8CE600" stroke="#8CE600" strokeWidth={1.5} />
-                                                        <span className="font-black text-gray-900 dark:text-white text-sm">{(court.rating || 5).toFixed(1)}</span>
-                                                        <span className="text-gray-400 text-xs font-bold">({reviews.length})</span>
-                                                    </div>
-                                                    <button
-                                                        onClick={() => setIsReviewsModalOpen(false)}
-                                                        className="p-2 rounded-xl bg-gray-100 dark:bg-white/10 hover:bg-gray-200 dark:hover:bg-white/20 text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-all"
-                                                    >
-                                                        <X className="w-5 h-5" />
-                                                    </button>
-                                                </div>
-                                            </div>
 
-                                            {/* Rating distribution bar in modal */}
-                                            <div className="px-6 py-4 border-b border-gray-100 dark:border-white/10 shrink-0">
-                                                <div className="flex items-center gap-5">
-                                                    <div className="text-center shrink-0">
-                                                        <p className="text-4xl font-black text-gray-900 dark:text-white">{(court.rating || 5).toFixed(1)}</p>
-                                                        <div className="flex justify-center gap-0.5 my-1">
-                                                            {[1, 2, 3, 4, 5].map(n => (
-                                                                <Star key={n} className="w-3.5 h-3.5" fill={n <= Math.round(court.rating || 5) ? '#8CE600' : 'none'} stroke={n <= Math.round(court.rating || 5) ? '#8CE600' : 'currentColor'} strokeWidth={1.5} />
-                                                            ))}
-                                                        </div>
-                                                        <p className="text-[10px] text-gray-500 dark:text-gray-400 font-bold">{reviews.length} avaliações</p>
-                                                    </div>
-                                                    <div className="flex-1 space-y-1.5">
-                                                        {[5, 4, 3, 2, 1].map(star => {
-                                                            const count = reviews.filter(r => r.rating === star).length;
-                                                            const pct = reviews.length > 0 ? (count / reviews.length) * 100 : 0;
-                                                            return (
-                                                                <div key={star} className="flex items-center gap-2 text-xs">
-                                                                    <span className="w-2 text-right font-bold text-gray-500 dark:text-gray-400">{star}</span>
-                                                                    <Star className="w-3 h-3" fill="#8CE600" stroke="#8CE600" strokeWidth={0} />
-                                                                    <div className="flex-1 h-1.5 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
-                                                                        <div className="h-full bg-[#8CE600] rounded-full transition-all duration-700" style={{ width: `${pct}%` }} />
-                                                                    </div>
-                                                                    <span className="w-5 text-right text-gray-400 font-bold">{count}</span>
-                                                                </div>
-                                                            );
-                                                        })}
-                                                    </div>
-                                                </div>
-                                            </div>
 
-                                            {/* Scrollable reviews list */}
-                                            <div className="overflow-y-auto flex-1 px-6 py-4 space-y-3 scrollbar-none" style={{ scrollbarWidth: 'none' }}>
-                                                {reviews.map((r) => (
-                                                    <div key={r.id} className="bg-gray-50 dark:bg-white/5 rounded-2xl p-4 border border-gray-100 dark:border-white/10">
-                                                        <div className="flex items-center justify-between mb-2">
-                                                            <div className="flex items-center gap-2.5">
-                                                                <div className="w-8 h-8 rounded-xl bg-[#8CE600] text-gray-950 flex items-center justify-center text-[11px] font-black shrink-0">{r.userInitials}</div>
-                                                                <div>
-                                                                    <p className="font-bold text-sm text-gray-900 dark:text-white">{r.userName}</p>
-                                                                    <p className="text-[10px] text-gray-500 dark:text-gray-400">
-                                                                        {format(new Date(r.createdAt), "dd 'de' MMM yyyy", { locale: ptBR })}
-                                                                    </p>
-                                                                </div>
-                                                            </div>
-                                                            <div className="flex gap-0.5">
-                                                                {[1, 2, 3, 4, 5].map(n => (
-                                                                    <Star key={n} className="w-3.5 h-3.5" fill={n <= r.rating ? '#8CE600' : 'none'} stroke={n <= r.rating ? '#8CE600' : 'currentColor'} strokeWidth={1.5} />
-                                                                ))}
-                                                            </div>
-                                                        </div>
-                                                        <p className="text-sm text-gray-600 dark:text-gray-400 leading-relaxed italic">"{r.text}"</p>
-                                                    </div>
-                                                ))}
-                                            </div>
-                                        </div>
-                                    </div>
-                                )}
-
-                                {/* CPF Modal */}
-                                {isCpfModalOpen && (
-                                    <div className="fixed inset-0 z-[200] flex items-center justify-center p-4">
-                                        <div
-                                            className="absolute inset-0 bg-black/60 backdrop-blur-sm"
-                                            onClick={() => setIsCpfModalOpen(false)}
-                                        />
-                                        <div className="relative z-10 w-full max-w-sm flex flex-col bg-white dark:bg-background rounded-3xl border border-gray-100 dark:border-white/10 shadow-2xl p-6 text-center animate-in zoom-in-95 duration-200">
-                                            <div className="w-16 h-16 mx-auto bg-amber-100 dark:bg-amber-900/30 text-amber-600 dark:text-amber-400 rounded-full flex items-center justify-center mb-4">
-                                                <Shield className="w-8 h-8" />
-                                            </div>
-                                            <h2 className="text-xl font-black tracking-tight text-gray-900 dark:text-white mb-2">{t('details.cpfModal.title')}</h2>
-                                            <p className="text-sm text-gray-600 dark:text-gray-400 mb-6">
-                                                {t('details.cpfModal.description')}
-                                            </p>
-                                            <div className="flex flex-col gap-2">
-                                                <button
-                                                    onClick={() => navigate('/lz_user/profile')}
-                                                    className="w-full py-3 rounded-xl font-black text-sm uppercase tracking-widest bg-[#8CE600] text-gray-950 hover:bg-[#7bc900] transition-colors"
-                                                >
-                                                    {t('details.cpfModal.completeProfile')}
-                                                </button>
-                                                <button
-                                                    onClick={() => setIsCpfModalOpen(false)}
-                                                    className="w-full py-3 rounded-xl font-bold text-sm text-gray-500 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-white/5 transition-colors"
-                                                >
-                                                    {t('details.cpfModal.cancel')}
-                                                </button>
-                                            </div>
-                                        </div>
-                                    </div>
-                                )}
 
                             </>
                         )}
@@ -991,6 +876,126 @@ export default function CourtsDetails() {
                     </div>
                 </div>
             </div>
+
+            {/* Global Modals */}
+            {isReviewsModalOpen && (
+                <div className="fixed inset-0 z-[200] flex items-center justify-center p-4">
+                    <div
+                        className="absolute inset-0 bg-black/70 backdrop-blur-sm"
+                        onClick={() => setIsReviewsModalOpen(false)}
+                    />
+                    <div className="relative z-10 w-full max-w-2xl max-h-[90vh] flex flex-col bg-white dark:bg-[#0a0f1a] rounded-[2rem] border border-gray-100 dark:border-white/10 shadow-2xl overflow-hidden animate-in fade-in slide-in-from-bottom-4 duration-300">
+                        {/* Modal Header */}
+                        <div className="flex items-center justify-between px-6 pt-6 pb-4 border-b border-gray-100 dark:border-white/10 shrink-0">
+                            <div>
+                                <h2 className="text-lg font-black tracking-tight text-gray-900 dark:text-white">Todas as Avaliações</h2>
+                                <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">{court?.name}</p>
+                            </div>
+                            <div className="flex items-center gap-3">
+                                <div className="flex items-center gap-1.5 bg-gray-50 dark:bg-white/5 rounded-2xl px-3 py-1.5 border border-gray-100 dark:border-white/10">
+                                    <Star className="w-4 h-4" fill="#8CE600" stroke="#8CE600" strokeWidth={1.5} />
+                                    <span className="font-black text-gray-900 dark:text-white text-sm">{(court?.rating || 5).toFixed(1)}</span>
+                                    <span className="text-gray-400 text-xs font-bold">({reviews.length})</span>
+                                </div>
+                                <button
+                                    onClick={() => setIsReviewsModalOpen(false)}
+                                    className="p-2 rounded-xl bg-gray-100 dark:bg-white/10 hover:bg-gray-200 dark:hover:bg-white/20 text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-all"
+                                >
+                                    <X className="w-5 h-5" />
+                                </button>
+                            </div>
+                        </div>
+
+                        {/* Rating distribution bar in modal */}
+                        <div className="px-6 py-4 border-b border-gray-100 dark:border-white/10 shrink-0">
+                            <div className="flex items-center gap-5">
+                                <div className="text-center shrink-0">
+                                    <p className="text-4xl font-black text-gray-900 dark:text-white">{(court?.rating || 5).toFixed(1)}</p>
+                                    <div className="flex justify-center gap-0.5 my-1">
+                                        {[1, 2, 3, 4, 5].map(n => (
+                                            <Star key={n} className="w-3.5 h-3.5" fill={n <= Math.round(court?.rating || 5) ? '#8CE600' : 'none'} stroke={n <= Math.round(court?.rating || 5) ? '#8CE600' : 'currentColor'} strokeWidth={1.5} />
+                                        ))}
+                                    </div>
+                                    <p className="text-[10px] text-gray-500 dark:text-gray-400 font-bold">{reviews.length} avaliações</p>
+                                </div>
+                                <div className="flex-1 space-y-1.5">
+                                    {[5, 4, 3, 2, 1].map(star => {
+                                        const count = reviews.filter(r => r.rating === star).length;
+                                        const pct = reviews.length > 0 ? (count / reviews.length) * 100 : 0;
+                                        return (
+                                            <div key={star} className="flex items-center gap-2 text-xs">
+                                                <span className="w-2 text-right font-bold text-gray-500 dark:text-gray-400">{star}</span>
+                                                <Star className="w-3 h-3" fill="#8CE600" stroke="#8CE600" strokeWidth={0} />
+                                                <div className="flex-1 h-1.5 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
+                                                    <div className="h-full bg-[#8CE600] rounded-full transition-all duration-700" style={{ width: `${pct}%` }} />
+                                                </div>
+                                                <span className="w-5 text-right text-gray-400 font-bold">{count}</span>
+                                            </div>
+                                        );
+                                    })}
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Scrollable reviews list */}
+                        <div className="overflow-y-auto flex-1 px-6 py-4 space-y-3 scrollbar-none" style={{ scrollbarWidth: 'none' }}>
+                            {reviews.map((r) => (
+                                <div key={r.id} className="bg-gray-50 dark:bg-white/5 rounded-2xl p-4 border border-gray-100 dark:border-white/10">
+                                    <div className="flex items-center justify-between mb-2">
+                                        <div className="flex items-center gap-2.5">
+                                            <div className="w-8 h-8 rounded-xl bg-[#8CE600] text-gray-950 flex items-center justify-center text-[11px] font-black shrink-0">{r.userInitials}</div>
+                                            <div>
+                                                <p className="font-bold text-sm text-gray-900 dark:text-white">{r.userName}</p>
+                                                <p className="text-[10px] text-gray-500 dark:text-gray-400">
+                                                    {format(new Date(r.createdAt), "dd 'de' MMM yyyy", { locale: ptBR })}
+                                                </p>
+                                            </div>
+                                        </div>
+                                        <div className="flex gap-0.5">
+                                            {[1, 2, 3, 4, 5].map(n => (
+                                                <Star key={n} className="w-3.5 h-3.5" fill={n <= r.rating ? '#8CE600' : 'none'} stroke={n <= r.rating ? '#8CE600' : 'currentColor'} strokeWidth={1.5} />
+                                            ))}
+                                        </div>
+                                    </div>
+                                    <p className="text-sm text-gray-600 dark:text-gray-400 leading-relaxed italic">"{r.text}"</p>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {isCpfModalOpen && (
+                <div className="fixed inset-0 z-[200] flex items-center justify-center p-4">
+                    <div
+                        className="absolute inset-0 bg-black/60 backdrop-blur-sm"
+                        onClick={() => setIsCpfModalOpen(false)}
+                    />
+                    <div className="relative z-10 w-full max-w-sm flex flex-col bg-white dark:bg-background rounded-3xl border border-gray-100 dark:border-white/10 shadow-2xl p-6 text-center animate-in zoom-in-95 duration-200">
+                        <div className="w-16 h-16 mx-auto bg-amber-100 dark:bg-amber-900/30 text-amber-600 dark:text-amber-400 rounded-full flex items-center justify-center mb-4">
+                            <Shield className="w-8 h-8" />
+                        </div>
+                        <h2 className="text-xl font-black tracking-tight text-gray-900 dark:text-white mb-2">{t('details.cpfModal.title')}</h2>
+                        <p className="text-sm text-gray-600 dark:text-gray-400 mb-6">
+                            {t('details.cpfModal.description')}
+                        </p>
+                        <div className="flex flex-col gap-2">
+                            <button
+                                onClick={() => navigate('/lz_user/profile')}
+                                className="w-full py-3 rounded-xl font-black text-sm uppercase tracking-widest bg-[#8CE600] text-gray-950 hover:bg-[#7bc900] transition-colors"
+                            >
+                                {t('details.cpfModal.completeProfile')}
+                            </button>
+                            <button
+                                onClick={() => setIsCpfModalOpen(false)}
+                                className="w-full py-3 rounded-xl font-bold text-sm text-gray-500 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-white/5 transition-colors"
+                            >
+                                {t('details.cpfModal.cancel')}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
 
             <Footer />
         </div>

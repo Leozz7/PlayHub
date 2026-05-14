@@ -74,6 +74,10 @@ export default function BookingConfirmation() {
         if (!connection || !state) return;
 
         const handleReservationCreated = (data: { courtId: string, startTime: string }) => {
+            // Se eu estou confirmando ou já confirmei, ignoro as notificações de "horário ocupado" 
+            // pois provavelmente é a minha própria reserva sendo processada pelo servidor.
+            if (confirming || confirmed) return;
+
             if (data.courtId === state.court.id) {
                 // Verificar se o horário reservado conflita com os slots selecionados
                 const reservedDate = new Date(data.startTime);
@@ -92,7 +96,7 @@ export default function BookingConfirmation() {
         return () => {
             connection.off("ReservationCreated", handleReservationCreated);
         };
-    }, [state, phToast, t]);
+    }, [state, phToast, t, confirming, confirmed]);
 
     if (!state) {
         return (
@@ -226,6 +230,12 @@ export default function BookingConfirmation() {
     async function handleConfirm() {
         if (!user) {
             phToast.error("Você precisa estar logado para confirmar uma reserva.");
+            return;
+        }
+
+        if (!user.cpf) {
+            phToast.error("Você precisa preencher seu CPF no perfil para realizar reservas.");
+            navigate('/lz_user/profile');
             return;
         }
 

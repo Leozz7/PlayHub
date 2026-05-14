@@ -1,5 +1,6 @@
 import { useState, useMemo } from 'react';
 import { Link } from 'react-router-dom';
+import { format } from 'date-fns';
 import { useTranslation, Trans } from 'react-i18next';
 import {
   CalendarDays,
@@ -156,7 +157,7 @@ export default function UserDashboard() {
         court: r.courtName || t('user.dashboard.table.deletedCourt'),
         sport: court?.sport || t('user.dashboard.table.sport'),
         location: court ? `${court.city} • ${court.neighborhood}` : t('user.dashboard.table.locationNotAvailable'),
-        date: start.toLocaleDateString(locale, { weekday: 'long', year: 'numeric', month: '2-digit', day: '2-digit' }),
+        date: format(start, 'dd/MM/yyyy'),
         time: `${start.getHours()}h–${end.getHours()}h`,
         duration: `${durHours}h`,
         value: r.totalPrice,

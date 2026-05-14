@@ -5,6 +5,7 @@ export const SPORTS_LIST = [
     'Basquete',
     'Futsal',
     'Padel',
+    'Futevôlei',
     'Tênis',
     'Handebol',
 ] as const;

@@ -99,7 +99,7 @@ public class GetPaymentsHandler : IRequestHandler<GetPaymentsQuery, List<Payment
                 PaymentDate = p.PaymentDate,
                 TransactionId = p.TransactionId,
                 CourtName = court?.Name,
-                CourtSport = court?.Sport ?? court?.Type.ToString(),
+                CourtSport = court?.Sports.FirstOrDefault() ?? court?.Type.ToString(),
                 StartTime = reservation?.StartTime,
                 EndTime = reservation?.EndTime,
                 UserPhone = user?.Phone != null ? _encryptionService.Decrypt(user.Phone) : null,

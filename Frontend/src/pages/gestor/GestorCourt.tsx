@@ -501,6 +501,7 @@ export default function GestorCourt() {
         'Padel': 'sports.padel',
         'Tênis': 'sports.tennis',
         'Handebol': 'sports.handball',
+        'Futevôlei': 'sports.footvolley',
     };
 
     return (
