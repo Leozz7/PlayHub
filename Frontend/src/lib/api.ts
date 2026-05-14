@@ -18,10 +18,15 @@ export const api = axios.create({
 
 
 
-let isRefreshing = false;
-let failedQueue: any[] = [];
+interface FailedRequest {
+  resolve: (value: string | null) => void;
+  reject: (reason: Error | null) => void;
+}
 
-const processQueue = (error: any, token: string | null = null) => {
+let isRefreshing = false;
+let failedQueue: FailedRequest[] = [];
+
+const processQueue = (error: Error | null, token: string | null = null) => {
   failedQueue.forEach((prom) => {
     if (error) {
       prom.reject(error);
@@ -58,10 +63,11 @@ api.interceptors.response.use(
         processQueue(null);
         return api(originalRequest);
       } catch (refreshError) {
-        processQueue(refreshError, null);
+        const error = refreshError instanceof Error ? refreshError : new Error(String(refreshError));
+        processQueue(error, null);
         useAuthStore.getState().logout();
         window.dispatchEvent(new CustomEvent('auth:unauthorized'));
-        return Promise.reject(refreshError);
+        return Promise.reject(error);
       } finally {
         isRefreshing = false;
       }

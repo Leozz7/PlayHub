@@ -1,5 +1,8 @@
 import { api } from '@/lib/api';
-import { Court } from '@/pages/CatalogData';
+import { Court } from '../types/court.types';
+import type { PagedResult } from '@/types/shared';
+
+export type { PagedResult };
 
 export interface GetCourtsParams {
   type?: string;
@@ -19,15 +22,6 @@ export interface GetCourtsParams {
   pageSize?: number;
 }
 
-export interface PagedResult<T> {
-  items: T[];
-  totalCount: number;
-  pageNumber: number;
-  pageSize: number;
-  totalPages: number;
-  hasPreviousPage: boolean;
-  hasNextPage: boolean;
-}
 
 export interface CourtsFilters {
   cities: string[];

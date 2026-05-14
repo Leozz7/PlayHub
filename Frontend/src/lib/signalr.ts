@@ -24,9 +24,9 @@ class SignalRService {
 
     try {
       await this.connection.start();
-      console.log('SignalR Connected');
+      if (import.meta.env.DEV) console.log('SignalR Connected');
     } catch (err) {
-      console.error('SignalR Connection Error: ', err);
+      if (import.meta.env.DEV) console.error('SignalR Connection Error: ', err);
       setTimeout(() => this.startConnection(), 5000);
     }
   };
@@ -35,9 +35,9 @@ class SignalRService {
     if (this.connection) {
       try {
         await this.connection.stop();
-        console.log('SignalR Disconnected');
+        if (import.meta.env.DEV) console.log('SignalR Disconnected');
       } catch (err) {
-        console.error('Error stopping SignalR: ', err);
+        if (import.meta.env.DEV) console.error('Error stopping SignalR: ', err);
       } finally {
         this.connection = null;
       }

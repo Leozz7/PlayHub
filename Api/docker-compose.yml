@@ -13,16 +13,14 @@ services:
       - "5000:5000"
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
-      - MongoDB__ConnectionString=mongodb://${MONGO_USER}:${MONGO_PASS}@mongo:27017/${MONGO_DB}?authSource=admin
-      - MongoDB__DatabaseName=${MONGO_DB}
+      - MongoDB__ConnectionString=${MongoDB__ConnectionString}
+      - MongoDB__DatabaseName=${MongoDB__DatabaseName}
       - Jwt__Key=${JWT_KEY}
       - Jwt__Issuer=${JWT_ISSUER}
       - Jwt__Audience=${JWT_AUDIENCE}
       - ENCRYPTION_KEY=${ENCRYPTION_KEY}
-      - Serilog__WriteTo__2__Args__databaseUrl=mongodb://${MONGO_USER}:${MONGO_PASS}@mongo:27017/${MONGO_DB}?authSource=admin
-    depends_on:
-      mongo:
-        condition: service_healthy
+      - Serilog__WriteTo__2__Args__databaseUrl=${MongoDB__ConnectionString}
+      - Redis__ConnectionString=${Redis__ConnectionString}
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:5000/health/live"]
       interval: 30s
@@ -42,44 +40,28 @@ services:
       - /app/src/PlayHub.Domain/bin
       - /app/src/PlayHub.Domain/obj
 
-  # ── MongoDB 7 ──────────────────────────────────────────────────────────────
-  mongo:
-    image: mongo:7.0
-    container_name: playhub_mongo
+  # ── Redis (Cache) ──────────────────────────────────────────────────────────
+  redis:
+    image: redis:7.2-alpine
+    container_name: playhub_redis
     restart: unless-stopped
     ports:
-      - "27017:27017"
-    environment:
-      MONGO_INITDB_ROOT_USERNAME: ${MONGO_USER}
-      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_PASS}
-      MONGO_INITDB_DATABASE: ${MONGO_DB}
-    volumes:
-      - mongo_data:/data/db
-      - mongo_config:/data/configdb
+      - "6379:6379"
     networks:
       - playhub_net
     healthcheck:
-      test: [ "CMD", "mongosh", "--quiet", "--eval", "db.adminCommand('ping').ok" ]
+      test: ["CMD", "redis-cli", "ping"]
       interval: 10s
       timeout: 5s
       retries: 5
-      start_period: 20s
 
-  # ── Mongo Express (UI) ─────────────────────────────────────────────────────
-  mongo-express:
-    image: mongo-express:1.0
-    container_name: playhub_mongo_express
+  # ── Redis Insight (UI para Cache) ──────────────────────────────────────────
+  redis-insight:
+    image: redis/redisinsight:latest
+    container_name: playhub_redis_insight
     restart: unless-stopped
     ports:
-      - "8081:8081"
-    environment:
-      ME_CONFIG_MONGODB_ADMINUSERNAME: ${MONGO_USER}
-      ME_CONFIG_MONGODB_ADMINPASSWORD: ${MONGO_PASS}
-      ME_CONFIG_MONGODB_URL: mongodb://${MONGO_USER}:${MONGO_PASS}@mongo:27017/?authSource=admin
-      ME_CONFIG_BASICAUTH: "false"
-    depends_on:
-      mongo:
-        condition: service_healthy
+      - "5540:5540"
     networks:
       - playhub_net
 
@@ -94,17 +76,13 @@ services:
     environment:
       ACCEPT_EULA: "Y"
       SEQ_FIRSTRUN_NOAUTHENTICATION: "true"
-
     volumes:
       - seq_data:/data
     networks:
       - playhub_net
-  # ── Volumes ────────────────────────────────────────────────────────────────
+
+# ── Volumes ────────────────────────────────────────────────────────────────
 volumes:
-  mongo_data:
-    driver: local
-  mongo_config:
-    driver: local
   seq_data:
     driver: local
 

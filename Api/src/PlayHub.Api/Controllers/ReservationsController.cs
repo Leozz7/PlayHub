@@ -5,6 +5,8 @@ using Microsoft.Extensions.DependencyInjection;
 using PlayHub.Application.Features.Reservations.Commands.CreateReservation;
 using PlayHub.Application.Features.Reservations.Commands.DeleteReservation;
 using PlayHub.Application.Features.Reservations.Commands.UpdateReservation;
+using PlayHub.Application.Features.Reservations.Commands.CreateRecurringReservation;
+using PlayHub.Application.Features.Reservations.Commands.CancelRecurringReservation;
 using PlayHub.Application.Features.Reservations.Queries.GetReservations;
 using PlayHub.Application.Features.Reservations.Queries.GetReservationById;
 using PlayHub.Application.Features.Reservations.Dtos;
@@ -12,6 +14,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
+using PlayHub.Domain.Constants;
 
 namespace PlayHub.Api.Controllers;
 
@@ -63,5 +66,22 @@ public class ReservationsController : ControllerBase
         var result = await Mediator.Send(new DeleteReservationCommand(id));
         if (!result) return NotFound();
         return NoContent();
+    }
+
+    [HttpPost("recurring")]
+    [Authorize(Roles = AppRoles.Manager)]
+    public async Task<ActionResult<CreateRecurringReservationResult>> CreateRecurring(
+        [FromBody] CreateRecurringReservationCommand command)
+    {
+        var result = await Mediator.Send(command);
+        return Ok(result);
+    }
+
+    [HttpDelete("recurring/{groupId}")]
+    [Authorize(Roles = AppRoles.Manager)]
+    public async Task<ActionResult<CancelRecurringReservationResult>> CancelRecurring(Guid groupId)
+    {
+        var result = await Mediator.Send(new CancelRecurringReservationCommand(groupId));
+        return Ok(result);
     }
 }

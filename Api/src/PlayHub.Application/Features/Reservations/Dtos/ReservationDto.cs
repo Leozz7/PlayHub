@@ -21,4 +21,7 @@ public class ReservationDto
     public Guid? PaymentId { get; set; }
     public PaymentMethod? PaymentMethod { get; set; }
     public DateTime Created { get; set; }
+    
+    public bool IsRecurring { get; set; }
+    public Guid? RecurringGroupId { get; set; }
 }

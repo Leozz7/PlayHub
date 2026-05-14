@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { Header } from '@/components/Header';
 import { Footer } from '@/components/Footer';
 import { Reveal } from '@/components/ui/Reveal';
-import { SPORT_ICONS } from '@/components/SportIcons';
+import { SPORT_ICONS } from '@/components/SportIconsMap';
 import { usePlayHubToast } from '@/hooks/usePlayHubToast';
 
 export default function Contact() {
@@ -91,7 +91,7 @@ export default function Contact() {
                                         </div>
                                         <div>
                                             <p className="text-xs font-bold uppercase tracking-widest text-gray-500 mb-1">Localização</p>
-                                            <p className="text-lg font-medium">São Paulo, SP - Brasil</p>
+                                            <p className="text-lg font-medium">Teofilândia, BA - Brasil</p>
                                         </div>
                                     </div>
                                 </div>

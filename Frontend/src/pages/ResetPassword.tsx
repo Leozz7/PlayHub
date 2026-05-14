@@ -68,8 +68,8 @@ export default function ResetPassword() {
       });
       phToast.success('Sua senha foi redefinida com sucesso!');
       navigate('/login');
-    } catch (error: any) {
-      const message = error.response?.data?.message || 'Erro ao redefinir senha.';
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : 'Erro ao redefinir senha.';
       phToast.error(message);
     } finally {
       setIsSubmitting(false);

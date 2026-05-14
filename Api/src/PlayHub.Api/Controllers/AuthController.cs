@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using System.Text.Json.Serialization;
 using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.AspNetCore.Authorization;
 using MediatR;
@@ -15,7 +16,7 @@ using PlayHub.Application.Features.Users.Queries.GetUserById;
 namespace PlayHub.Api.Controllers;
 
 public record LoginRequest(string Email, string Password);
-public record RegisterRequest(string Name, string Email, string Password);
+public record RegisterRequest(string Name, string Email, string Password, [property: JsonPropertyName("cpf")] string? Cpf = null);
 public record ChangePasswordRequest(string CurrentPassword, string NewPassword);
 public record ForgotPasswordRequest(string Email);
 public record ResetPasswordRequest(string Email, string Token, string NewPassword);
@@ -140,7 +141,7 @@ public class AuthController : ControllerBase
     [EnableRateLimiting("fixed")]
     public async Task<IActionResult> Register([FromBody] RegisterRequest request, CancellationToken cancellationToken)
     {
-        var result = await _mediator.Send(new RegisterUserCommand(request.Name, request.Email, request.Password), cancellationToken);
+        var result = await _mediator.Send(new RegisterUserCommand(request.Name, request.Email, request.Password, request.Cpf), cancellationToken);
 
         Response.Cookies.Append("refreshToken", result.RefreshToken, GetRefreshTokenCookieOptions(result.RefreshTokenExpiry));
         Response.Cookies.Append("playhub_token", result.AccessToken, GetAccessTokenCookieOptions(DateTime.UtcNow.AddHours(2)));

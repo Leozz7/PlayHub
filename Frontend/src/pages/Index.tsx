@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { Header } from '@/components/Header';
 import { Footer } from '@/components/Footer';
-import { SPORT_ICONS } from '@/components/SportIcons';
+import { SPORT_ICONS } from '@/components/SportIconsMap';
 import { HeroBackground } from '@/components/ui/HeroBackground';
 import { Reveal } from '@/components/ui/Reveal';
 import { HomeSearchWidget } from '@/components/HomeSearchWidget';

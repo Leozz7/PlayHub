@@ -11,4 +11,5 @@ public interface IApplicationDbContext
     IMongoCollection<Reservation> Reservations { get; }
     IMongoCollection<Payment> Payments { get; }
     IMongoCollection<SystemLog> SystemLogs { get; }
+    IMongoCollection<Invoice> Invoices { get; }
 }

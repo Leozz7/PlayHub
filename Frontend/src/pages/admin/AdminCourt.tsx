@@ -54,7 +54,8 @@ import { CSS } from '@dnd-kit/utilities';
 import { useManagementCourts } from '@/features/courts/hooks/useCourts';
 
 import { courtService } from '@/features/courts/api/courtService';
-import { Court, SPORTS_LIST, OperatingDay } from '@/pages/CatalogData';
+import { SPORTS_LIST } from '@/features/courts/constants';
+import { Court, OperatingDay } from '@/features/courts/types/court.types';
 
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -437,8 +438,13 @@ export default function AdminCourt() {
     const watchType = watch('type');
     useEffect(() => {
         const typeLabel = COURT_TYPES.find(t => t.value === watchType)?.label;
-        if (typeLabel && typeLabel !== 'Outro' && !selectedSportsList.includes(typeLabel)) {
-            setSelectedSportsList(prev => [...prev, typeLabel]);
+        if (typeLabel && typeLabel !== 'Outro') {
+            setSelectedSportsList(prev => {
+                if (!prev.includes(typeLabel)) {
+                    return [...prev, typeLabel];
+                }
+                return prev;
+            });
         }
     }, [watchType]);
 
@@ -450,7 +456,7 @@ export default function AdminCourt() {
         setSelectedAmenitiesList(prev => prev.includes(amenity) ? prev.filter(a => a !== amenity) : [...prev, amenity]);
     };
 
-    const updateSchedule = (day: number, field: keyof OperatingDay, value: any) => {
+    const updateSchedule = (day: number, field: keyof OperatingDay, value: OperatingDay[keyof OperatingDay]) => {
         setSchedules(prev => prev.map(s => s.day === day ? { ...s, [field]: value } : s));
     };
 
@@ -501,13 +507,13 @@ export default function AdminCourt() {
             city: court.city,
             neighborhood: court.neighborhood,
             address: court.address,
-            hourlyRate: court.price,
+            hourlyRate: court.hourlyRate,
             capacity: court.capacity,
             description: court.description || '',
             openingHour: court.openingHour,
             closingHour: court.closingHour,
             badge: court.badge || '',
-            type: court.type || 2,
+            type: typeof court.type === 'number' ? court.type : 2,
             status: court.status === 'available' ? 1 : (court.status === 'busy' ? 2 : (typeof court.status === 'number' ? court.status : 1))
         });
         setIsDialogOpen(true);
@@ -529,10 +535,10 @@ export default function AdminCourt() {
         if (editingCourt) {
             updateMutation.mutate({
                 id: editingCourt.id,
-                data: payload as any
+                data: payload as Partial<Court>
             });
         } else {
-            createMutation.mutate(payload as any);
+            createMutation.mutate(payload as unknown as Court);
         }
     };
 
@@ -683,7 +689,7 @@ export default function AdminCourt() {
                                                     <div>
                                                         <p className="font-black text-sm text-gray-900 dark:text-white">{court.name}</p>
                                                         <div className="flex flex-wrap gap-1 mt-1">
-                                                            {court.sports.slice(0, 2).map(s => (
+                                                            {court.sports?.slice(0, 2).map(s => (
                                                                 <span key={s} className="text-[9px] font-bold text-[#8CE600] bg-[#8CE600]/10 px-1.5 py-0.5 rounded-full">{s}</span>
                                                             ))}
                                                         </div>
@@ -697,7 +703,7 @@ export default function AdminCourt() {
                                                 </div>
                                             </TableCell>
                                             <TableCell className="px-6 py-4">
-                                                <p className="font-black text-sm text-gray-900 dark:text-white">R$ {court.price}</p>
+                                                <p className="font-black text-sm text-gray-900 dark:text-white">R$ {court.hourlyRate}</p>
                                             </TableCell>
                                             <TableCell className="px-6 py-4">
                                                 <Badge className={`rounded-full font-black text-[10px] uppercase tracking-widest ${court.frontendStatus === 'available'
@@ -1122,7 +1128,7 @@ export default function AdminCourt() {
                                                                 </TableCell>
                                                             </TableRow>
                                                         ) : (
-                                                            linkedManagers.map((manager: any) => (
+                                                            linkedManagers.map((manager: { id: string; name: string; email: string; role: string; }) => (
                                                                 <TableRow key={manager.id} className="border-b border-gray-50 dark:border-white/5">
                                                                     <TableCell className="px-6 py-4">
                                                                         <div className="flex items-center gap-3">

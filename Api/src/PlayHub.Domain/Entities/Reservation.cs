@@ -13,6 +13,9 @@ public class Reservation : BaseEntity
     public decimal TotalPrice { get; private set; }
     public Guid? PaymentId { get; private set; }
 
+    public bool IsRecurring { get; private set; }
+    public Guid? RecurringGroupId { get; private set; }
+
     private Reservation() { }
 
     public Reservation(Guid courtId, Guid userId, DateTime startTime, DateTime endTime, decimal totalPrice, ReservationStatus status = ReservationStatus.Pending)
@@ -35,6 +38,23 @@ public class Reservation : BaseEntity
         EndTime = endTime;
         TotalPrice = totalPrice;
         Status = status;
+    }
+
+    public static Reservation CreateRecurring(
+        Guid courtId,
+        Guid userId,
+        DateTime startTime,
+        DateTime endTime,
+        decimal totalPrice,
+        Guid recurringGroupId)
+    {
+        if (recurringGroupId == Guid.Empty)
+            throw new DomainException("RecurringGroupId is required for recurring reservations.");
+
+        var reservation = new Reservation(courtId, userId, startTime, endTime, totalPrice);
+        reservation.IsRecurring = true;
+        reservation.RecurringGroupId = recurringGroupId;
+        return reservation;
     }
 
     public void UpdateStatus(ReservationStatus status)

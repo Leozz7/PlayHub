@@ -5,7 +5,8 @@ using PlayHub.Application.Common.Security;
 using PlayHub.Application.Features.Users.Dtos;
 using PlayHub.Domain.Common.Exceptions;
 using PlayHub.Domain.Entities;
-
+using PlayHub.Domain.Common;
+using PlayHub.Application.Common.Extensions;
 using PlayHub.Application.Features.Auth.Dtos;
 
 namespace PlayHub.Application.Features.Users.Commands.RegisterUser;
@@ -45,6 +46,14 @@ public class RegisterUserHandler : IRequestHandler<RegisterUserCommand, AuthResp
 
         var user = new User(request.Name, encryptedEmail, emailIndex, passwordHash, "User");
 
+        if (!string.IsNullOrWhiteSpace(request.Cpf))
+        {
+            if (!request.Cpf.IsValidCpf())
+                throw new DomainException("CPF inválido.");
+
+            user.UpdateCpf(_encryptionService.Encrypt(request.Cpf));
+        }
+
         await _db.Users.InsertOneAsync(user, cancellationToken: ct);
 
         var accessToken        = _tokenService.GenerateToken(user);
@@ -65,6 +74,7 @@ public class RegisterUserHandler : IRequestHandler<RegisterUserCommand, AuthResp
                 Id = user.Id,
                 Name = user.Name,
                 Email = request.Email,
+                Cpf = request.Cpf,
                 Role = user.Role,
                 Created = user.Created
             }

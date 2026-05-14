@@ -8,9 +8,18 @@ interface ReportStats {
   newUsers: number;
 }
 
+interface ReportReservation {
+  startTime: string;
+  userName?: string;
+  courtName?: string;
+  courtSport?: string;
+  totalPrice: number;
+  status: number;
+}
+
 interface ExportPDFParams {
   stats: ReportStats;
-  reservationsData: any[];
+  reservationsData: ReportReservation[];
   t: (key: string) => string;
 }
 
@@ -100,7 +109,7 @@ export const exportAdminReportPDF = ({ stats, reservationsData, t }: ExportPDFPa
   doc.line(15, 106, 25, 106);
 
   const sportsCount: Record<string, number> = {};
-  reservationsData.forEach((r: any) => {
+  reservationsData.forEach((r: ReportReservation) => {
     const s = r.courtSport || 'Outros';
     sportsCount[s] = (sportsCount[s] || 0) + 1;
   });
@@ -135,7 +144,7 @@ export const exportAdminReportPDF = ({ stats, reservationsData, t }: ExportPDFPa
     margin: { left: 15, right: 110 }
   });
 
-  const finalY = (doc as any).lastAutoTable.finalY || 115;
+  const finalY = (doc as unknown as { lastAutoTable?: { finalY?: number } }).lastAutoTable?.finalY || 115;
 
   doc.setTextColor(...darkColor);
   doc.setFontSize(12);
@@ -145,7 +154,7 @@ export const exportAdminReportPDF = ({ stats, reservationsData, t }: ExportPDFPa
   doc.setLineWidth(1.5);
   doc.line(15, finalY + 24, 25, finalY + 24);
 
-  const tableData = reservationsData.slice(0, 50).map((r: any) => [
+  const tableData = reservationsData.slice(0, 50).map((r: ReportReservation) => [
     new Date(r.startTime).toLocaleDateString('pt-BR'),
     (r.userName || 'N/A').toUpperCase(),
     (r.courtName || 'N/A').toUpperCase(),
@@ -195,7 +204,7 @@ export const exportAdminReportPDF = ({ stats, reservationsData, t }: ExportPDFPa
     }
   });
 
-  const pageCount = (doc as any).internal.getNumberOfPages();
+  const pageCount = (doc as unknown as { internal: { getNumberOfPages: () => number } }).internal.getNumberOfPages();
   for (let i = 1; i <= pageCount; i++) {
     doc.setPage(i);
     doc.setFillColor(255, 255, 255);

@@ -167,6 +167,7 @@ interface ActionModalProps {
   variant?: 'default' | 'premium' | 'danger';
   icon?: React.ElementType;
   isLoading?: boolean;
+  children?: React.ReactNode;
 }
 
 export function ActionModal({
@@ -178,7 +179,8 @@ export function ActionModal({
   actionText,
   variant = 'default',
   icon: Icon = Info,
-  isLoading
+  isLoading,
+  children
 }: ActionModalProps) {
   const variantStyles = {
     default: 'bg-gray-900 dark:bg-white text-white dark:text-gray-900',
@@ -205,6 +207,12 @@ export function ActionModal({
           <p className="text-gray-500 dark:text-gray-400 text-sm mb-6">
             {description}
           </p>
+
+          {children && (
+            <div className="w-full mb-6">
+              {children}
+            </div>
+          )}
 
           <div className="grid grid-cols-2 gap-2 w-full">
             <Button

@@ -1,8 +1,9 @@
 import React, { useState, useMemo } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import { format } from 'date-fns';
 import { ptBR, enUS, es } from 'date-fns/locale';
 import { useTranslation } from 'react-i18next';
-import { Calendar, Clock, User, CheckCircle2, Building2, Search, ArrowRight, Lock, Unlock, AlertCircle, Phone } from 'lucide-react';
+import { Calendar, Clock, User, CheckCircle2, Building2, Search, ArrowRight, Lock, Unlock, AlertCircle, Phone, Repeat } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { ActionModal } from '@/components/ui/PremiumModal';
@@ -12,9 +13,16 @@ import { useReservations } from '@/features/reservations/hooks/useReservations';
 import { useAuthStore } from '@/data/useAuthStore';
 import { api } from '@/lib/api';
 import { usePlayHubToast } from '@/hooks/usePlayHubToast';
+import { useCreateRecurringReservation } from '@/features/reservations/hooks/useRecurringReservations';
+import { Switch } from '@/components/ui/switch';
+import { Label } from '@/components/ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Input } from '@/components/ui/input';
+import { Court } from '@/features/courts/types/court.types';
+import { Reservation } from '@/features/reservations/types/reservation.types';
 
-function CourtScheduleModal({ court, isOpen, onClose }: { court: any, isOpen: boolean, onClose: () => void }) {
+
+function CourtScheduleModal({ court, isOpen, onClose }: { court: Court | null, isOpen: boolean, onClose: () => void }) {
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
   const { user } = useAuthStore();
   const phToast = usePlayHubToast();
@@ -22,8 +30,13 @@ function CourtScheduleModal({ court, isOpen, onClose }: { court: any, isOpen: bo
   const [isBlocking, setIsBlocking] = useState(false);
   const [showBlockConfirm, setShowBlockConfirm] = useState(false);
   const [slotToBlock, setSlotToBlock] = useState<number | null>(null);
-  const [selectedReservation, setSelectedReservation] = useState<any | null>(null);
+  const [selectedReservation, setSelectedReservation] = useState<Reservation | null>(null);
   const [showReleaseConfirm, setShowReleaseConfirm] = useState(false);
+  
+  // Recurring States
+  const [isRecurring, setIsRecurring] = useState(false);
+  const [durationMonths, setDurationMonths] = useState("3");
+  const createRecurring = useCreateRecurringReservation();
   
   const dateLocale = i18n.language === 'pt' ? ptBR : i18n.language === 'es' ? es : enUS;
 
@@ -32,6 +45,20 @@ function CourtScheduleModal({ court, isOpen, onClose }: { court: any, isOpen: bo
     date: format(selectedDate, 'yyyy-MM-dd'), 
     pageSize: 100
   });
+
+  const [userSearch, setUserSearch] = useState('');
+  const [selectedClient, setSelectedClient] = useState<{id: string, name: string} | null>(null);
+  
+  const { data: usersData, isLoading: isLoadingUsers } = useQuery({
+    queryKey: ['users', 'search', userSearch],
+    queryFn: async () => {
+      if (userSearch.length < 2) return { items: [] };
+      const res = await api.get('/users', { params: { search: userSearch, pageSize: 5 } });
+      return res.data;
+    },
+    enabled: isRecurring && userSearch.length >= 2
+  });
+  const users = usersData?.items || [];
 
   const reservations = reservationsData?.items || [];
 
@@ -51,23 +78,43 @@ function CourtScheduleModal({ court, isOpen, onClose }: { court: any, isOpen: bo
       const end = new Date(selectedDate);
       end.setHours(slotToBlock + 1, 0, 0, 0);
 
-      const payload = {
-        courtId: court.id,
-        userId: user.id,
-        startTime: start.toISOString(),
-        endTime: end.toISOString(),
-        totalPrice: 0,
-        status: 5 // Blocked
-      };
+      if (isRecurring) {
+        if (!selectedClient) {
+          phToast.error("Por favor, selecione um cliente para a mensalidade.");
+          setIsBlocking(false);
+          return;
+        }
 
-      await api.post('/Reservations', payload);
-      phToast.success(`Horário das ${slotToBlock}:00 bloqueado com sucesso.`);
+        await createRecurring.mutateAsync({
+          courtId: court?.id!,
+          userId: selectedClient.id,
+          firstStartTime: start.toISOString(),
+          firstEndTime: end.toISOString(),
+          monthsToBlock: parseInt(durationMonths)
+        });
+        phToast.success(`Mensalista criado para ${selectedClient.name} às ${slotToBlock}:00 por ${durationMonths} meses.`);
+      } else {
+        const payload = {
+          courtId: court?.id,
+          userId: user.id,
+          startTime: start.toISOString(),
+          endTime: end.toISOString(),
+          totalPrice: 0,
+          status: 5 // Blocked
+        };
+        await api.post('/Reservations', payload);
+        phToast.success(`Horário das ${slotToBlock}:00 bloqueado com sucesso.`);
+      }
+
       refetch();
       setShowBlockConfirm(false);
       setSlotToBlock(null);
+      setIsRecurring(false);
+      setSelectedClient(null);
+      setUserSearch('');
     } catch (error) {
-      console.error('Error blocking slot:', error);
-      phToast.error("Erro ao bloquear horário.");
+      console.error('Error blocking/recurring slot:', error);
+      phToast.error("Erro ao processar solicitação.");
     } finally {
       setIsBlocking(false);
     }
@@ -155,14 +202,14 @@ function CourtScheduleModal({ court, isOpen, onClose }: { court: any, isOpen: bo
             ) : (
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                 {hours.map(hour => {
-                  const reservation = reservations.find((r: any) => {
+                  const reservation = reservations.find((r: Reservation) => {
                     const resDate = new Date(r.startTime);
-                    return resDate.getHours() === hour && r.status !== 3; 
+                    return resDate.getHours() === hour && Number(r.status) !== 3; 
                   });
 
                   const isOccupied = !!reservation;
-                  const isBlocked = reservation?.status === 5;
-                  const isConfirmed = reservation?.status === 2;
+                  const isBlocked = Number(reservation?.status) === 5;
+                  const isConfirmed = Number(reservation?.status) === 2;
 
                   return (
                     <div 
@@ -222,9 +269,16 @@ function CourtScheduleModal({ court, isOpen, onClose }: { court: any, isOpen: bo
                               <div className="w-6 h-6 rounded-lg bg-red-500/10 flex items-center justify-center text-red-500 text-[10px] font-black">
                                 {reservation.userName?.charAt(0) || 'U'}
                               </div>
-                              <p className="text-sm font-bold text-gray-900 dark:text-white truncate">
-                                {reservation.userName || t('gestor.schedule.modal.details.client')}
-                              </p>
+                              <div className="flex items-center gap-1.5 truncate">
+                                <p className="text-sm font-bold text-gray-900 dark:text-white truncate">
+                                  {reservation.userName || t('gestor.schedule.modal.details.client')}
+                                </p>
+                                {reservation.isRecurring && (
+                                  <span title="Mensalista">
+                                    <Repeat className="w-3 h-3 text-[#8CE600] shrink-0" />
+                                  </span>
+                                )}
+                              </div>
                             </div>
                             <div className="flex items-center justify-between text-[10px] font-bold">
                                <span className="text-gray-400">R$ {reservation.totalPrice}</span>
@@ -265,27 +319,124 @@ function CourtScheduleModal({ court, isOpen, onClose }: { court: any, isOpen: bo
           onClose={() => {
             setShowBlockConfirm(false);
             setSlotToBlock(null);
+            setIsRecurring(false);
+            setSelectedClient(null);
+            setUserSearch('');
           }}
           onAction={handleBlockSlot}
-          title={t('gestor.schedule.modal.blockConfirm.title')}
-          description={t('gestor.schedule.modal.blockConfirm.desc', { start: slotToBlock, end: Number(slotToBlock) + 1 })}
-          actionText={t('gestor.schedule.modal.blockConfirm.confirm')}
+          title={isRecurring ? "Confirmar Reserva Mensalista" : t('gestor.schedule.modal.blockConfirm.title')}
+          description={isRecurring 
+            ? `Deseja criar uma reserva recorrente para toda ${format(selectedDate, "EEEE", { locale: dateLocale })} às ${slotToBlock}:00 pelos próximos ${durationMonths} meses?`
+            : t('gestor.schedule.modal.blockConfirm.desc', { start: slotToBlock, end: Number(slotToBlock) + 1 })
+          }
+          actionText={isRecurring ? "Confirmar Mensalista" : t('gestor.schedule.modal.blockConfirm.confirm')}
           variant="premium"
-          icon={Lock}
+          icon={isRecurring ? Repeat : Lock}
           isLoading={isBlocking}
-        />
+        >
+          <div className="mt-6 p-4 bg-gray-50 dark:bg-white/5 rounded-2xl border border-gray-100 dark:border-white/5 space-y-4">
+            <div className="flex items-center justify-between">
+              <div className="space-y-0.5">
+                <Label className="text-xs font-black uppercase tracking-widest text-gray-400">Reserva Mensalista</Label>
+                <p className="text-[10px] text-gray-500">Repetir semanalmente este horário</p>
+              </div>
+              <Switch 
+                checked={isRecurring} 
+                onCheckedChange={setIsRecurring}
+                className="data-[state=checked]:bg-[#8CE600]"
+              />
+            </div>
+
+            {isRecurring && (
+              <div className="space-y-4 animate-in slide-in-from-top-2 duration-300">
+                <div className="space-y-2">
+                  <Label className="text-[10px] font-black uppercase tracking-widest text-gray-400">Cliente da Mensalidade</Label>
+                  
+                  {!selectedClient ? (
+                    <div className="space-y-2">
+                      <div className="relative">
+                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                        <Input 
+                          placeholder="Pesquisar por nome, e-mail ou CPF..."
+                          value={userSearch}
+                          onChange={(e) => setUserSearch(e.target.value)}
+                          className="pl-9 bg-white dark:bg-[#0a0f1a] border-gray-100 dark:border-white/10 rounded-xl h-10"
+                        />
+                      </div>
+                      
+                      {userSearch.length >= 2 && (
+                        <div className="bg-white dark:bg-card border border-gray-100 dark:border-white/10 rounded-xl overflow-hidden shadow-lg">
+                          {isLoadingUsers ? (
+                            <div className="p-4 text-center text-xs text-gray-400">Carregando usuários...</div>
+                          ) : users.length === 0 ? (
+                            <div className="p-4 text-center text-xs text-gray-400">Nenhum usuário encontrado.</div>
+                          ) : (
+                            users.map((u: any) => (
+                              <button
+                                key={u.id}
+                                onClick={() => {
+                                  setSelectedClient({ id: u.id, name: u.name });
+                                  setUserSearch('');
+                                }}
+                                className="w-full p-3 text-left hover:bg-gray-50 dark:hover:bg-white/5 transition-colors border-b border-gray-50 dark:border-white/5 last:border-0"
+                              >
+                                <p className="text-sm font-bold text-gray-900 dark:text-white">{u.name}</p>
+                                <p className="text-[10px] text-gray-400">{u.email}</p>
+                              </button>
+                            ))
+                          )}
+                        </div>
+                      )}
+                    </div>
+                  ) : (
+                    <div className="flex items-center justify-between p-3 bg-[#8CE600]/10 border border-[#8CE600]/20 rounded-xl">
+                      <div className="flex items-center gap-3">
+                        <div className="w-8 h-8 rounded-full bg-[#8CE600] text-gray-950 flex items-center justify-center font-black text-xs">
+                          {selectedClient.name.charAt(0)}
+                        </div>
+                        <span className="text-sm font-bold text-gray-900 dark:text-white">{selectedClient.name}</span>
+                      </div>
+                      <Button 
+                        variant="ghost" 
+                        size="sm" 
+                        onClick={() => setSelectedClient(null)}
+                        className="h-8 text-[10px] font-black uppercase tracking-widest text-red-500 hover:bg-red-500/10 hover:text-red-500"
+                      >
+                        Alterar
+                      </Button>
+                    </div>
+                  )}
+                </div>
+
+                <div className="space-y-2">
+                  <Label className="text-[10px] font-black uppercase tracking-widest text-gray-400">Duração do Contrato</Label>
+                  <Select value={durationMonths} onValueChange={setDurationMonths}>
+                    <SelectTrigger className="bg-white dark:bg-[#0a0f1a] border-gray-100 dark:border-white/10 rounded-xl h-10">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent className="rounded-xl border-gray-100 dark:border-white/10">
+                      <SelectItem value="3">3 Meses</SelectItem>
+                      <SelectItem value="6">6 Meses</SelectItem>
+                      <SelectItem value="12">12 Meses</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+            )}
+          </div>
+        </ActionModal>
 
         {/* Modal de Detalhes da Reserva / Bloqueio */}
         <Dialog open={!!selectedReservation} onOpenChange={(open) => !open && setSelectedReservation(null)}>
           <DialogContent className="max-w-md bg-white dark:bg-[#0a0f1a] border-gray-100 dark:border-white/10 rounded-[2rem] p-8 shadow-2xl">
             <DialogHeader className="mb-6">
               <div className="flex items-center gap-3 mb-4">
-                <div className={`w-12 h-12 rounded-2xl flex items-center justify-center ${selectedReservation?.status === 5 ? 'bg-gray-100 text-gray-500' : 'bg-red-50 text-red-500'}`}>
-                  {selectedReservation?.status === 5 ? <Lock className="w-6 h-6" /> : <User className="w-6 h-6" />}
+                <div className={`w-12 h-12 rounded-2xl flex items-center justify-center ${Number(selectedReservation?.status) === 5 ? 'bg-gray-100 text-gray-500' : 'bg-red-50 text-red-500'}`}>
+                  {Number(selectedReservation?.status) === 5 ? <Lock className="w-6 h-6" /> : <User className="w-6 h-6" />}
                 </div>
                 <div>
                   <DialogTitle className="text-xl font-black text-gray-900 dark:text-white">
-                    {selectedReservation?.status === 5 ? t('gestor.schedule.modal.details.blockedTitle') : t('gestor.schedule.modal.details.reservedTitle')}
+                    {Number(selectedReservation?.status) === 5 ? t('gestor.schedule.modal.details.blockedTitle') : t('gestor.schedule.modal.details.reservedTitle')}
                   </DialogTitle>
                   <p className="text-xs text-gray-400 font-bold uppercase tracking-widest">{t('gestor.schedule.modal.details.opInfo')}</p>
                 </div>
@@ -303,8 +454,8 @@ function CourtScheduleModal({ court, isOpen, onClose }: { court: any, isOpen: bo
                 </div>
                 <div className="p-4 bg-gray-50 dark:bg-white/5 rounded-2xl border border-gray-100 dark:border-white/5">
                   <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">{t('gestor.schedule.modal.details.status')}</p>
-                  <p className={`text-sm font-black ${selectedReservation?.status === 5 ? 'text-gray-500' : 'text-red-500'}`}>
-                    {selectedReservation?.status === 5 ? t('gestor.schedule.modal.status.blocked') : t('gestor.schedule.modal.status.occupied')}
+                  <p className={`text-sm font-black ${Number(selectedReservation?.status) === 5 ? 'text-gray-500' : 'text-red-500'}`}>
+                    {Number(selectedReservation?.status) === 5 ? t('gestor.schedule.modal.status.blocked') : t('gestor.schedule.modal.status.occupied')}
                   </p>
                 </div>
               </div>
@@ -349,7 +500,7 @@ function CourtScheduleModal({ court, isOpen, onClose }: { court: any, isOpen: bo
                   {t('gestor.schedule.modal.details.close')}
                 </Button>
                 
-                {selectedReservation?.status === 5 && (
+                {Number(selectedReservation?.status) === 5 && (
                   <Button 
                     variant="destructive" 
                     onClick={() => setShowReleaseConfirm(true)}
@@ -379,7 +530,7 @@ function CourtScheduleModal({ court, isOpen, onClose }: { court: any, isOpen: bo
   );
 }
 
-function CourtCard({ court, onOpenSchedule }: { court: any, onOpenSchedule: () => void }) {
+function CourtCard({ court, onOpenSchedule }: { court: Court, onOpenSchedule: () => void }) {
   const { t } = useTranslation();
   return (
     <div className="group bg-white dark:bg-white/[0.03] border border-gray-100 dark:border-white/[0.06] rounded-[2rem] overflow-hidden hover:shadow-2xl hover:shadow-gray-200/50 dark:hover:shadow-black/40 transition-all duration-500 flex flex-col h-full">
@@ -393,7 +544,7 @@ function CourtCard({ court, onOpenSchedule }: { court: any, onOpenSchedule: () =
         
         <div className="absolute top-4 left-4 flex flex-col gap-2">
           <span className="px-3 py-1 bg-[#8CE600] text-gray-950 text-[10px] font-black uppercase tracking-widest rounded-full shadow-lg shadow-[#8CE600]/20">
-            {court.sport}
+            {court.sport || t('common.sport')}
           </span>
         </div>
         
@@ -436,15 +587,15 @@ function CourtCard({ court, onOpenSchedule }: { court: any, onOpenSchedule: () =
 export default function GestorSchedule() {
     const [searchTerm, setSearchTerm] = useState('');
     const { data: pagedData, isLoading } = useManagementCourts({ pageSize: 100 });
-    const [selectedCourt, setSelectedCourt] = useState<any | null>(null);
+    const [selectedCourt, setSelectedCourt] = useState<Court | null>(null);
     const { t } = useTranslation();
 
-    const courts = pagedData?.items || [];
+    const courts = useMemo(() => pagedData?.items || [], [pagedData?.items]);
 
     const filteredCourts = useMemo(() => {
-        return courts.filter((c: any) =>
+        return courts.filter((c: Court) =>
             c.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            c.sport.toLowerCase().includes(searchTerm.toLowerCase())
+            (c.sport || '').toLowerCase().includes(searchTerm.toLowerCase())
         );
     }, [courts, searchTerm]);
 
@@ -487,7 +638,7 @@ export default function GestorSchedule() {
                 </div>
             ) : (
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
-                    {filteredCourts.map((court: any) => (
+                    {filteredCourts.map((court: Court) => (
                         <CourtCard
                             key={court.id}
                             court={court}

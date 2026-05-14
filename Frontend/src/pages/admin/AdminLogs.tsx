@@ -326,8 +326,8 @@ export default function AdminLogs() {
               </Button>
               <div className="flex items-center gap-1 bg-gray-100 dark:bg-white/5 p-1 rounded-xl">
                 {Array.from({ length: Math.min(5, pagedLogs.totalPages) }).map((_, i) => {
-                  // Lógica simples para mostrar páginas próximas à atual
-                  let pageNum = page <= 3 ? i + 1 : page + i - 2;
+                  // mostrar páginas próximas à atual
+                  const pageNum = page <= 3 ? i + 1 : page + i - 2;
                   if (pageNum > pagedLogs.totalPages) return null;
 
                   return (

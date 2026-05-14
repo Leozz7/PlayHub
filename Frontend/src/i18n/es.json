@@ -185,8 +185,11 @@
       "emailInvalid": "Correo electrónico inválido",
       "passwordMin": "La contraseña debe tener al menos 6 caracteres",
       "passwordMismatch": "Las contraseñas no coinciden",
+      "cpfInvalid": "CPF inválido.",
       "genericError": "Ocurrió un error al criar la cuenta."
-    }
+    },
+    "cpfLabel": "CPF (Opcional)",
+    "cpfInfo": "Para realizar una reserva es obligatorio tener el CPF registrado."
   },
   "userProfile": {
     "back": "Volver",
@@ -243,7 +246,18 @@
       "saving": "Guardando…",
       "changePassword": "Cambiar Contraseña",
       "changing": "Cambiando…",
-      "delete": "Eliminar mi cuenta"
+      "deleteAccount": "Eliminar mi cuenta"
+    },
+    "deleteModal": {
+      "title": "Eliminar Cuenta Permanentemente",
+      "subtitle": "Esta acción es irreversible. Todos tus datos, reservas e historial serán eliminados para siempre.",
+      "passwordLabel": "Confirma tu contraseña",
+      "confirmTextLabel": "Escribe <1>DELETE</1> para confirmar",
+      "placeholderDELETE": "DELETE",
+      "cancel": "Cancelar",
+      "confirm": "Eliminar Permanentemente",
+      "deleting": "Eliminando...",
+      "error": "Contraseña incorrecta o error al eliminar."
     },
     "notifications": {
       "email": {
@@ -362,7 +376,7 @@
     },
     "favorites": {
       "collection": "Mi Colección",
-      "title": "Canchas <span class=\"text-[#8CE600]\">Favoritas</span>",
+      "title": "Canchas <1>Favoritas</1>",
       "subtitle": {
         "withItems": "Has seleccionado {{count}} arena increíble para tu próximo juego.",
         "withItems_plural": "Has seleccionado {{count}} arenas increíbles para tu próximo juego.",

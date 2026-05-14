@@ -2,6 +2,7 @@ using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using PlayHub.Application.Features.Users.Commands.CreateUser;
 using PlayHub.Application.Features.Users.Commands.DeleteUser;
+using PlayHub.Application.Features.Users.Commands.DeleteMyAccount;
 using PlayHub.Application.Features.Users.Commands.UpdateUser;
 using PlayHub.Application.Features.Users.Commands.UpdateMyProfile;
 using PlayHub.Application.Features.Users.Queries.GetUsers;
@@ -36,7 +37,7 @@ public class UsersController : ControllerBase
     }
 
     [HttpPost]
-    [Authorize(Roles = AppRoles.AdminOrManager)]
+    [Authorize(Roles = AppRoles.Admin)]
     public async Task<ActionResult<UserDto>> Create(CreateUserCommand command)
     {
         var result = await Mediator.Send(command);
@@ -44,7 +45,7 @@ public class UsersController : ControllerBase
     }
 
     [HttpPut("{id}")]
-    [Authorize(Roles = AppRoles.AdminOrManager)]
+    [Authorize(Roles = AppRoles.Admin)]
     public async Task<ActionResult> Update(Guid id, UpdateUserCommand command)
     {
         if (id != command.Id)
@@ -70,8 +71,18 @@ public class UsersController : ControllerBase
         return NoContent();
     }
 
+    [HttpDelete("me")]
+    public async Task<ActionResult> DeleteMe(DeleteMyAccountCommand command)
+    {
+        var result = await Mediator.Send(command);
+
+        if (!result) return BadRequest("Senha incorreta ou texto de confirmação inválido.");
+
+        return NoContent();
+    }
+
     [HttpDelete("{id}")]
-    [Authorize(Roles = AppRoles.AdminOrManager)]
+    [Authorize(Roles = AppRoles.Admin)]
     public async Task<ActionResult> Delete(Guid id)
     {
         var result = await Mediator.Send(new DeleteUserCommand(id));

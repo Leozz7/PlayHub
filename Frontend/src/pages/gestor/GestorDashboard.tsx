@@ -12,6 +12,7 @@ import { useDashboardStats, useDashboardTopCourts } from '@/features/dashboard/h
 import { Skeleton } from '@/components/ui/skeleton';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { Reservation } from '@/features/reservations/types/reservation.types';
 
 const STATUS_CONFIG = {
   2: { key: 'confirmed', icon: CheckCircle2, className: 'bg-emerald-500/10 text-emerald-500 border-emerald-500/20' },
@@ -27,7 +28,17 @@ function formatValue(value: number, isCurrency: boolean, locale: string) {
   return value.toLocaleString(locale);
 }
 
-function StatCard({ stat, t, locale, i }: { stat: any, t: any, locale: string, i: number }) {
+interface DashboardStat {
+  id: string;
+  value: number;
+  color: string;
+  isCurrency: boolean;
+  icon: React.ElementType;
+}
+
+// Using official Reservation type
+
+function StatCard({ stat, t, locale, i }: { stat: DashboardStat, t: (k: string) => string, locale: string, i: number }) {
   const Icon = stat.icon;
   return (
     <motion.div
@@ -129,7 +140,7 @@ export default function ManagerDashboard() {
                 {['reservations', 'schedule'].map((tab) => (
                   <button
                     key={tab}
-                    onClick={() => setActiveTab(tab as any)}
+                    onClick={() => setActiveTab(tab as 'reservations' | 'schedule')}
                     className={`px-6 py-2.5 rounded-2xl text-xs font-black uppercase tracking-widest transition-all ${
                       activeTab === tab
                         ? 'bg-[#8CE600] text-gray-950'
@@ -178,8 +189,8 @@ export default function ManagerDashboard() {
                           <td colSpan={5} className="py-20 text-center text-gray-400 font-bold">{t('gestor.dashboard.emptyState.title')}</td>
                         </tr>
                       ) : (
-                        recentReservations.map((r: any) => {
-                          const cfg = STATUS_CONFIG[r.status as keyof typeof STATUS_CONFIG] || STATUS_CONFIG[1];
+                        recentReservations.map((r: Reservation) => {
+                          const cfg = STATUS_CONFIG[Number(r.status) as keyof typeof STATUS_CONFIG] || STATUS_CONFIG[1];
                           return (
                             <tr key={r.id} className="hover:bg-gray-50 dark:hover:bg-white/5 transition-colors group">
                               <td className="px-6 py-4">
@@ -221,8 +232,8 @@ export default function ManagerDashboard() {
                     ) : scheduleToday.length === 0 ? (
                         <div className="py-20 text-center text-gray-400 font-bold">{t('gestor.dashboard.emptyState.scheduleTitle')}</div>
                     ) : (
-                      scheduleToday.map((item: any, i: number) => {
-                        const cfg = STATUS_CONFIG[item.status as keyof typeof STATUS_CONFIG] || STATUS_CONFIG[1];
+                      scheduleToday.map((item: Reservation, i: number) => {
+                        const cfg = STATUS_CONFIG[Number(item.status) as keyof typeof STATUS_CONFIG] || STATUS_CONFIG[1];
                         return (
                           <div key={i} className="flex items-center gap-6 px-6 py-4 hover:bg-gray-50 dark:hover:bg-white/5 transition-colors">
                             <div className="w-16 shrink-0 font-black text-xs text-[#8CE600] bg-[#8CE600]/10 px-2 py-1 rounded-lg text-center">
@@ -256,7 +267,7 @@ export default function ManagerDashboard() {
                     {topCourtsLoading ? (
                         Array.from({ length: 4 }).map((_, i) => <Skeleton key={i} className="h-10 w-full rounded-xl" />)
                     ) : (
-                        topCourtsData?.slice(0, 5).map((court: any) => {
+                        topCourtsData?.slice(0, 5).map((court: { id: string; name: string; revenue: number; }) => {
                             const maxRev = topCourtsData[0]?.revenue || 1;
                             const pct = Math.round((court.revenue / maxRev) * 100);
                             return (

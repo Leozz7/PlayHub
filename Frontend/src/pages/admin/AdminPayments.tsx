@@ -5,7 +5,7 @@ import { toast } from 'sonner';
 import { 
   CreditCard, Search, Filter, CheckCircle2, XCircle, Clock, 
   MoreHorizontal, Trash2, ArrowUpRight, DollarSign, Wallet,
-  Eye, Calendar, User, Hash, Tag, Activity, Building2
+  Eye, Calendar, User, Hash, Tag, Activity
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Input } from '@/components/ui/input';
@@ -37,7 +37,7 @@ import {
     DialogDescription,
 } from "@/components/ui/dialog";
 import { ConfirmDeleteModal, StatusModal } from '@/components/ui/PremiumModal';
-import { usePayments, useProcessPayment, useDeletePayment } from '@/features/payments/hooks/usePayments';
+import { usePayments, useProcessPayment, useDeletePayment, type Payment } from '@/features/payments/hooks/usePayments';
 
 export default function AdminPayments() {
   const { t, i18n } = useTranslation();
@@ -47,7 +47,7 @@ export default function AdminPayments() {
   const search = searchParams.get('search') || '';
   const selectedStatus = searchParams.get('status') || 'all';
   
-  const [selectedPayment, setSelectedPayment] = useState<any>(null);
+  const [selectedPayment, setSelectedPayment] = useState<Payment | null>(null);
   const [isDetailsOpen, setIsDetailsOpen] = useState(false);
 
   // Modal States
@@ -85,7 +85,7 @@ export default function AdminPayments() {
     setProcessModalOpen(true);
   };
 
-  const handleDelete = (payment: any) => {
+  const handleDelete = (payment: Payment) => {
     setPaymentToDelete({ id: payment.id, amount: payment.amount });
     setDeleteModalOpen(true);
   };
@@ -348,11 +348,17 @@ export default function AdminPayments() {
                 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-y-4 gap-x-8">
                   <div className="flex items-start gap-3">
-                    <Building2 className="w-4 h-4 text-gray-400 mt-0.5" />
+                    <Calendar className="w-4 h-4 text-gray-400 mt-0.5" />
                     <div>
-                      <p className="text-[10px] font-bold uppercase tracking-tight text-gray-500">{t('admin.payments.modal.labels.court')}</p>
-                      <p className="text-xs font-bold text-gray-900 dark:text-white">{selectedPayment.courtName || 'N/A'}</p>
-                      <p className="text-[10px] text-gray-500">{selectedPayment.courtSport}</p>
+                      <p className="text-[10px] font-bold uppercase tracking-tight text-gray-500">Horário da Reserva</p>
+                      <p className="text-xs font-bold text-gray-900 dark:text-white">
+                        {selectedPayment.startTime ? new Date(selectedPayment.startTime).toLocaleDateString(locale) : '—'}
+                      </p>
+                      <p className="text-[10px] text-gray-500">
+                        {selectedPayment.startTime && selectedPayment.endTime 
+                          ? `${new Date(selectedPayment.startTime).toLocaleTimeString(locale, { hour: '2-digit', minute: '2-digit', hour12: false })} – ${new Date(selectedPayment.endTime).toLocaleTimeString(locale, { hour: '2-digit', minute: '2-digit', hour12: false })}`
+                          : '—'}
+                      </p>
                     </div>
                   </div>
 
@@ -368,6 +374,16 @@ export default function AdminPayments() {
                       </p>
                     </div>
                   </div>
+
+                  <div className="flex items-start gap-3">
+                    <Hash className="w-4 h-4 text-gray-400 mt-0.5" />
+                    <div>
+                      <p className="text-[10px] font-bold uppercase tracking-tight text-gray-500">Documento / Contato</p>
+                      <p className="text-xs font-bold text-gray-900 dark:text-white">{selectedPayment.userCpf || 'N/A'}</p>
+                      <p className="text-[10px] text-gray-500">{selectedPayment.userPhone || 'Sem telefone'}</p>
+                    </div>
+                  </div>
+
                   <div className="flex items-start gap-3">
                     <Hash className="w-4 h-4 text-gray-400 mt-0.5" />
                     <div>
@@ -389,7 +405,7 @@ export default function AdminPayments() {
                   <div className="flex items-start gap-3">
                     <Calendar className="w-4 h-4 text-gray-400 mt-0.5" />
                     <div>
-                      <p className="text-[10px] font-bold uppercase tracking-tight text-gray-500">{t('admin.payments.table.dateTime')}</p>
+                      <p className="text-[10px] font-bold uppercase tracking-tight text-gray-500">Data do Pagamento</p>
                       <p className="text-xs font-bold text-gray-900 dark:text-gray-300">
                         {new Date(selectedPayment.created).toLocaleDateString(locale)} {t('common.at')} {new Date(selectedPayment.created).toLocaleTimeString(locale, { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false })}
                       </p>
@@ -407,16 +423,8 @@ export default function AdminPayments() {
                   <div className="flex items-start gap-3">
                     <Hash className="w-4 h-4 text-gray-400 mt-0.5" />
                     <div>
-                      <p className="text-[10px] font-bold uppercase tracking-tight text-gray-500">{t('admin.payments.modal.labels.reservationId')}</p>
+                      <p className="text-[10px] font-bold uppercase tracking-tight text-gray-500">ID da Reserva</p>
                       <p className="text-xs font-mono font-medium text-gray-900 dark:text-gray-300 break-all">{selectedPayment.reservationId}</p>
-                    </div>
-                  </div>
-
-                  <div className="flex items-start gap-3">
-                    <Hash className="w-4 h-4 text-gray-400 mt-0.5" />
-                    <div>
-                      <p className="text-[10px] font-bold uppercase tracking-tight text-gray-500">{t('admin.payments.table.id')}</p>
-                      <p className="text-xs font-mono font-medium text-gray-900 dark:text-gray-300 break-all">{selectedPayment.id}</p>
                     </div>
                   </div>
                 </div>

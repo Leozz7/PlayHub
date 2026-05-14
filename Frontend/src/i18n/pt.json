@@ -197,8 +197,11 @@
       "passwordUpper": "A senha deve conter ao menos uma letra maiúscula",
       "passwordNumber": "A senha deve conter ao menos um número",
       "passwordMismatch": "As senhas não coincidem",
+      "cpfInvalid": "CPF inválido.",
       "genericError": "Ocorreu um erro ao criar a conta."
-    }
+    },
+    "cpfLabel": "CPF (Opcional)",
+    "cpfInfo": "Para fazer uma reserva é obrigatório que tenha o CPF registrado."
   },
   "userProfile": {
     "back": "Voltar",
@@ -255,7 +258,18 @@
       "saving": "Salvando…",
       "changePassword": "Alterar Senha",
       "changing": "Alterando…",
-      "delete": "Excluir minha conta"
+      "deleteAccount": "Excluir minha conta"
+    },
+    "deleteModal": {
+      "title": "Excluir Conta Permanentemente",
+      "subtitle": "Esta ação é irreversível. Todos os seus dados, reservas e histórico serão removidos para sempre.",
+      "passwordLabel": "Confirme sua senha",
+      "confirmTextLabel": "Digite <1>DELETE</1> para confirmar",
+      "placeholderDELETE": "DELETE",
+      "cancel": "Cancelar",
+      "confirm": "Excluir Permanentemente",
+      "deleting": "Excluindo...",
+      "error": "Senha incorreta ou falha ao excluir."
     },
     "notifications": {
       "email": {
@@ -374,7 +388,7 @@
     },
     "favorites": {
       "collection": "Minha Coleção",
-      "title": "Quadras <span class=\"text-[#8CE600]\">Favoritas</span>",
+      "title": "Quadras <1>Favoritas</1>",
       "subtitle": {
         "withItems": "Você selecionou {{count}} arena incrível para o seu próximo jogo.",
         "withItems_plural": "Você selecionou {{count}} arenas incríveis para o seu próximo jogo.",

@@ -91,6 +91,16 @@ public static class MongoDbBsonConfiguration
                 });
             }
 
+            if (!BsonClassMap.IsClassMapRegistered(typeof(Invoice)))
+            {
+                BsonClassMap.RegisterClassMap<Invoice>(cm =>
+                {
+                    cm.AutoMap();
+                    cm.MapField("_reservationIds").SetElementName("reservationIds");
+                    cm.SetIgnoreExtraElements(true);
+                });
+            }
+
             if (!BsonClassMap.IsClassMapRegistered(typeof(OperatingDay)))
             {
                 BsonClassMap.RegisterClassMap<OperatingDay>(cm =>

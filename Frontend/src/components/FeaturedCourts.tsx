@@ -2,7 +2,7 @@ import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { Reveal } from '@/components/ui/Reveal';
 import { Stars } from '@/components/ui/Stars';
-import { SPORT_ICONS } from '@/components/SportIcons';
+import { SPORT_ICONS } from '@/components/SportIconsMap';
 import { FavoriteButton } from '@/components/FavoriteButton';
 import { useCourts } from '@/features/courts/hooks/useCourts';
 
@@ -79,7 +79,7 @@ export function FeaturedCourts() {
                                                 style={{ clipPath: 'inset(0 round 1.5rem)' }}
                                             >
                                                 <img
-                                                    src={court.img}
+                                                    src={court.imageUrls?.[0] || court.img}
                                                     alt={court.name}
                                                     loading="lazy"
                                                     className="w-full h-full object-cover opacity-90 dark:opacity-80 group-hover:opacity-100 transition-all duration-700 group-hover:scale-105"
@@ -101,7 +101,7 @@ export function FeaturedCourts() {
 
                                         <div className="flex justify-between items-start mb-1">
                                             <h3 className="text-base font-bold text-gray-900 dark:text-white transition-colors group-hover:text-[#8CE600] truncate pr-2">{court.name}</h3>
-                                            <Stars rating={court.rating} />
+                                            <Stars rating={court.rating ?? 0} />
                                         </div>
                                         
                                         <p className="text-gray-600 dark:text-gray-400 text-xs mb-3 flex items-center gap-1 transition-colors">
@@ -115,7 +115,7 @@ export function FeaturedCourts() {
                                         <div className="flex items-center justify-between">
                                             <div className="flex items-baseline gap-2">
                                                 <p className="text-sm">
-                                                    <span className="font-bold text-gray-900 dark:text-white">R$ {court.price}</span>
+                                                    <span className="font-bold text-gray-900 dark:text-white">R$ {court.hourlyRate}</span>
                                                     <span className="text-gray-600 dark:text-gray-400"> {t('index.featuredCourts.perHour')}</span>
                                                 </p>
                                                 {court.oldPrice && (

@@ -48,6 +48,9 @@ import {
 import { StatusModal } from '@/components/ui/PremiumModal';
 import { Dialog, DialogContent } from '@/components/ui/dialog';
 import { exportAdminReportPDF } from '@/pdf/AdminReportGenerator';
+import { type Court } from '@/features/courts/types/court.types';
+import { type Reservation } from '@/features/reservations/types/reservation.types';
+import { type Payment } from '@/features/payments/hooks/usePayments';
 
 export default function AdminReport() {
   const { t } = useTranslation();
@@ -94,8 +97,8 @@ export default function AdminReport() {
 
   const stats = useMemo(() => {
     const totalBookings = reservationsData?.length || 0;
-    const confirmedBookings = reservationsData?.filter((r: any) => r.status === 2).length || 0;
-    const totalRevenue = paymentsData?.filter((p: any) => p.status === 2).reduce((acc: number, p: any) => acc + p.amount, 0) || 0;
+    const confirmedBookings = reservationsData?.filter((r: Reservation) => Number(r.status) === 2).length || 0;
+    const totalRevenue = paymentsData?.filter((p: Payment) => p.status === 2).reduce((acc: number, p: Payment) => acc + p.amount, 0) || 0;
     const newUsers = usersData?.length || 0;
     const averageTicket = confirmedBookings > 0 ? totalRevenue / confirmedBookings : 0;
 
@@ -119,8 +122,8 @@ export default function AdminReport() {
       const dayName = days[date.getDay()];
 
       const dayRevenue = paymentsData
-        ?.filter((p: any) => p.status === 2 && new Date(p.created).toDateString() === date.toDateString())
-        .reduce((acc: number, p: any) => acc + p.amount, 0) || 0;
+        ?.filter((p: Payment) => p.status === 2 && new Date(p.created).toDateString() === date.toDateString())
+        .reduce((acc: number, p: Payment) => acc + p.amount, 0) || 0;
 
       data.push({ name: dayName, revenue: dayRevenue });
     }
@@ -129,7 +132,7 @@ export default function AdminReport() {
 
   const sportData = useMemo(() => {
     const counts: Record<string, number> = {};
-    reservationsData?.forEach((r: any) => {
+    reservationsData?.forEach((r: Reservation) => {
       const sport = r.courtSport || 'Outros';
       counts[sport] = (counts[sport] || 0) + 1;
     });
@@ -138,7 +141,7 @@ export default function AdminReport() {
 
   const openExportModal = () => {
     if (courtsData) {
-      setSelectedCourts(courtsData.map((c: any) => c.id));
+      setSelectedCourts(courtsData.map((c: Court) => c.id));
     }
     setIsExportModalOpen(true);
   };
@@ -153,15 +156,15 @@ export default function AdminReport() {
     });
 
     try {
-      const filteredReservations = reservationsData?.filter((r: any) => selectedCourts.includes(r.courtId)) || [];
+      const filteredReservations = reservationsData?.filter((r: Reservation) => selectedCourts.includes(r.courtId)) || [];
       // Also we need to recalculate stats based on selected courts if necessary.
       // But for simplicity and UI consistency, we will pass filtered reservations to the PDF.
       // Let's also recalculate the stats to be passed to the PDF.
 
-      const confirmedBookings = filteredReservations.filter((r: any) => r.status === 2).length;
-      const totalRevenue = paymentsData?.filter((p: any) =>
-        p.status === 2 && filteredReservations.some((r: any) => r.id === p.reservationId)
-      ).reduce((acc: number, p: any) => acc + p.amount, 0) || 0;
+      const confirmedBookings = filteredReservations.filter((r: Reservation) => Number(r.status) === 2).length;
+      const totalRevenue = paymentsData?.filter((p: Payment) =>
+        p.status === 2 && filteredReservations.some((r: Reservation) => r.id === p.reservationId)
+      ).reduce((acc: number, p: Payment) => acc + p.amount, 0) || 0;
 
       const filteredStats = {
         totalBookings: filteredReservations.length,
@@ -197,7 +200,7 @@ export default function AdminReport() {
     if (selectedCourts.length === (courtsData?.length || 0)) {
       setSelectedCourts([]);
     } else {
-      setSelectedCourts(courtsData?.map((c: any) => c.id) || []);
+      setSelectedCourts(courtsData?.map((c: Court) => c.id) || []);
     }
   };
 
@@ -380,7 +383,7 @@ export default function AdminReport() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {(reservationsData || []).slice(0, 8).map((r: any) => (
+              {(reservationsData || []).slice(0, 8).map((r: Reservation) => (
                 <TableRow key={r.id} className="border-b border-gray-50 dark:border-white/5 hover:bg-gray-50/50 dark:hover:bg-white/5 transition-colors group">
                   <TableCell className="px-8 py-5">
                     <span className="text-sm font-bold text-gray-600 dark:text-gray-400">
@@ -406,10 +409,10 @@ export default function AdminReport() {
                   <TableCell className="px-8 py-5">
                     <span className="text-sm font-black text-[#8CE600]">R$ {r.totalPrice}</span>
                   </TableCell>
-                  <TableCell className="px-8 py-5">
-                    <Badge className={`rounded-full text-[10px] font-black uppercase tracking-widest px-3 py-1 ${r.status === 2 ? 'bg-[#8CE600]/10 text-[#6aad00] dark:text-[#8CE600] border border-[#8CE600]/20' : 'bg-gray-100 text-gray-500'
+                    <TableCell className="px-8 py-5">
+                    <Badge className={`rounded-full text-[10px] font-black uppercase tracking-widest px-3 py-1 ${Number(r.status) === 2 ? 'bg-[#8CE600]/10 text-[#6aad00] dark:text-[#8CE600] border border-[#8CE600]/20' : 'bg-gray-100 text-gray-500'
                       }`}>
-                      {r.status === 2 ? t('admin.dashboard.resConfirmed') : t('admin.dashboard.resPending')}
+                      {Number(r.status) === 2 ? t('admin.dashboard.resConfirmed') : t('admin.dashboard.resPending')}
                     </Badge>
                   </TableCell>
                 </TableRow>
@@ -456,7 +459,7 @@ export default function AdminReport() {
                 <span className="font-bold text-gray-900 dark:text-white">Selecionar Todas</span>
               </div>
 
-              {courtsData?.map((court: any) => (
+              {courtsData?.map((court: Court) => (
                 <div
                   key={court.id}
                   className="flex items-center gap-3 p-3 rounded-xl hover:bg-gray-50 dark:hover:bg-white/5 cursor-pointer transition-colors border border-transparent hover:border-gray-100 dark:hover:border-white/10"
