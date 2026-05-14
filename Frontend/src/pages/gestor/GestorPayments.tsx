@@ -73,6 +73,13 @@ export default function GestorPayments() {
     const { data: paymentsData = [], isLoading } = usePayments();
     const { data: invoicesData = [], isLoading: isLoadingInvoices } = useInvoices();
     
+    console.log('[DEBUG] GestorPayments Render', { 
+        paymentsCount: paymentsData?.length, 
+        invoicesCount: invoicesData?.length,
+        isLoading,
+        isLoadingInvoices
+    });
+
     const processMutation = useProcessPayment();
     const deleteMutation = useDeletePayment();
     const cancelRecurringMutation = useCancelRecurringReservation();
@@ -414,7 +421,9 @@ export default function GestorPayments() {
                               </TableCell>
                               <TableCell className="px-6 py-4">
                                 <span className="text-sm font-bold text-gray-700 dark:text-gray-300 capitalize">
-                                  {new Intl.DateTimeFormat(locale, { month: 'long', year: 'numeric' }).format(new Date(invoice.year, invoice.month - 1))}
+                                  {invoice.year && invoice.month 
+                                    ? new Intl.DateTimeFormat(locale, { month: 'long', year: 'numeric' }).format(new Date(invoice.year, invoice.month - 1))
+                                    : '—'}
                                 </span>
                               </TableCell>
                               <TableCell className="px-6 py-4">

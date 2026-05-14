@@ -246,7 +246,18 @@
       "saving": "Guardando…",
       "changePassword": "Cambiar Contraseña",
       "changing": "Cambiando…",
-      "delete": "Eliminar mi cuenta"
+      "deleteAccount": "Eliminar mi cuenta"
+    },
+    "deleteModal": {
+      "title": "Eliminar Cuenta Permanentemente",
+      "subtitle": "Esta acción es irreversible. Todos tus datos, reservas e historial serán eliminados para siempre.",
+      "passwordLabel": "Confirma tu contraseña",
+      "confirmTextLabel": "Escribe <1>DELETE</1> para confirmar",
+      "placeholderDELETE": "DELETE",
+      "cancel": "Cancelar",
+      "confirm": "Eliminar Permanentemente",
+      "deleting": "Eliminando...",
+      "error": "Contraseña incorrecta o error al eliminar."
     },
     "notifications": {
       "email": {

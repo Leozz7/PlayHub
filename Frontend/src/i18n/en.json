@@ -258,7 +258,18 @@
       "saving": "Saving…",
       "changePassword": "Change Password",
       "changing": "Changing…",
-      "delete": "Delete my account"
+      "deleteAccount": "Delete my account"
+    },
+    "deleteModal": {
+      "title": "Permanently Delete Account",
+      "subtitle": "This action is irreversible. All your data, bookings and history will be removed forever.",
+      "passwordLabel": "Confirm your password",
+      "confirmTextLabel": "Type <1>DELETE</1> to confirm",
+      "placeholderDELETE": "DELETE",
+      "cancel": "Cancel",
+      "confirm": "Permanently Delete",
+      "deleting": "Deleting...",
+      "error": "Incorrect password or failed to delete."
     },
     "notifications": {
       "email": {

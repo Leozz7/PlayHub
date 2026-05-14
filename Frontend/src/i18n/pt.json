@@ -258,7 +258,18 @@
       "saving": "Salvando…",
       "changePassword": "Alterar Senha",
       "changing": "Alterando…",
-      "delete": "Excluir minha conta"
+      "deleteAccount": "Excluir minha conta"
+    },
+    "deleteModal": {
+      "title": "Excluir Conta Permanentemente",
+      "subtitle": "Esta ação é irreversível. Todos os seus dados, reservas e histórico serão removidos para sempre.",
+      "passwordLabel": "Confirme sua senha",
+      "confirmTextLabel": "Digite <1>DELETE</1> para confirmar",
+      "placeholderDELETE": "DELETE",
+      "cancel": "Cancelar",
+      "confirm": "Excluir Permanentemente",
+      "deleting": "Excluindo...",
+      "error": "Senha incorreta ou falha ao excluir."
     },
     "notifications": {
       "email": {

@@ -1,4 +1,5 @@
 import React, { useState, useMemo } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import { format } from 'date-fns';
 import { ptBR, enUS, es } from 'date-fns/locale';
 import { useTranslation } from 'react-i18next';
@@ -45,6 +46,20 @@ function CourtScheduleModal({ court, isOpen, onClose }: { court: Court | null, i
     pageSize: 100
   });
 
+  const [userSearch, setUserSearch] = useState('');
+  const [selectedClient, setSelectedClient] = useState<{id: string, name: string} | null>(null);
+  
+  const { data: usersData, isLoading: isLoadingUsers } = useQuery({
+    queryKey: ['users', 'search', userSearch],
+    queryFn: async () => {
+      if (userSearch.length < 2) return { items: [] };
+      const res = await api.get('/users', { params: { search: userSearch, pageSize: 5 } });
+      return res.data;
+    },
+    enabled: isRecurring && userSearch.length >= 2
+  });
+  const users = usersData?.items || [];
+
   const reservations = reservationsData?.items || [];
 
   const hours = Array.from(
@@ -64,14 +79,20 @@ function CourtScheduleModal({ court, isOpen, onClose }: { court: Court | null, i
       end.setHours(slotToBlock + 1, 0, 0, 0);
 
       if (isRecurring) {
+        if (!selectedClient) {
+          phToast.error("Por favor, selecione um cliente para a mensalidade.");
+          setIsBlocking(false);
+          return;
+        }
+
         await createRecurring.mutateAsync({
           courtId: court?.id!,
-          userId: user.id,
+          userId: selectedClient.id,
           firstStartTime: start.toISOString(),
           firstEndTime: end.toISOString(),
           monthsToBlock: parseInt(durationMonths)
         });
-        phToast.success(`Mensalista criado para as ${slotToBlock}:00 por ${durationMonths} meses.`);
+        phToast.success(`Mensalista criado para ${selectedClient.name} às ${slotToBlock}:00 por ${durationMonths} meses.`);
       } else {
         const payload = {
           courtId: court?.id,
@@ -89,6 +110,8 @@ function CourtScheduleModal({ court, isOpen, onClose }: { court: Court | null, i
       setShowBlockConfirm(false);
       setSlotToBlock(null);
       setIsRecurring(false);
+      setSelectedClient(null);
+      setUserSearch('');
     } catch (error) {
       console.error('Error blocking/recurring slot:', error);
       phToast.error("Erro ao processar solicitação.");
@@ -297,6 +320,8 @@ function CourtScheduleModal({ court, isOpen, onClose }: { court: Court | null, i
             setShowBlockConfirm(false);
             setSlotToBlock(null);
             setIsRecurring(false);
+            setSelectedClient(null);
+            setUserSearch('');
           }}
           onAction={handleBlockSlot}
           title={isRecurring ? "Confirmar Reserva Mensalista" : t('gestor.schedule.modal.blockConfirm.title')}
@@ -323,18 +348,79 @@ function CourtScheduleModal({ court, isOpen, onClose }: { court: Court | null, i
             </div>
 
             {isRecurring && (
-              <div className="space-y-2 animate-in slide-in-from-top-2 duration-300">
-                <Label className="text-[10px] font-black uppercase tracking-widest text-gray-400">Duração do Contrato</Label>
-                <Select value={durationMonths} onValueChange={setDurationMonths}>
-                  <SelectTrigger className="bg-white dark:bg-[#0a0f1a] border-gray-100 dark:border-white/10 rounded-xl h-10">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent className="rounded-xl border-gray-100 dark:border-white/10">
-                    <SelectItem value="3">3 Meses</SelectItem>
-                    <SelectItem value="6">6 Meses</SelectItem>
-                    <SelectItem value="12">12 Meses</SelectItem>
-                  </SelectContent>
-                </Select>
+              <div className="space-y-4 animate-in slide-in-from-top-2 duration-300">
+                <div className="space-y-2">
+                  <Label className="text-[10px] font-black uppercase tracking-widest text-gray-400">Cliente da Mensalidade</Label>
+                  
+                  {!selectedClient ? (
+                    <div className="space-y-2">
+                      <div className="relative">
+                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                        <Input 
+                          placeholder="Pesquisar por nome, e-mail ou CPF..."
+                          value={userSearch}
+                          onChange={(e) => setUserSearch(e.target.value)}
+                          className="pl-9 bg-white dark:bg-[#0a0f1a] border-gray-100 dark:border-white/10 rounded-xl h-10"
+                        />
+                      </div>
+                      
+                      {userSearch.length >= 2 && (
+                        <div className="bg-white dark:bg-card border border-gray-100 dark:border-white/10 rounded-xl overflow-hidden shadow-lg">
+                          {isLoadingUsers ? (
+                            <div className="p-4 text-center text-xs text-gray-400">Carregando usuários...</div>
+                          ) : users.length === 0 ? (
+                            <div className="p-4 text-center text-xs text-gray-400">Nenhum usuário encontrado.</div>
+                          ) : (
+                            users.map((u: any) => (
+                              <button
+                                key={u.id}
+                                onClick={() => {
+                                  setSelectedClient({ id: u.id, name: u.name });
+                                  setUserSearch('');
+                                }}
+                                className="w-full p-3 text-left hover:bg-gray-50 dark:hover:bg-white/5 transition-colors border-b border-gray-50 dark:border-white/5 last:border-0"
+                              >
+                                <p className="text-sm font-bold text-gray-900 dark:text-white">{u.name}</p>
+                                <p className="text-[10px] text-gray-400">{u.email}</p>
+                              </button>
+                            ))
+                          )}
+                        </div>
+                      )}
+                    </div>
+                  ) : (
+                    <div className="flex items-center justify-between p-3 bg-[#8CE600]/10 border border-[#8CE600]/20 rounded-xl">
+                      <div className="flex items-center gap-3">
+                        <div className="w-8 h-8 rounded-full bg-[#8CE600] text-gray-950 flex items-center justify-center font-black text-xs">
+                          {selectedClient.name.charAt(0)}
+                        </div>
+                        <span className="text-sm font-bold text-gray-900 dark:text-white">{selectedClient.name}</span>
+                      </div>
+                      <Button 
+                        variant="ghost" 
+                        size="sm" 
+                        onClick={() => setSelectedClient(null)}
+                        className="h-8 text-[10px] font-black uppercase tracking-widest text-red-500 hover:bg-red-500/10 hover:text-red-500"
+                      >
+                        Alterar
+                      </Button>
+                    </div>
+                  )}
+                </div>
+
+                <div className="space-y-2">
+                  <Label className="text-[10px] font-black uppercase tracking-widest text-gray-400">Duração do Contrato</Label>
+                  <Select value={durationMonths} onValueChange={setDurationMonths}>
+                    <SelectTrigger className="bg-white dark:bg-[#0a0f1a] border-gray-100 dark:border-white/10 rounded-xl h-10">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent className="rounded-xl border-gray-100 dark:border-white/10">
+                      <SelectItem value="3">3 Meses</SelectItem>
+                      <SelectItem value="6">6 Meses</SelectItem>
+                      <SelectItem value="12">12 Meses</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
               </div>
             )}
           </div>

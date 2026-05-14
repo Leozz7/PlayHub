@@ -1,6 +1,6 @@
 import { useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useTranslation } from 'react-i18next';
+import { useTranslation, Trans } from 'react-i18next';
 import {
   User as UserIcon,
   Mail,
@@ -219,6 +219,30 @@ export default function UserProfile() {
   const [notifEmail, setNotifEmail] = useState(true);
   const [notifSms, setNotifSms] = useState(false);
   const [notifPromo, setNotifPromo] = useState(true);
+
+  // Estados para Excluir Conta
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [deletePassword, setDeletePassword] = useState('');
+  const [deleteConfirmText, setDeleteConfirmText] = useState('');
+  const [isDeleting, setIsDeleting] = useState(false);
+
+  const handleDeleteAccount = async () => {
+    if (deleteConfirmText !== 'DELETE') return;
+
+    try {
+      setIsDeleting(true);
+      await api.delete('/users/me', {
+        data: { password: deletePassword, confirmText: deleteConfirmText }
+      });
+      logout();
+      navigate('/');
+    } catch (err: any) {
+      console.error(err);
+      alert(err.response?.data || t('userProfile.deleteModal.error'));
+    } finally {
+      setIsDeleting(false);
+    }
+  };
 
   const handleInfoSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -596,6 +620,7 @@ export default function UserProfile() {
             </div>
             <button
               type="button"
+              onClick={() => setIsDeleteModalOpen(true)}
               className="shrink-0 flex items-center gap-2 px-5 py-2.5 rounded-xl border border-red-300 dark:border-red-800/50 text-red-600 dark:text-red-400 text-sm font-bold hover:bg-red-50 dark:hover:bg-red-950/30 transition-all"
             >
               <Trash2 className="w-4 h-4" />
@@ -605,6 +630,84 @@ export default function UserProfile() {
         </div>
 
       </div>
+
+      {/* Modal de Confirmação de Exclusão */}
+      {isDeleteModalOpen && (
+        <div className="fixed inset-0 z-[200] flex items-center justify-center p-4">
+          <div
+            className="absolute inset-0 bg-black/60 backdrop-blur-sm"
+            onClick={() => !isDeleting && setIsDeleteModalOpen(false)}
+          />
+          <div className="relative z-10 w-full max-w-md flex flex-col bg-white dark:bg-[#111] rounded-[2rem] border border-gray-100 dark:border-white/10 shadow-2xl p-8 animate-in zoom-in-95 duration-200">
+            <div className="w-16 h-16 bg-red-500/10 text-red-500 rounded-2xl flex items-center justify-center mb-6">
+              <Trash2 className="w-8 h-8" />
+            </div>
+
+            <h2 className="text-2xl font-black tracking-tight text-gray-900 dark:text-white mb-2">
+              {t('userProfile.deleteModal.title')}
+            </h2>
+            <p className="text-sm text-gray-500 dark:text-gray-400 mb-8 font-medium">
+              {t('userProfile.deleteModal.subtitle')}
+            </p>
+
+            <div className="space-y-4 mb-8">
+              <div>
+                <label className="block text-xs font-black uppercase tracking-widest text-gray-400 dark:text-gray-500 mb-2 ml-1">
+                  {t('userProfile.deleteModal.passwordLabel')}
+                </label>
+                <div className="relative">
+                  <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                  <input
+                    type="password"
+                    value={deletePassword}
+                    onChange={(e) => setDeletePassword(e.target.value)}
+                    className="w-full bg-gray-50 dark:bg-white/[0.03] border border-gray-100 dark:border-white/[0.08] rounded-xl py-3 pl-11 pr-4 text-sm font-bold focus:ring-2 focus:ring-red-500/20 focus:border-red-500 outline-none transition-all"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-xs font-black uppercase tracking-widest text-gray-400 dark:text-gray-500 mb-2 ml-1">
+                  <Trans i18nKey="userProfile.deleteModal.confirmTextLabel">
+                    Digite <span className="text-red-500">DELETE</span> para confirmar
+                  </Trans>
+                </label>
+                <input
+                  type="text"
+                  value={deleteConfirmText}
+                  onChange={(e) => setDeleteConfirmText(e.target.value)}
+                  placeholder={t('userProfile.deleteModal.placeholderDELETE')}
+                  className="w-full bg-gray-50 dark:bg-white/[0.03] border border-gray-100 dark:border-white/[0.08] rounded-xl py-3 px-4 text-sm font-black tracking-widest focus:ring-2 focus:ring-red-500/20 focus:border-red-500 outline-none transition-all placeholder:font-bold placeholder:tracking-normal"
+                />
+              </div>
+            </div>
+
+            <div className="grid grid-cols-2 gap-3">
+              <button
+                onClick={() => setIsDeleteModalOpen(false)}
+                disabled={isDeleting}
+                className="w-full py-3.5 rounded-xl font-bold text-sm text-gray-500 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-white/5 transition-all disabled:opacity-50"
+              >
+                {t('userProfile.deleteModal.cancel')}
+              </button>
+              <button
+                onClick={handleDeleteAccount}
+                disabled={isDeleting || deleteConfirmText !== 'DELETE' || !deletePassword}
+                className="w-full py-3.5 rounded-xl font-black text-sm uppercase tracking-widest bg-red-600 text-white hover:bg-red-700 shadow-lg shadow-red-600/20 transition-all disabled:opacity-50 disabled:grayscale disabled:shadow-none flex items-center justify-center gap-2"
+              >
+                {isDeleting ? (
+                  <>
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                    {t('userProfile.deleteModal.deleting')}
+                  </>
+                ) : (
+                  t('userProfile.deleteModal.confirm')
+                )}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
