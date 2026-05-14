@@ -1,6 +1,6 @@
 import { useState, useMemo, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Search, CalendarDays, CheckCircle2, Clock, XCircle, DollarSign } from 'lucide-react';
+import { Search, CalendarDays, CheckCircle2, Clock, XCircle, DollarSign, Repeat } from 'lucide-react';
 import { useReservations } from '@/features/reservations/hooks/useReservations';
 import { useManagementCourts } from '@/features/courts/hooks/useCourts';
 import { ActionModal } from '@/components/ui/PremiumModal';
@@ -239,7 +239,14 @@ export default function GestorReservations() {
                                                     <span className="text-xs font-mono font-bold text-gray-400 group-hover:text-[#8CE600] transition-colors">{r.id.split('-')[0].toUpperCase()}</span>
                                                 </TableCell>
                                                 <TableCell className="px-6 py-4">
-                                                    <span className="font-black text-sm text-gray-900 dark:text-white">{r.userName || 'Usuário'}</span>
+                                                    <div className="flex items-center gap-2">
+                                                      <span className="font-black text-sm text-gray-900 dark:text-white">{r.userName || 'Usuário'}</span>
+                                                      {r.isRecurring && (
+                                                        <span title="Mensalista">
+                                                          <Repeat className="w-3 h-3 text-[#8CE600]" />
+                                                        </span>
+                                                      )}
+                                                    </div>
                                                 </TableCell>
                                                 <TableCell className="px-6 py-4">
                                                     <span className="text-sm font-medium text-gray-700 dark:text-gray-300">{r.courtName || 'Quadra'}</span>

@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { 
     CreditCard, Search, CheckCircle2, Clock, XCircle, DollarSign, 
     Activity, Eye, User, Calendar, Hash, Tag, Building2,
-    MoreHorizontal, Trash2
+    MoreHorizontal, Trash2, Repeat, Receipt, ArrowRight
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Input } from '@/components/ui/input';
@@ -34,8 +34,10 @@ import {
 import { Skeleton } from '@/components/ui/skeleton';
 import { Badge } from '@/components/ui/badge';
 import { toast } from 'sonner';
-import { ConfirmDeleteModal, StatusModal } from '@/components/ui/PremiumModal';
+import { ConfirmDeleteModal, StatusModal, ActionModal } from '@/components/ui/PremiumModal';
 import { usePayments, useProcessPayment, useDeletePayment, type Payment } from '@/features/payments/hooks/usePayments';
+import { useInvoices, useCancelRecurringReservation } from '@/features/reservations/hooks/useRecurringReservations';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 export default function GestorPayments() {
     const { t, i18n } = useTranslation();
@@ -69,9 +71,14 @@ export default function GestorPayments() {
     });
 
     const { data: paymentsData = [], isLoading } = usePayments();
+    const { data: invoicesData = [], isLoading: isLoadingInvoices } = useInvoices();
     
     const processMutation = useProcessPayment();
     const deleteMutation = useDeletePayment();
+    const cancelRecurringMutation = useCancelRecurringReservation();
+
+    const [cancelGroupModalOpen, setCancelGroupModalOpen] = useState(false);
+    const [groupToCancel, setGroupToCancel] = useState<string | null>(null);
 
     const handleProcess = (id: string) => {
         setPaymentToProcess(id);
@@ -139,6 +146,23 @@ export default function GestorPayments() {
         ];
     }, [paymentsData, t]);
 
+    const handleCancelRecurringGroup = (groupId: string) => {
+      setGroupToCancel(groupId);
+      setCancelGroupModalOpen(true);
+    };
+
+    const confirmCancelRecurringGroup = async () => {
+      if (!groupToCancel) return;
+      try {
+        await cancelRecurringMutation.mutateAsync(groupToCancel);
+        toast.success("Pacote mensalista cancelado com sucesso!");
+        setCancelGroupModalOpen(false);
+        setGroupToCancel(null);
+      } catch (err) {
+        toast.error("Erro ao cancelar pacote mensalista.");
+      }
+    };
+
     return (
         <div className="p-8 space-y-8 animate-in fade-in duration-700">
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
@@ -173,155 +197,285 @@ export default function GestorPayments() {
                 ))}
             </div>
 
-            <div className="bg-white dark:bg-card border border-gray-100 dark:border-white/10 rounded-[2.5rem] overflow-hidden shadow-xl shadow-black/5 dark:shadow-none">
-                <div className="p-6 border-b border-gray-100 dark:border-white/10">
-                    <div className="relative w-full max-w-md">
-                        <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-                        <Input
-                            placeholder={t('gestor.payments.searchPlaceholder')}
-                            className="pl-11 h-12 bg-gray-50 dark:bg-white/5 border-none rounded-2xl focus-visible:ring-2 focus-visible:ring-[#8CE600]/50"
-                            value={searchTerm}
-                            onChange={(e) => setSearchTerm(e.target.value)}
-                        />
+            <Tabs defaultValue="all" className="w-full">
+              <div className="flex items-center justify-between mb-6">
+                <TabsList className="bg-gray-100 dark:bg-white/5 p-1 rounded-2xl h-12">
+                  <TabsTrigger value="all" className="rounded-xl px-6 font-black text-xs uppercase tracking-widest data-[state=active]:bg-white dark:data-[state=active]:bg-[#8CE600] data-[state=active]:text-gray-950">
+                    Todos os Pagamentos
+                  </TabsTrigger>
+                  <TabsTrigger value="recurring" className="rounded-xl px-6 font-black text-xs uppercase tracking-widest data-[state=active]:bg-white dark:data-[state=active]:bg-[#8CE600] data-[state=active]:text-gray-950 flex items-center gap-2">
+                    <Repeat className="w-3 h-3" /> Faturas Mensalistas
+                  </TabsTrigger>
+                </TabsList>
+              </div>
+
+              <TabsContent value="all" className="mt-0">
+                <div className="bg-white dark:bg-card border border-gray-100 dark:border-white/10 rounded-[2.5rem] overflow-hidden shadow-xl shadow-black/5 dark:shadow-none">
+                    <div className="p-6 border-b border-gray-100 dark:border-white/10">
+                        <div className="relative w-full max-w-md">
+                            <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                            <Input
+                                placeholder={t('gestor.payments.searchPlaceholder')}
+                                className="pl-11 h-12 bg-gray-50 dark:bg-white/5 border-none rounded-2xl focus-visible:ring-2 focus-visible:ring-[#8CE600]/50"
+                                value={searchTerm}
+                                onChange={(e) => setSearchTerm(e.target.value)}
+                            />
+                        </div>
+                    </div>
+
+                    <div className="overflow-x-auto">
+                        <Table>
+                            <TableHeader>
+                                <TableRow className="border-b border-gray-100 dark:border-white/10 hover:bg-transparent">
+                                    <TableHead className="px-6 py-4 font-black text-xs uppercase tracking-widest text-gray-400">{t('gestor.payments.table.id')}</TableHead>
+                                    <TableHead className="px-6 py-4 font-black text-xs uppercase tracking-widest text-gray-400">{t('gestor.payments.table.client')}</TableHead>
+                                    <TableHead className="px-6 py-4 font-black text-xs uppercase tracking-widest text-gray-400">{t('gestor.payments.table.amount')}</TableHead>
+                                    <TableHead className="px-6 py-4 font-black text-xs uppercase tracking-widest text-gray-400">{t('gestor.payments.table.method')}</TableHead>
+                                    <TableHead className="px-6 py-4 font-black text-xs uppercase tracking-widest text-gray-400">{t('gestor.payments.table.status')}</TableHead>
+                                    <TableHead className="px-6 py-4 font-black text-xs uppercase tracking-widest text-gray-400">{t('gestor.payments.table.date')}</TableHead>
+                                    <TableHead className="px-6 py-4 text-right"></TableHead>
+                                </TableRow>
+                            </TableHeader>
+                            <TableBody>
+                                {isLoading ? (
+                                    Array.from({ length: 5 }).map((_, i) => (
+                                        <TableRow key={i} className="border-b border-gray-50 dark:border-white/5">
+                                            <TableCell className="px-6 py-4"><Skeleton className="h-10 w-20 rounded-lg" /></TableCell>
+                                            <TableCell className="px-6 py-4"><Skeleton className="h-10 w-40 rounded-lg" /></TableCell>
+                                            <TableCell className="px-6 py-4"><Skeleton className="h-10 w-24 rounded-lg" /></TableCell>
+                                            <TableCell className="px-6 py-4"><Skeleton className="h-10 w-24 rounded-lg" /></TableCell>
+                                            <TableCell className="px-6 py-4"><Skeleton className="h-10 w-32 rounded-lg" /></TableCell>
+                                            <TableCell className="px-6 py-4"><Skeleton className="h-10 w-40 rounded-lg" /></TableCell>
+                                            <TableCell className="px-6 py-4 text-right"><Skeleton className="h-8 w-8 ml-auto rounded-lg" /></TableCell>
+                                        </TableRow>
+                                    ))
+                                ) : payments.length === 0 ? (
+                                    <TableRow>
+                                        <TableCell colSpan={6} className="h-64 text-center">
+                                            <div className="flex flex-col items-center justify-center text-gray-500">
+                                                <div className="p-4 bg-gray-50 dark:bg-white/5 rounded-full mb-4">
+                                                    <CreditCard className="w-8 h-8" />
+                                                </div>
+                                                <p className="font-bold">{t('gestor.payments.noResults')}</p>
+                                            </div>
+                                        </TableCell>
+                                    </TableRow>
+                                ) : (
+                                    <AnimatePresence>
+                                        {payments.map((p: DashboardPaymentExtended) => (
+                                            <motion.tr
+                                                key={p.id}
+                                                initial={{ opacity: 0 }}
+                                                animate={{ opacity: 1 }}
+                                                exit={{ opacity: 0 }}
+                                                className="border-b border-gray-50 dark:border-white/5 hover:bg-gray-50/50 dark:hover:bg-white/5 transition-colors group"
+                                            >
+                                                <TableCell className="px-6 py-4">
+                                                    <span className="text-xs font-mono font-bold text-gray-400 group-hover:text-[#8CE600] transition-colors">{p.displayId}</span>
+                                                </TableCell>
+                                                <TableCell className="px-6 py-4">
+                                                    <span className="font-black text-sm text-gray-900 dark:text-white">{p.clientName}</span>
+                                                </TableCell>
+                                                <TableCell className="px-6 py-4">
+                                                    <span className="font-black text-sm text-[#8CE600]">R$ {p.amount.toFixed(2)}</span>
+                                                </TableCell>
+                                                <TableCell className="px-6 py-4">
+                                                    <span className="text-[10px] font-black text-gray-400 uppercase tracking-wider">{p.methodLabel}</span>
+                                                </TableCell>
+                                                <TableCell className="px-6 py-4">
+                                                    <Badge className={`rounded-full font-black text-[10px] uppercase tracking-widest ${
+                                                        p.statusCode === 2 || p.statusCode === 4
+                                                            ? 'bg-emerald-500/10 text-emerald-500 border-emerald-500/20'
+                                                            : p.statusCode === 3
+                                                                ? 'bg-red-500/10 text-red-500 border-red-500/20'
+                                                                : 'bg-amber-500/10 text-amber-500 border-amber-500/20'
+                                                    }`}>
+                                                        {p.statusCode === 2 || p.statusCode === 4 ? (
+                                                            <CheckCircle2 className="w-3 h-3 mr-1.5" />
+                                                        ) : p.statusCode === 3 ? (
+                                                            <XCircle className="w-3 h-3 mr-1.5" />
+                                                        ) : (
+                                                            <Clock className="w-3 h-3 mr-1.5" />
+                                                        )}
+                                                        {p.statusLabel}
+                                                    </Badge>
+                                                </TableCell>
+                                                <TableCell className="px-6 py-4">
+                                                    <div className="flex flex-col">
+                                                        <span className="text-sm font-bold text-gray-700 dark:text-gray-300">
+                                                            {new Date(p.date).toLocaleDateString(locale)}
+                                                        </span>
+                                                        <span className="text-[11px] text-gray-400 font-medium">
+                                                            {new Date(p.date).toLocaleTimeString(locale, { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false })}
+                                                        </span>
+                                                    </div>
+                                                </TableCell>
+                                                <TableCell className="px-6 py-4 text-right">
+                                                    <DropdownMenu>
+                                                        <DropdownMenuTrigger asChild>
+                                                            <Button variant="ghost" size="icon" className="h-9 w-9 rounded-xl hover:bg-[#8CE600]/10 hover:text-[#8CE600] transition-all">
+                                                                <MoreHorizontal className="w-4 h-4" />
+                                                            </Button>
+                                                        </DropdownMenuTrigger>
+                                                        <DropdownMenuContent align="end" className="w-48 rounded-2xl border-gray-100 dark:border-white/10 shadow-xl">
+                                                            <DropdownMenuLabel className="text-[10px] font-black uppercase tracking-widest text-gray-400 px-4 py-3">{t('common.actions.title', 'Ações')}</DropdownMenuLabel>
+                                                            <DropdownMenuSeparator className="bg-gray-50 dark:bg-white/5" />
+                                                            <DropdownMenuItem 
+                                                                onClick={() => {
+                                                                    setSelectedPayment(p);
+                                                                    setIsDetailsOpen(true);
+                                                                }}
+                                                                className="flex items-center gap-2 px-4 py-3 cursor-pointer rounded-xl"
+                                                            >
+                                                                <Eye className="w-4 h-4 text-gray-400" />
+                                                                <span className="font-bold text-xs">{t('common.actions.view', 'Visualizar')}</span>
+                                                            </DropdownMenuItem>
+
+                                                            {p.statusCode === 1 && (
+                                                                <DropdownMenuItem 
+                                                                    onClick={() => handleProcess(p.id)}
+                                                                    className="flex items-center gap-2 px-4 py-3 cursor-pointer rounded-xl text-emerald-500 focus:text-emerald-500 focus:bg-emerald-500/5"
+                                                                >
+                                                                    <CheckCircle2 className="w-4 h-4" />
+                                                                    <span className="font-bold text-xs">{t('admin.payments.modal.processTitle')}</span>
+                                                                </DropdownMenuItem>
+                                                            )}
+
+                                                            <DropdownMenuItem 
+                                                                onClick={() => handleDelete(p)}
+                                                                className="flex items-center gap-2 px-4 py-3 cursor-pointer rounded-xl text-red-500 focus:text-red-500 focus:bg-red-500/5"
+                                                            >
+                                                                <Trash2 className="w-4 h-4" />
+                                                                <span className="font-bold text-xs">{t('common.actions.delete', 'Excluir')}</span>
+                                                            </DropdownMenuItem>
+                                                        </DropdownMenuContent>
+                                                    </DropdownMenu>
+                                                </TableCell>
+                                            </motion.tr>
+                                        ))}
+                                    </AnimatePresence>
+                                )}
+                            </TableBody>
+                        </Table>
                     </div>
                 </div>
+              </TabsContent>
 
-                <div className="overflow-x-auto">
+              <TabsContent value="recurring" className="mt-0">
+                <div className="bg-white dark:bg-card border border-gray-100 dark:border-white/10 rounded-[2.5rem] overflow-hidden shadow-xl shadow-black/5 dark:shadow-none">
+                  <div className="overflow-x-auto">
                     <Table>
-                        <TableHeader>
-                            <TableRow className="border-b border-gray-100 dark:border-white/10 hover:bg-transparent">
-                                <TableHead className="px-6 py-4 font-black text-xs uppercase tracking-widest text-gray-400">{t('gestor.payments.table.id')}</TableHead>
-                                <TableHead className="px-6 py-4 font-black text-xs uppercase tracking-widest text-gray-400">{t('gestor.payments.table.client')}</TableHead>
-                                <TableHead className="px-6 py-4 font-black text-xs uppercase tracking-widest text-gray-400">{t('gestor.payments.table.amount')}</TableHead>
-                                <TableHead className="px-6 py-4 font-black text-xs uppercase tracking-widest text-gray-400">{t('gestor.payments.table.method')}</TableHead>
-                                <TableHead className="px-6 py-4 font-black text-xs uppercase tracking-widest text-gray-400">{t('gestor.payments.table.status')}</TableHead>
-                                <TableHead className="px-6 py-4 font-black text-xs uppercase tracking-widest text-gray-400">{t('gestor.payments.table.date')}</TableHead>
-                                <TableHead className="px-6 py-4 text-right"></TableHead>
+                      <TableHeader>
+                        <TableRow className="border-b border-gray-100 dark:border-white/10 hover:bg-transparent">
+                          <TableHead className="px-6 py-4 font-black text-xs uppercase tracking-widest text-gray-400">Cliente</TableHead>
+                          <TableHead className="px-6 py-4 font-black text-xs uppercase tracking-widest text-gray-400">Período</TableHead>
+                          <TableHead className="px-6 py-4 font-black text-xs uppercase tracking-widest text-gray-400">Valor Total</TableHead>
+                          <TableHead className="px-6 py-4 font-black text-xs uppercase tracking-widest text-gray-400">Status</TableHead>
+                          <TableHead className="px-6 py-4 font-black text-xs uppercase tracking-widest text-gray-400">Jogos no Mês</TableHead>
+                          <TableHead className="px-6 py-4 text-right"></TableHead>
+                        </TableRow>
+                      </TableHeader>
+                      <TableBody>
+                        {isLoadingInvoices ? (
+                          Array.from({ length: 3 }).map((_, i) => (
+                            <TableRow key={i} className="border-b border-gray-50 dark:border-white/5">
+                              <TableCell className="px-6 py-4"><Skeleton className="h-10 w-40 rounded-lg" /></TableCell>
+                              <TableCell className="px-6 py-4"><Skeleton className="h-10 w-32 rounded-lg" /></TableCell>
+                              <TableCell className="px-6 py-4"><Skeleton className="h-10 w-24 rounded-lg" /></TableCell>
+                              <TableCell className="px-6 py-4"><Skeleton className="h-10 w-24 rounded-lg" /></TableCell>
+                              <TableCell className="px-6 py-4"><Skeleton className="h-10 w-16 rounded-lg" /></TableCell>
+                              <TableCell className="px-6 py-4 text-right"><Skeleton className="h-8 w-8 ml-auto rounded-lg" /></TableCell>
                             </TableRow>
-                        </TableHeader>
-                        <TableBody>
-                            {isLoading ? (
-                                Array.from({ length: 5 }).map((_, i) => (
-                                    <TableRow key={i} className="border-b border-gray-50 dark:border-white/5">
-                                        <TableCell className="px-6 py-4"><Skeleton className="h-10 w-20 rounded-lg" /></TableCell>
-                                        <TableCell className="px-6 py-4"><Skeleton className="h-10 w-40 rounded-lg" /></TableCell>
-                                        <TableCell className="px-6 py-4"><Skeleton className="h-10 w-24 rounded-lg" /></TableCell>
-                                        <TableCell className="px-6 py-4"><Skeleton className="h-10 w-24 rounded-lg" /></TableCell>
-                                        <TableCell className="px-6 py-4"><Skeleton className="h-10 w-32 rounded-lg" /></TableCell>
-                                        <TableCell className="px-6 py-4"><Skeleton className="h-10 w-40 rounded-lg" /></TableCell>
-                                        <TableCell className="px-6 py-4 text-right"><Skeleton className="h-8 w-8 ml-auto rounded-lg" /></TableCell>
-                                    </TableRow>
-                                ))
-                            ) : payments.length === 0 ? (
-                                <TableRow>
-                                    <TableCell colSpan={6} className="h-64 text-center">
-                                        <div className="flex flex-col items-center justify-center text-gray-500">
-                                            <div className="p-4 bg-gray-50 dark:bg-white/5 rounded-full mb-4">
-                                                <CreditCard className="w-8 h-8" />
-                                            </div>
-                                            <p className="font-bold">{t('gestor.payments.noResults')}</p>
-                                        </div>
-                                    </TableCell>
-                                </TableRow>
-                            ) : (
-                                <AnimatePresence>
-                                    {payments.map((p: DashboardPaymentExtended) => (
-                                        <motion.tr
-                                            key={p.id}
-                                            initial={{ opacity: 0 }}
-                                            animate={{ opacity: 1 }}
-                                            exit={{ opacity: 0 }}
-                                            className="border-b border-gray-50 dark:border-white/5 hover:bg-gray-50/50 dark:hover:bg-white/5 transition-colors group"
-                                        >
-                                            <TableCell className="px-6 py-4">
-                                                <span className="text-xs font-mono font-bold text-gray-400 group-hover:text-[#8CE600] transition-colors">{p.displayId}</span>
-                                            </TableCell>
-                                            <TableCell className="px-6 py-4">
-                                                <span className="font-black text-sm text-gray-900 dark:text-white">{p.clientName}</span>
-                                            </TableCell>
-                                            <TableCell className="px-6 py-4">
-                                                <span className="font-black text-sm text-[#8CE600]">R$ {p.amount.toFixed(2)}</span>
-                                            </TableCell>
-                                            <TableCell className="px-6 py-4">
-                                                <span className="text-[10px] font-black text-gray-400 uppercase tracking-wider">{p.methodLabel}</span>
-                                            </TableCell>
-                                            <TableCell className="px-6 py-4">
-                                                <Badge className={`rounded-full font-black text-[10px] uppercase tracking-widest ${
-                                                    p.statusCode === 2 || p.statusCode === 4
-                                                        ? 'bg-emerald-500/10 text-emerald-500 border-emerald-500/20'
-                                                        : p.statusCode === 3
-                                                            ? 'bg-red-500/10 text-red-500 border-red-500/20'
-                                                            : 'bg-amber-500/10 text-amber-500 border-amber-500/20'
-                                                }`}>
-                                                    {p.statusCode === 2 || p.statusCode === 4 ? (
-                                                        <CheckCircle2 className="w-3 h-3 mr-1.5" />
-                                                    ) : p.statusCode === 3 ? (
-                                                        <XCircle className="w-3 h-3 mr-1.5" />
-                                                    ) : (
-                                                        <Clock className="w-3 h-3 mr-1.5" />
-                                                    )}
-                                                    {p.statusLabel}
-                                                </Badge>
-                                            </TableCell>
-                                            <TableCell className="px-6 py-4">
-                                                <div className="flex flex-col">
-                                                    <span className="text-sm font-bold text-gray-700 dark:text-gray-300">
-                                                        {new Date(p.date).toLocaleDateString(locale)}
-                                                    </span>
-                                                    <span className="text-[11px] text-gray-400 font-medium">
-                                                        {new Date(p.date).toLocaleTimeString(locale, { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false })}
-                                                    </span>
-                                                </div>
-                                            </TableCell>
-                                            <TableCell className="px-6 py-4 text-right">
-                                                <DropdownMenu>
-                                                    <DropdownMenuTrigger asChild>
-                                                        <Button variant="ghost" size="icon" className="h-9 w-9 rounded-xl hover:bg-[#8CE600]/10 hover:text-[#8CE600] transition-all">
-                                                            <MoreHorizontal className="w-4 h-4" />
-                                                        </Button>
-                                                    </DropdownMenuTrigger>
-                                                    <DropdownMenuContent align="end" className="w-48 rounded-2xl border-gray-100 dark:border-white/10 shadow-xl">
-                                                        <DropdownMenuLabel className="text-[10px] font-black uppercase tracking-widest text-gray-400 px-4 py-3">{t('common.actions.title', 'Ações')}</DropdownMenuLabel>
-                                                        <DropdownMenuSeparator className="bg-gray-50 dark:bg-white/5" />
-                                                        <DropdownMenuItem 
-                                                            onClick={() => {
-                                                                setSelectedPayment(p);
-                                                                setIsDetailsOpen(true);
-                                                            }}
-                                                            className="flex items-center gap-2 px-4 py-3 cursor-pointer rounded-xl"
-                                                        >
-                                                            <Eye className="w-4 h-4 text-gray-400" />
-                                                            <span className="font-bold text-xs">{t('common.actions.view', 'Visualizar')}</span>
-                                                        </DropdownMenuItem>
-
-                                                        {p.statusCode === 1 && (
-                                                            <DropdownMenuItem 
-                                                                onClick={() => handleProcess(p.id)}
-                                                                className="flex items-center gap-2 px-4 py-3 cursor-pointer rounded-xl text-emerald-500 focus:text-emerald-500 focus:bg-emerald-500/5"
-                                                            >
-                                                                <CheckCircle2 className="w-4 h-4" />
-                                                                <span className="font-bold text-xs">{t('admin.payments.modal.processTitle')}</span>
-                                                            </DropdownMenuItem>
-                                                        )}
-
-                                                        <DropdownMenuItem 
-                                                            onClick={() => handleDelete(p)}
-                                                            className="flex items-center gap-2 px-4 py-3 cursor-pointer rounded-xl text-red-500 focus:text-red-500 focus:bg-red-500/5"
-                                                        >
-                                                            <Trash2 className="w-4 h-4" />
-                                                            <span className="font-bold text-xs">{t('common.actions.delete', 'Excluir')}</span>
-                                                        </DropdownMenuItem>
-                                                    </DropdownMenuContent>
-                                                </DropdownMenu>
-                                            </TableCell>
-                                        </motion.tr>
-                                    ))}
-                                </AnimatePresence>
-                            )}
-                        </TableBody>
+                          ))
+                        ) : invoicesData.length === 0 ? (
+                          <TableRow>
+                            <TableCell colSpan={6} className="h-64 text-center">
+                              <div className="flex flex-col items-center justify-center text-gray-500">
+                                <div className="p-4 bg-gray-50 dark:bg-white/5 rounded-full mb-4">
+                                  <Repeat className="w-8 h-8" />
+                                </div>
+                                <p className="font-bold">Nenhuma fatura mensalista encontrada.</p>
+                              </div>
+                            </TableCell>
+                          </TableRow>
+                        ) : (
+                          invoicesData.map((invoice) => (
+                            <TableRow key={invoice.id} className="border-b border-gray-50 dark:border-white/5 hover:bg-gray-50/50 dark:hover:bg-white/5 transition-colors group">
+                              <TableCell className="px-6 py-4">
+                                <div className="flex items-center gap-3">
+                                  <div className="w-8 h-8 rounded-full bg-[#8CE600]/10 flex items-center justify-center text-[#8CE600] text-[10px] font-black">
+                                    {invoice.userName?.charAt(0) || 'U'}
+                                  </div>
+                                  <div>
+                                    <p className="font-black text-sm text-gray-900 dark:text-white">{invoice.userName}</p>
+                                    <p className="text-[10px] text-gray-400 truncate max-w-[150px]">{invoice.userEmail}</p>
+                                  </div>
+                                </div>
+                              </TableCell>
+                              <TableCell className="px-6 py-4">
+                                <span className="text-sm font-bold text-gray-700 dark:text-gray-300 capitalize">
+                                  {new Intl.DateTimeFormat(locale, { month: 'long', year: 'numeric' }).format(new Date(invoice.year, invoice.month - 1))}
+                                </span>
+                              </TableCell>
+                              <TableCell className="px-6 py-4">
+                                <span className="font-black text-sm text-[#8CE600]">R$ {invoice.totalAmount.toFixed(2)}</span>
+                              </TableCell>
+                              <TableCell className="px-6 py-4">
+                                <Badge className={`rounded-full font-black text-[10px] uppercase tracking-widest ${
+                                  invoice.status === 2
+                                    ? 'bg-emerald-500/10 text-emerald-500 border-emerald-500/20'
+                                    : invoice.status === 3
+                                      ? 'bg-red-500/10 text-red-500 border-red-500/20'
+                                      : 'bg-amber-500/10 text-amber-500 border-amber-500/20'
+                                }`}>
+                                  {invoice.status === 2 ? 'Pago' : invoice.status === 3 ? 'Atrasado' : 'Pendente'}
+                                </Badge>
+                              </TableCell>
+                              <TableCell className="px-6 py-4 text-center">
+                                <Badge variant="outline" className="rounded-xl border-gray-200 dark:border-white/10 font-bold px-3">
+                                  {invoice.reservationIds.length}
+                                </Badge>
+                              </TableCell>
+                              <TableCell className="px-6 py-4 text-right">
+                                <DropdownMenu>
+                                  <DropdownMenuTrigger asChild>
+                                    <Button variant="ghost" size="icon" className="h-9 w-9 rounded-xl hover:bg-[#8CE600]/10 hover:text-[#8CE600] transition-all">
+                                      <MoreHorizontal className="w-4 h-4" />
+                                    </Button>
+                                  </DropdownMenuTrigger>
+                                  <DropdownMenuContent align="end" className="w-56 rounded-2xl border-gray-100 dark:border-white/10 shadow-xl">
+                                    <DropdownMenuLabel className="text-[10px] font-black uppercase tracking-widest text-gray-400 px-4 py-3">Ações do Mensalista</DropdownMenuLabel>
+                                    <DropdownMenuSeparator className="bg-gray-50 dark:bg-white/5" />
+                                    <DropdownMenuItem className="flex items-center gap-2 px-4 py-3 cursor-pointer rounded-xl">
+                                      <Receipt className="w-4 h-4 text-gray-400" />
+                                      <span className="font-bold text-xs">Visualizar Fatura</span>
+                                    </DropdownMenuItem>
+                                    <DropdownMenuItem className="flex items-center gap-2 px-4 py-3 cursor-pointer rounded-xl">
+                                      <ArrowRight className="w-4 h-4 text-gray-400" />
+                                      <span className="font-bold text-xs">Ver Reservas do Mês</span>
+                                    </DropdownMenuItem>
+                                    <DropdownMenuSeparator className="bg-gray-50 dark:bg-white/5" />
+                                    <DropdownMenuItem 
+                                      onClick={() => handleCancelRecurringGroup(invoice.recurringGroupId)}
+                                      className="flex items-center gap-2 px-4 py-3 cursor-pointer rounded-xl text-red-500 focus:text-red-500 focus:bg-red-500/5"
+                                    >
+                                      <XCircle className="w-4 h-4" />
+                                      <span className="font-bold text-xs">Cancelar Contrato</span>
+                                    </DropdownMenuItem>
+                                  </DropdownMenuContent>
+                                </DropdownMenu>
+                              </TableCell>
+                            </TableRow>
+                          ))
+                        )}
+                      </TableBody>
                     </Table>
+                  </div>
                 </div>
-            </div>
+              </TabsContent>
+            </Tabs>
+
+            {/* Manual Process Modal */}
 
             <Dialog open={isDetailsOpen} onOpenChange={setIsDetailsOpen}>
                 <DialogContent className="sm:max-w-[550px] rounded-3xl border-none bg-white dark:bg-card p-0 overflow-hidden shadow-2xl">
@@ -563,6 +717,18 @@ export default function GestorPayments() {
                 title={statusModal.title}
                 message={statusModal.message}
                 onClose={() => setStatusModal(prev => ({ ...prev, isOpen: false }))}
+            />
+
+            <ActionModal
+              isOpen={cancelGroupModalOpen}
+              onClose={() => setCancelGroupModalOpen(false)}
+              onAction={confirmCancelRecurringGroup}
+              title="Cancelar Pacote Mensalista"
+              description="Isso irá cancelar todas as reservas futuras deste mensalista. Faturas pagas ou reservas passadas não serão afetadas. Esta ação é irreversível."
+              actionText="Confirmar Cancelamento"
+              variant="danger"
+              icon={XCircle}
+              isLoading={cancelRecurringMutation.isPending}
             />
         </div>
     );

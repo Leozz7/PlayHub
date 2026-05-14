@@ -2,7 +2,7 @@ import React, { useState, useMemo } from 'react';
 import { format } from 'date-fns';
 import { ptBR, enUS, es } from 'date-fns/locale';
 import { useTranslation } from 'react-i18next';
-import { Calendar, Clock, User, CheckCircle2, Building2, Search, ArrowRight, Lock, Unlock, AlertCircle, Phone } from 'lucide-react';
+import { Calendar, Clock, User, CheckCircle2, Building2, Search, ArrowRight, Lock, Unlock, AlertCircle, Phone, Repeat } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { ActionModal } from '@/components/ui/PremiumModal';
@@ -12,11 +12,14 @@ import { useReservations } from '@/features/reservations/hooks/useReservations';
 import { useAuthStore } from '@/data/useAuthStore';
 import { api } from '@/lib/api';
 import { usePlayHubToast } from '@/hooks/usePlayHubToast';
+import { useCreateRecurringReservation } from '@/features/reservations/hooks/useRecurringReservations';
+import { Switch } from '@/components/ui/switch';
+import { Label } from '@/components/ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Input } from '@/components/ui/input';
 import { Court } from '@/features/courts/types/court.types';
 import { Reservation } from '@/features/reservations/types/reservation.types';
 
-// Using official types from features layer
 
 function CourtScheduleModal({ court, isOpen, onClose }: { court: Court | null, isOpen: boolean, onClose: () => void }) {
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
@@ -28,6 +31,11 @@ function CourtScheduleModal({ court, isOpen, onClose }: { court: Court | null, i
   const [slotToBlock, setSlotToBlock] = useState<number | null>(null);
   const [selectedReservation, setSelectedReservation] = useState<Reservation | null>(null);
   const [showReleaseConfirm, setShowReleaseConfirm] = useState(false);
+  
+  // Recurring States
+  const [isRecurring, setIsRecurring] = useState(false);
+  const [durationMonths, setDurationMonths] = useState("3");
+  const createRecurring = useCreateRecurringReservation();
   
   const dateLocale = i18n.language === 'pt' ? ptBR : i18n.language === 'es' ? es : enUS;
 
@@ -55,23 +63,35 @@ function CourtScheduleModal({ court, isOpen, onClose }: { court: Court | null, i
       const end = new Date(selectedDate);
       end.setHours(slotToBlock + 1, 0, 0, 0);
 
-      const payload = {
-        courtId: court?.id,
-        userId: user.id,
-        startTime: start.toISOString(),
-        endTime: end.toISOString(),
-        totalPrice: 0,
-        status: 5 // Blocked
-      };
+      if (isRecurring) {
+        await createRecurring.mutateAsync({
+          courtId: court?.id!,
+          userId: user.id,
+          firstStartTime: start.toISOString(),
+          firstEndTime: end.toISOString(),
+          monthsToBlock: parseInt(durationMonths)
+        });
+        phToast.success(`Mensalista criado para as ${slotToBlock}:00 por ${durationMonths} meses.`);
+      } else {
+        const payload = {
+          courtId: court?.id,
+          userId: user.id,
+          startTime: start.toISOString(),
+          endTime: end.toISOString(),
+          totalPrice: 0,
+          status: 5 // Blocked
+        };
+        await api.post('/Reservations', payload);
+        phToast.success(`Horário das ${slotToBlock}:00 bloqueado com sucesso.`);
+      }
 
-      await api.post('/Reservations', payload);
-      phToast.success(`Horário das ${slotToBlock}:00 bloqueado com sucesso.`);
       refetch();
       setShowBlockConfirm(false);
       setSlotToBlock(null);
+      setIsRecurring(false);
     } catch (error) {
-      console.error('Error blocking slot:', error);
-      phToast.error("Erro ao bloquear horário.");
+      console.error('Error blocking/recurring slot:', error);
+      phToast.error("Erro ao processar solicitação.");
     } finally {
       setIsBlocking(false);
     }
@@ -226,9 +246,16 @@ function CourtScheduleModal({ court, isOpen, onClose }: { court: Court | null, i
                               <div className="w-6 h-6 rounded-lg bg-red-500/10 flex items-center justify-center text-red-500 text-[10px] font-black">
                                 {reservation.userName?.charAt(0) || 'U'}
                               </div>
-                              <p className="text-sm font-bold text-gray-900 dark:text-white truncate">
-                                {reservation.userName || t('gestor.schedule.modal.details.client')}
-                              </p>
+                              <div className="flex items-center gap-1.5 truncate">
+                                <p className="text-sm font-bold text-gray-900 dark:text-white truncate">
+                                  {reservation.userName || t('gestor.schedule.modal.details.client')}
+                                </p>
+                                {reservation.isRecurring && (
+                                  <span title="Mensalista">
+                                    <Repeat className="w-3 h-3 text-[#8CE600] shrink-0" />
+                                  </span>
+                                )}
+                              </div>
                             </div>
                             <div className="flex items-center justify-between text-[10px] font-bold">
                                <span className="text-gray-400">R$ {reservation.totalPrice}</span>
@@ -269,15 +296,49 @@ function CourtScheduleModal({ court, isOpen, onClose }: { court: Court | null, i
           onClose={() => {
             setShowBlockConfirm(false);
             setSlotToBlock(null);
+            setIsRecurring(false);
           }}
           onAction={handleBlockSlot}
-          title={t('gestor.schedule.modal.blockConfirm.title')}
-          description={t('gestor.schedule.modal.blockConfirm.desc', { start: slotToBlock, end: Number(slotToBlock) + 1 })}
-          actionText={t('gestor.schedule.modal.blockConfirm.confirm')}
+          title={isRecurring ? "Confirmar Reserva Mensalista" : t('gestor.schedule.modal.blockConfirm.title')}
+          description={isRecurring 
+            ? `Deseja criar uma reserva recorrente para toda ${format(selectedDate, "EEEE", { locale: dateLocale })} às ${slotToBlock}:00 pelos próximos ${durationMonths} meses?`
+            : t('gestor.schedule.modal.blockConfirm.desc', { start: slotToBlock, end: Number(slotToBlock) + 1 })
+          }
+          actionText={isRecurring ? "Confirmar Mensalista" : t('gestor.schedule.modal.blockConfirm.confirm')}
           variant="premium"
-          icon={Lock}
+          icon={isRecurring ? Repeat : Lock}
           isLoading={isBlocking}
-        />
+        >
+          <div className="mt-6 p-4 bg-gray-50 dark:bg-white/5 rounded-2xl border border-gray-100 dark:border-white/5 space-y-4">
+            <div className="flex items-center justify-between">
+              <div className="space-y-0.5">
+                <Label className="text-xs font-black uppercase tracking-widest text-gray-400">Reserva Mensalista</Label>
+                <p className="text-[10px] text-gray-500">Repetir semanalmente este horário</p>
+              </div>
+              <Switch 
+                checked={isRecurring} 
+                onCheckedChange={setIsRecurring}
+                className="data-[state=checked]:bg-[#8CE600]"
+              />
+            </div>
+
+            {isRecurring && (
+              <div className="space-y-2 animate-in slide-in-from-top-2 duration-300">
+                <Label className="text-[10px] font-black uppercase tracking-widest text-gray-400">Duração do Contrato</Label>
+                <Select value={durationMonths} onValueChange={setDurationMonths}>
+                  <SelectTrigger className="bg-white dark:bg-[#0a0f1a] border-gray-100 dark:border-white/10 rounded-xl h-10">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent className="rounded-xl border-gray-100 dark:border-white/10">
+                    <SelectItem value="3">3 Meses</SelectItem>
+                    <SelectItem value="6">6 Meses</SelectItem>
+                    <SelectItem value="12">12 Meses</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            )}
+          </div>
+        </ActionModal>
 
         {/* Modal de Detalhes da Reserva / Bloqueio */}
         <Dialog open={!!selectedReservation} onOpenChange={(open) => !open && setSelectedReservation(null)}>

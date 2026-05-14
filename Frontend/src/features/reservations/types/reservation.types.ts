@@ -25,4 +25,7 @@ export interface Reservation {
   paymentId?: string;
   paymentMethod?: number;
   created: string;
+  // Recurring (Mensalista) fields
+  isRecurring?: boolean;
+  recurringGroupId?: string;
 }
