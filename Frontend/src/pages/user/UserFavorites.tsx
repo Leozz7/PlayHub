@@ -215,7 +215,7 @@ export default function UserFavorites() {
                         <div className="flex flex-col">
                           <span className="text-[10px] font-black uppercase text-gray-400 tracking-widest">{t('user.favorites.card.priceLabel')}</span>
                           <div className="flex items-baseline gap-1">
-                            <span className="text-2xl font-black text-gray-900 dark:text-white">R$ {court.price}</span>
+                            <span className="text-2xl font-black text-gray-900 dark:text-white">R$ {court.hourlyRate}</span>
                             <span className="text-[10px] font-bold text-gray-400">/h</span>
                           </div>
                         </div>

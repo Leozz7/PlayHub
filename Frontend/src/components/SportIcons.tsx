@@ -180,17 +180,3 @@ export function IconTrophy({ className, style }: IconProps) {
     </svg>
   );
 }
-
-export const SPORT_ICONS = [
-  IconFootball,
-  IconBasketball,
-  IconRacket,
-  IconTennis,
-  IconVolleyball,
-  IconSoccer,
-  IconTrophy,
-  IconRacket,   // repeat for variety
-];
-
-
-

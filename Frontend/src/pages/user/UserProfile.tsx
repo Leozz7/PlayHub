@@ -31,9 +31,9 @@ function getInitials(name?: string) {
 
 function getRoleBadge(role?: string, t?: (k: string) => string) {
   switch (role?.toLowerCase()) {
-    case 'admin': return { label: t('userProfile.role.admin'), className: 'bg-red-500/10 text-red-500 border-red-500/20' };
-    case 'manager': return { label: t('userProfile.role.manager'), className: 'bg-blue-500/10 text-blue-500 border-blue-500/20' };
-    default: return { label: t('userProfile.role.athlete'), className: 'bg-[#8CE600]/10 text-[#6aad00] dark:text-[#8CE600] border-[#8CE600]/20' };
+    case 'admin': return { label: t ? t('userProfile.role.admin') : 'Admin', className: 'bg-red-500/10 text-red-500 border-red-500/20' };
+    case 'manager': return { label: t ? t('userProfile.role.manager') : 'Manager', className: 'bg-blue-500/10 text-blue-500 border-blue-500/20' };
+    default: return { label: t ? t('userProfile.role.athlete') : 'Athlete', className: 'bg-[#8CE600]/10 text-[#6aad00] dark:text-[#8CE600] border-[#8CE600]/20' };
   }
 }
 

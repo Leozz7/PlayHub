@@ -21,6 +21,8 @@ import {
 import { Skeleton } from '@/components/ui/skeleton';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { Reservation } from '@/features/reservations/types/reservation.types';
+import { Court } from '@/features/courts/types/court.types';
 
 const STATUS_CONFIG = {
     2: { key: 'confirmed', icon: CheckCircle2, color: 'text-emerald-500', bg: 'bg-emerald-500/10', border: 'border-emerald-500/20' },
@@ -39,24 +41,8 @@ export default function GestorReservations() {
     const [selectedCourt, setSelectedCourt] = useState('all');
     const [selectedStatus, setSelectedStatus] = useState('all');
     const [cancelModalOpen, setCancelModalOpen] = useState(false);
-    interface DashboardCourt {
-        id: string;
-        name: string;
-    }
 
-    interface DashboardReservation {
-        id: string;
-        userName?: string;
-        courtName?: string;
-        courtId: string;
-        startTime: string;
-        endTime: string;
-        totalPrice: number;
-        status: number;
-        userId?: string;
-    }
-
-    const [reservationToCancel, setReservationToCancel] = useState<DashboardReservation | null>(null);
+    const [reservationToCancel, setReservationToCancel] = useState<Reservation | null>(null);
 
     const { data: courtsData } = useManagementCourts({ pageSize: 100 });
     const { data: reservationsData, isLoading, refetch } = useReservations({ pageSize: 100 });
@@ -80,8 +66,8 @@ export default function GestorReservations() {
     const reservations = useMemo(() => reservationsData?.items || [], [reservationsData?.items]);
 
     const filteredReservations = useMemo(() => {
-        return reservations.filter((r: DashboardReservation) => {
-            const matchSearch = r.userName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        return reservations.filter((r: Reservation) => {
+            const matchSearch = (r.userName || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
                 r.id.toLowerCase().includes(searchTerm.toLowerCase());
             const matchCourt = selectedCourt === 'all' || r.courtId === selectedCourt;
             const matchStatus = selectedStatus === 'all' || String(r.status) === selectedStatus;
@@ -92,11 +78,11 @@ export default function GestorReservations() {
 
     const stats = useMemo(() => {
         const total = reservations.length;
-        const confirmed = reservations.filter((r: DashboardReservation) => r.status === 2).length;
-        const pending = reservations.filter((r: DashboardReservation) => r.status === 1).length;
+        const confirmed = reservations.filter((r: Reservation) => Number(r.status) === 2).length;
+        const pending = reservations.filter((r: Reservation) => Number(r.status) === 1).length;
         const revenue = reservations
-            .filter((r: DashboardReservation) => r.status === 2 || r.status === 4)
-            .reduce((acc: number, r: DashboardReservation) => acc + r.totalPrice, 0);
+            .filter((r: Reservation) => Number(r.status) === 2 || Number(r.status) === 4)
+            .reduce((acc: number, r: Reservation) => acc + r.totalPrice, 0);
 
         return [
             { label: t('gestor.reservations.stats.total'), value: total, icon: CalendarDays, color: 'text-blue-500' },
@@ -172,7 +158,7 @@ export default function GestorReservations() {
                             </SelectTrigger>
                             <SelectContent className="rounded-2xl border-gray-100 dark:border-white/10">
                                 <SelectItem value="all">{t('gestor.reservations.allCourts')}</SelectItem>
-                                {courts.map((c: DashboardCourt) => (
+                                {courts.map((c: Court) => (
                                     <SelectItem key={c.id} value={c.id}>{c.name}</SelectItem>
                                 ))}
                             </SelectContent>
@@ -233,13 +219,13 @@ export default function GestorReservations() {
                                 </TableRow>
                             ) : (
                                 <AnimatePresence>
-                                    {filteredReservations.map((r: DashboardReservation) => {
-                                        const cfg = STATUS_CONFIG[r.status as keyof typeof STATUS_CONFIG] || STATUS_CONFIG[1];
+                                    {filteredReservations.map((r: Reservation) => {
+                                        const cfg = STATUS_CONFIG[Number(r.status) as keyof typeof STATUS_CONFIG] || STATUS_CONFIG[1];
                                         let statusLabel = 'Pendente';
-                                        if (r.status === 2) statusLabel = 'Confirmado';
-                                        if (r.status === 3) statusLabel = 'Cancelado';
-                                        if (r.status === 4) statusLabel = 'Concluído';
-                                        if (r.status === 5) statusLabel = 'Bloqueado';
+                                        if (Number(r.status) === 2) statusLabel = 'Confirmado';
+                                        if (Number(r.status) === 3) statusLabel = 'Cancelado';
+                                        if (Number(r.status) === 4) statusLabel = 'Concluído';
+                                        if (Number(r.status) === 5) statusLabel = 'Bloqueado';
 
                                         return (
                                             <motion.tr
@@ -274,7 +260,7 @@ export default function GestorReservations() {
                                                     </Badge>
                                                 </TableCell>
                                                 <TableCell className="px-6 py-4 text-right">
-                                                    {r.status !== 3 && r.status !== 5 && (
+                                                    {Number(r.status) !== 3 && Number(r.status) !== 5 && (
                                                         <Button
                                                             variant="ghost"
                                                             size="icon"

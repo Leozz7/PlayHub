@@ -18,6 +18,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Skeleton } from '@/components/ui/skeleton';
 import { Link } from 'react-router-dom';
 
+import { type Reservation } from '@/features/reservations/types/reservation.types';
+
 interface ActivityItem {
   id: string;
   type: 'new_user' | 'new_booking' | 'booking_confirmed' | 'booking_cancelled' | 'review_added';
@@ -26,6 +28,13 @@ interface ActivityItem {
   date: string;
   details: string;
   link?: string;
+}
+
+interface ActivityUser {
+  id: string;
+  name: string;
+  email: string;
+  created: string;
 }
 
 export default function AdminActivities() {
@@ -50,9 +59,9 @@ export default function AdminActivities() {
   });
 
   const activities = useMemo(() => {
-    let list: ActivityItem[] = [];
+    const list: ActivityItem[] = [];
 
-    (usersData || []).forEach((u: any) => {
+    (usersData || []).forEach((u: ActivityUser) => {
       list.push({
         id: `user-${u.id}`,
         type: 'new_user',
@@ -64,7 +73,7 @@ export default function AdminActivities() {
       });
     });
 
-    (reservationsData || []).forEach((r: any) => {
+    (reservationsData || []).forEach((r: Reservation) => {
       list.push({
         id: `res-new-${r.id}`,
         type: 'new_booking',
@@ -75,7 +84,8 @@ export default function AdminActivities() {
         link: `/lz_admin/bookings`
       });
 
-      if (r.status === 2) {
+      const status = Number(r.status);
+      if (status === 2) {
         list.push({
           id: `res-conf-${r.id}`,
           type: 'booking_confirmed',
@@ -85,7 +95,7 @@ export default function AdminActivities() {
           details: `${r.courtName}`,
           link: `/lz_admin/bookings`
         });
-      } else if (r.status === 3) {
+      } else if (status === 3) {
         list.push({
           id: `res-canc-${r.id}`,
           type: 'booking_cancelled',

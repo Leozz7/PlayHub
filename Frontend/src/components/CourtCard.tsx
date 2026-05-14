@@ -4,12 +4,12 @@ import { useTranslation } from 'react-i18next';
 import { MapPin, Clock } from 'lucide-react';
 import { Stars } from '@/components/ui/Stars';
 import { FavoriteButton } from '@/components/FavoriteButton';
-import { type Court } from '@/pages/CatalogData';
+import { type Court } from '@/features/courts/types/court.types';
 
 const LocationIcon = () => <MapPin className="w-3.5 h-3.5" strokeWidth={2.5} />;
 const ClockIcon = () => <Clock className="w-3.5 h-3.5" strokeWidth={2.5} />;
 
-export function StatusPill({ status }: { status: any }) {
+export function StatusPill({ status }: { status: string | number }) {
     const { t } = useTranslation();
     
     const normalizedStatus = String(status).toLowerCase();
@@ -54,7 +54,7 @@ export const CourtCard = memo(function CourtCard({ court }: { court: Court }) {
             {/* Image (Inset style) */}
             <div className="p-2 pb-0">
                 <div className="relative h-52 overflow-hidden rounded-[20px] [transform:translateZ(0)]">
-                    <img src={court.img} alt={court.name} loading="lazy" className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" />
+                    <img src={court.imageUrls?.[0] || court.img || ''} alt={court.name} loading="lazy" className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" />
                     <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-black/10 opacity-80 group-hover:opacity-60 transition-opacity duration-500" />
                     
                     {/* Badge */}
@@ -66,7 +66,7 @@ export const CourtCard = memo(function CourtCard({ court }: { court: Court }) {
                     
                     {/* Status Pill over image */}
                     <div className="absolute bottom-3 left-3">
-                        <StatusPill status={court.frontendStatus || court.status} />
+                        <StatusPill status={court.frontendStatus || court.status || 'available'} />
                     </div>
                 </div>
             </div>
@@ -76,7 +76,7 @@ export const CourtCard = memo(function CourtCard({ court }: { court: Court }) {
                 <div className="flex items-start justify-between gap-3 mb-2">
                     <h3 className="font-black text-xl tracking-tight text-gray-900 dark:text-white group-hover:text-[#8CE600] transition-colors line-clamp-1">{court.name}</h3>
                     <div className="flex items-center shrink-0 bg-gray-50/80 dark:bg-black/30 backdrop-blur-sm px-2.5 py-1.5 rounded-xl border border-gray-100 dark:border-white/5">
-                        <Stars rating={court.rating} />
+                        <Stars rating={court.rating ?? 0} />
                     </div>
                 </div>
 
@@ -85,15 +85,15 @@ export const CourtCard = memo(function CourtCard({ court }: { court: Court }) {
                 </p>
 
                 <div className="flex flex-wrap gap-1.5 mb-5">
-                    {court.sports.map(s => (
+                    {(court.sports || []).map(s => (
                         <span key={s} className="text-[10px] font-black uppercase tracking-wider text-gray-800 dark:text-gray-200 bg-gray-100 dark:bg-white/10 px-3 py-1 rounded-lg border border-gray-200 dark:border-white/5">{t(s)}</span>
                     ))}
-                    {court.amenities.slice(0, 2).map(a => (
+                    {(court.amenities || []).slice(0, 2).map(a => (
                         <span key={a} className="text-[10px] font-semibold text-gray-500 dark:text-gray-400 bg-transparent px-3 py-1 rounded-lg border border-gray-100 dark:border-white/5">{a}</span>
                     ))}
-                    {court.amenities.length > 2 && (
+                    {(court.amenities || []).length > 2 && (
                         <span className="text-[10px] font-semibold text-gray-500 dark:text-gray-400 bg-transparent px-3 py-1 rounded-lg border border-gray-100 dark:border-white/5">
-                            +{court.amenities.length - 2}
+                            +{(court.amenities || []).length - 2}
                         </span>
                     )}
                 </div>
@@ -103,14 +103,16 @@ export const CourtCard = memo(function CourtCard({ court }: { court: Court }) {
                         {court.oldPrice && <span className="text-[10px] font-bold text-gray-400 line-through mb-0.5">{t('common.actions.currency')} {court.oldPrice}{t('common.actions.perHour')}</span>}
                         <div className="flex items-baseline gap-1">
                             <span className="text-sm font-black text-[#8CE600]">{t('common.actions.currency')}</span>
-                            <span className="font-black text-3xl text-gray-900 dark:text-white tracking-tighter leading-none">{court.price}</span>
+                            <span className="font-black text-3xl text-gray-900 dark:text-white tracking-tighter leading-none">{court.hourlyRate}</span>
                             <span className="text-xs font-bold text-gray-500 dark:text-gray-500">{t('common.actions.perHour')}</span>
                         </div>
                     </div>
-                    <div className="flex items-center gap-1.5 text-xs font-bold text-gray-600 dark:text-gray-300 bg-gray-50 dark:bg-white/5 px-3 py-2 rounded-xl border border-gray-100 dark:border-white/5 shadow-sm">
-                        <ClockIcon />
-                        <span>{court.openingHour}h – {court.closingHour}h</span>
-                    </div>
+                    {court.openingHour !== undefined && court.closingHour !== undefined && (
+                        <div className="flex items-center gap-1.5 text-xs font-bold text-gray-600 dark:text-gray-300 bg-gray-50 dark:bg-white/5 px-3 py-2 rounded-xl border border-gray-100 dark:border-white/5 shadow-sm">
+                            <ClockIcon />
+                            <span>{court.openingHour}h – {court.closingHour}h</span>
+                        </div>
+                    )}
                 </div>
             </div>
         </div>
@@ -127,13 +129,13 @@ export const CourtRow = memo(function CourtRow({ court }: { court: Court }) {
             </Link>
 
             <div className="relative w-36 h-32 rounded-[18px] overflow-hidden shrink-0 [transform:translateZ(0)]">
-                <img src={court.img} alt={court.name} loading="lazy" className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" />
+                <img src={court.imageUrls?.[0] || court.img || ''} alt={court.name} loading="lazy" className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/10 to-transparent opacity-80 group-hover:opacity-60 transition-opacity duration-500" />
                 
                 {court.badge && <div className="absolute top-2 left-2 bg-[#8CE600] text-[#0A0A0A] text-[9px] font-black uppercase tracking-widest px-2 py-1 rounded-md shadow-sm">{t(court.badge)}</div>}
                 
                 <div className="absolute bottom-2 left-2 scale-90 origin-bottom-left">
-                     <StatusPill status={court.frontendStatus || court.status} />
+                     <StatusPill status={court.frontendStatus || court.status || 'available'} />
                 </div>
             </div>
             
@@ -153,17 +155,17 @@ export const CourtRow = memo(function CourtRow({ court }: { court: Court }) {
                 </p>
                 
                 <div className="flex flex-wrap gap-1.5 mb-auto">
-                    {court.sports.map(s => <span key={s} className="text-[10px] font-black uppercase tracking-wider text-gray-800 dark:text-gray-200 bg-gray-100 dark:bg-white/10 px-2.5 py-1 rounded-lg border border-gray-200 dark:border-white/5">{t(s)}</span>)}
+                    {(court.sports || []).map(s => <span key={s} className="text-[10px] font-black uppercase tracking-wider text-gray-800 dark:text-gray-200 bg-gray-100 dark:bg-white/10 px-2.5 py-1 rounded-lg border border-gray-200 dark:border-white/5">{t(s)}</span>)}
                 </div>
                 
                 <div className="flex items-end justify-between mt-3">
                     <div className="flex items-center gap-1.5 bg-gray-50/80 dark:bg-black/30 backdrop-blur-sm px-2.5 py-1.5 rounded-xl border border-gray-100 dark:border-white/5">
-                        <Stars rating={court.rating} />
+                        <Stars rating={court.rating ?? 0} />
                         <span className="text-[10px] font-bold text-gray-500 dark:text-gray-400">({court.reviewCount})</span>
                     </div>
                     <div className="flex items-baseline gap-1">
                         <span className="text-[10px] font-black text-[#8CE600]">{t('common.actions.currency')}</span>
-                        <span className="font-black text-2xl text-gray-900 dark:text-white tracking-tighter leading-none">{court.price}</span>
+                        <span className="font-black text-2xl text-gray-900 dark:text-white tracking-tighter leading-none">{court.hourlyRate}</span>
                         <span className="text-[10px] font-bold text-gray-500 dark:text-gray-500">{t('common.actions.perHour')}</span>
                     </div>
                 </div>

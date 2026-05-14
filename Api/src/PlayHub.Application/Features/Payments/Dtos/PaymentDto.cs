@@ -17,5 +17,10 @@ public class PaymentDto
     public string? TransactionId { get; set; }
     public string? CourtName { get; set; }
     public string? CourtSport { get; set; }
+    public DateTime? StartTime { get; set; }
+    public DateTime? EndTime { get; set; }
+    public string? UserPhone { get; set; }
+    public string? UserCpf { get; set; }
+    public string? PaymentId { get; set; }
     public DateTime Created { get; set; }
 }

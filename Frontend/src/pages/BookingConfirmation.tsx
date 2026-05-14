@@ -25,7 +25,7 @@ export interface BookingConfirmationState {
         address: string;
         neighborhood: string;
         city: string;
-        price: number;
+        hourlyRate: number;
         img: string;
         sports: string[];
     };
@@ -117,7 +117,7 @@ export default function BookingConfirmation() {
 
     const { court, date, slots } = state;
     const dateObj = new Date(date);
-    const total   = slots.length * court.price;
+    const total   = slots.length * (court.hourlyRate || 0);
 
     const formatCardNumber = (value: string) => {
         const v = value.replace(/\s+/g, '').replace(/[^0-9]/gi, '');
@@ -413,7 +413,7 @@ export default function BookingConfirmation() {
                                 
                                 <div className="space-y-4 text-sm mb-6 relative">
                                     <div className="flex justify-between text-gray-600 dark:text-gray-400">
-                                        <span>{slots.length} {t('details.hoursCount')} × R$ {court.price}/h</span>
+                                        <span>{slots.length} {t('details.hoursCount')} × R$ {court.hourlyRate || 0}/h</span>
                                         <span className="font-medium">R$ {total}</span>
                                     </div>
                                     <div className="flex justify-between text-gray-600 dark:text-gray-400">
@@ -445,7 +445,7 @@ export default function BookingConfirmation() {
                                             return (
                                                 <button
                                                     key={m.id}
-                                                    onClick={() => setPaymentMethod(m.id as any)}
+                                                    onClick={() => setPaymentMethod(m.id as 'pix' | 'credit' | 'debit')}
                                                     className={`flex-1 py-2.5 rounded-xl text-xs font-bold border-2 transition-all flex items-center justify-center gap-1.5 ${
                                                         isSelected
                                                             ? 'border-[#8CE600] bg-[#8CE600]/10 text-[#8CE600] shadow-sm'

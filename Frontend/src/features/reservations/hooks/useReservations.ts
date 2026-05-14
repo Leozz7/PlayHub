@@ -1,29 +1,9 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { api } from '@/lib/api';
+import { Reservation } from '../types/reservation.types';
+import type { PagedResult } from '@/types/shared';
 
-export interface Reservation {
-    id: string;
-    courtId: string;
-    courtName?: string;
-    userId: string;
-    userName?: string;
-    startTime: string;
-    endTime: string;
-    status: number;
-    totalPrice: number;
-    paymentId?: string;
-    created: string;
-}
-
-export interface PagedResult<T> {
-    items: T[];
-    totalCount: number;
-    pageNumber: number;
-    pageSize: number;
-    totalPages: number;
-    hasPreviousPage: boolean;
-    hasNextPage: boolean;
-}
+export type { PagedResult };
 
 export function useReservations(filters?: { courtId?: string; userId?: string; status?: number; date?: string; pageNumber?: number; pageSize?: number }) {
     return useQuery<PagedResult<Reservation>>({

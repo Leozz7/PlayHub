@@ -43,7 +43,8 @@ export default function Login() {
           phToast.loginSuccess();
           navigate('/');
         },
-        onError: (err: any) => {
+        onError: (error: unknown) => {
+          const err = error as { response?: { data?: { message?: string } } };
           phToast.loginError(err?.response?.data?.message);
         },
       }

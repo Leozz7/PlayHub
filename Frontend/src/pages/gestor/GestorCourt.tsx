@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useSearchParams } from 'react-router-dom';
 import { useQueryClient, useMutation } from '@tanstack/react-query';
@@ -53,7 +53,8 @@ import { CSS } from '@dnd-kit/utilities';
 import { useManagementCourts } from '@/features/courts/hooks/useCourts';
 
 import { courtService } from '@/features/courts/api/courtService';
-import { Court, SPORTS_LIST, OperatingDay } from '@/pages/CatalogData';
+import { Court, OperatingDay } from '@/features/courts/types/court.types';
+import { SPORTS_LIST } from '@/features/courts/constants';
 import { useAuthStore } from '@/data/useAuthStore';
 
 import { Button } from '@/components/ui/button';
@@ -198,7 +199,7 @@ export default function GestorCourt() {
         t('gestor.courts.form.amenities.bleachers')
     ];
 
-    const COURT_TYPES = useMemo(() => [
+    const COURT_TYPES: { value: number; label: string }[] = useMemo(() => [
         { value: 1, label: t('sports.tennis') },
         { value: 2, label: t('sports.soccerSociety') },
         { value: 3, label: t('sports.footvolley') },
@@ -448,13 +449,13 @@ export default function GestorCourt() {
             city: court.city,
             neighborhood: court.neighborhood,
             address: court.address,
-            hourlyRate: court.price,
+            hourlyRate: court.hourlyRate,
             capacity: court.capacity,
             description: court.description || '',
             openingHour: court.openingHour,
             closingHour: court.closingHour,
             badge: court.badge || '',
-            type: court.type || 2,
+            type: Number(court.type) || 2,
             status: court.status === 'available' ? 1 : (court.status === 'busy' ? 2 : (typeof court.status === 'number' ? court.status : 1))
         });
         setIsDialogOpen(true);
@@ -640,7 +641,7 @@ export default function GestorCourt() {
                                                     <div>
                                                         <p className="font-black text-sm text-gray-900 dark:text-white">{court.name}</p>
                                                         <div className="flex flex-wrap gap-1 mt-1">
-                                                            {court.sports.slice(0, 2).map(s => (
+                                                            {(court.sports || []).slice(0, 2).map(s => (
                                                                 <span key={s} className="text-[9px] font-bold text-[#8CE600] bg-[#8CE600]/10 px-1.5 py-0.5 rounded-full">
                                                                     {t(sportToKey[s] || s)}
                                                                 </span>
@@ -656,7 +657,7 @@ export default function GestorCourt() {
                                                 </div>
                                             </TableCell>
                                             <TableCell className="px-6 py-4">
-                                                <p className="font-black text-sm text-gray-900 dark:text-white">R$ {court.price}</p>
+                                                <p className="font-black text-sm text-gray-900 dark:text-white">R$ {court.hourlyRate}</p>
                                             </TableCell>
                                             <TableCell className="px-6 py-4">
                                                 <Badge className={`rounded-full font-black text-[10px] uppercase tracking-widest ${court.frontendStatus === 'available'

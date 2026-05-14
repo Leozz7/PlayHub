@@ -83,6 +83,9 @@ public class GetPaymentsHandler : IRequestHandler<GetPaymentsQuery, List<Payment
 
         return payments.Select(p => {
             var user = users.FirstOrDefault(u => u.Id == p.UserId);
+            var reservation = reservations.FirstOrDefault(r => r.Id == p.ReservationId);
+            var court = courts.FirstOrDefault(c => c.Id == reservation?.CourtId);
+
             return new PaymentDto
             {
                 Id = p.Id,
@@ -95,8 +98,13 @@ public class GetPaymentsHandler : IRequestHandler<GetPaymentsQuery, List<Payment
                 Method = p.Method,
                 PaymentDate = p.PaymentDate,
                 TransactionId = p.TransactionId,
-                CourtName = courts.FirstOrDefault(c => c.Id == reservations.FirstOrDefault(r => r.Id == p.ReservationId)?.CourtId)?.Name,
-                CourtSport = courts.FirstOrDefault(c => c.Id == reservations.FirstOrDefault(r => r.Id == p.ReservationId)?.CourtId)?.Type.ToString(),
+                CourtName = court?.Name,
+                CourtSport = court?.Sport ?? court?.Type.ToString(),
+                StartTime = reservation?.StartTime,
+                EndTime = reservation?.EndTime,
+                UserPhone = user?.Phone != null ? _encryptionService.Decrypt(user.Phone) : null,
+                UserCpf = user?.Cpf != null ? _encryptionService.Decrypt(user.Cpf) : null,
+                PaymentId = p.TransactionId,
                 Created = p.Created
             };
         }).ToList();

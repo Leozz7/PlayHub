@@ -2,7 +2,7 @@ import { api } from '@/lib/api';
 import type { CourtDto } from '@/features/favorites/types/favorites.types';
 
 export const favoritesService = {
-  /** Busca todas as quadras favoritas do usuário autenticado. */
+  /** Busca todas as quadras favoritas */
   getMyFavorites: async (): Promise<CourtDto[]> => {
     const { data } = await api.get<CourtDto[]>('/favorites');
     return data;

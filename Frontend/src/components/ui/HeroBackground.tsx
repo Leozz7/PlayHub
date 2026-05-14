@@ -1,4 +1,4 @@
-import { SPORT_ICONS } from '@/components/SportIcons';
+import { SPORT_ICONS } from '@/components/SportIconsMap';
 
 export function HeroBackground() {
     const icons = SPORT_ICONS;
@@ -55,7 +55,7 @@ export function HeroBackground() {
                         style={{
                             top: pos.top,
                             left: pos.left,
-                            // @ts-ignore
+                            // @ts-expect-error Custom CSS variables are valid in React 18+ but TS types might complain
                             '--dur': pos.dur,
                             '--delay': pos.delay,
                         }}

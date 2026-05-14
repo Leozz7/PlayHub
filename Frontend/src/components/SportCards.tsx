@@ -2,7 +2,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { Reveal } from '@/components/ui/Reveal';
 import { SPORTS } from '@/pages/IndexData';
-import { SPORT_ICONS } from '@/components/SportIcons';
+import { SPORT_ICONS } from '@/components/SportIconsMap';
 
 export function SportCards() {
     const { t } = useTranslation();

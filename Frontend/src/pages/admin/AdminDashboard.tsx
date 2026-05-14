@@ -36,7 +36,50 @@ function formatValue(value: number, isCurrency: boolean, locale: string) {
   return value.toLocaleString(locale);
 }
 
-function StatCard({ stat, t, locale }: { stat: any, t: any, locale: string }) {
+interface DashboardStat {
+  id: string;
+  value: number;
+  color: string;
+  isCurrency: boolean;
+  icon: React.ElementType;
+}
+
+interface DashboardReservation {
+  id: string;
+  userName?: string;
+  courtName?: string;
+  courtId: string;
+  startTime: string;
+  endTime: string;
+  totalPrice: number;
+  status: number;
+  userId: string;
+}
+
+interface DashboardUser {
+  id: string;
+  name: string;
+  email: string;
+  role: string;
+  created: string;
+  joinedAt?: string;
+  reservations?: number;
+}
+
+interface DashboardCourt {
+  id: string;
+  name: string;
+  city: string;
+  sport: string;
+  rating: number;
+}
+
+interface DashboardPayment {
+  amount: number;
+  status: number;
+}
+
+function StatCard({ stat, t, locale }: { stat: DashboardStat, t: (k: string) => string, locale: string }) {
   const col = COLOR_MAP[stat.color as keyof typeof COLOR_MAP];
 
   return (
@@ -57,7 +100,7 @@ function StatCard({ stat, t, locale }: { stat: any, t: any, locale: string }) {
   );
 }
 
-function ReservationRow({ r, t }: { r: any, t: any }) {
+function ReservationRow({ r, t }: { r: DashboardReservation, t: (k: string) => string }) {
   const cfg = STATUS_CONFIG[r.status as keyof typeof STATUS_CONFIG] || STATUS_CONFIG[1];
 
   let statusLabel = t('admin.dashboard.resPending');
@@ -161,7 +204,7 @@ export default function AdminDashboard() {
   const usersCount = usersData?.totalCount || 0;
   const courtsCount = courtsData?.totalCount || 0;
   const reservationsCount = reservationsData?.totalCount || 0;
-  const revenue = paymentsData.filter((p: any) => p.status === 2).reduce((sum: number, p: any) => sum + p.amount, 0);
+  const revenue = paymentsData.filter((p: DashboardPayment) => p.status === 2).reduce((sum: number, p: DashboardPayment) => sum + p.amount, 0);
 
   const functionalStats = [
     { id: 'users', value: usersCount, icon: Users, color: 'blue', isCurrency: false },
@@ -176,7 +219,7 @@ export default function AdminDashboard() {
     if (!courtsData?.items || !reservationsData?.items) return [];
 
     const courtStats: Record<string, { revenue: number, reservations: number }> = {};
-    reservationsData.items.forEach((r: any) => {
+    reservationsData.items.forEach((r: DashboardReservation) => {
       if (!courtStats[r.courtId]) courtStats[r.courtId] = { revenue: 0, reservations: 0 };
       courtStats[r.courtId].reservations += 1;
       if (r.status === 2) {
@@ -184,18 +227,18 @@ export default function AdminDashboard() {
       }
     });
 
-    return courtsData.items.map((c: any) => ({
+    return courtsData.items.map((c: DashboardCourt) => ({
       name: c.name,
       city: c.city,
       sport: c.sport,
       rating: c.rating || 5.0,
       revenue: courtStats[c.id]?.revenue || 0,
       reservations: courtStats[c.id]?.reservations || 0,
-    })).sort((a: any, b: any) => b.revenue - a.revenue);
+    })).sort((a: { revenue: number }, b: { revenue: number }) => b.revenue - a.revenue);
   }, [courtsData, reservationsData]);
 
-  const recentUsers = (usersData?.items || []).slice(0, 4).map((u: any) => {
-    const userRes = (reservationsData?.items || []).filter((r: any) => r.userId === u.id).length;
+  const recentUsers = (usersData?.items || []).slice(0, 4).map((u: DashboardUser) => {
+    const userRes = (reservationsData?.items || []).filter((r: DashboardReservation) => r.userId === u.id).length;
     return {
       name: u.name,
       email: u.email,
@@ -207,11 +250,11 @@ export default function AdminDashboard() {
 
   const dynamicAlerts = useMemo(() => {
     const alerts = [];
-    const pendingPayments = paymentsData.filter((p: any) => p.status === 1).length;
+    const pendingPayments = paymentsData.filter((p: DashboardPayment) => p.status === 1).length;
     if (pendingPayments > 0) {
       alerts.push({ type: 'info', message: t('admin.dashboard.alerts.pendingPayments', { count: pendingPayments }) });
     }
-    const pendingRes = (reservationsData?.items || []).filter((r: any) => r.status === 1).length;
+    const pendingRes = (reservationsData?.items || []).filter((r: DashboardReservation) => r.status === 1).length;
     if (pendingRes > 0) {
       alerts.push({ type: 'warning', message: t('admin.dashboard.alerts.pendingReservations', { count: pendingRes }) });
     }
@@ -303,7 +346,7 @@ export default function AdminDashboard() {
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-gray-100 dark:divide-white/[0.04]">
-                    {recentReservations.length > 0 ? recentReservations.map((r: any) => <ReservationRow key={r.id} r={r} t={t} />) : (
+                    {recentReservations.length > 0 ? recentReservations.map((r: DashboardReservation) => <ReservationRow key={r.id} r={r} t={t} />) : (
                       <tr><td colSpan={6} className="text-center py-4 text-xs text-gray-500">{t('admin.dashboard.noReservations')}</td></tr>
                     )}
                   </tbody>
@@ -313,7 +356,7 @@ export default function AdminDashboard() {
 
             {activeTab === 'users' && (
               <div className="divide-y divide-gray-100 dark:divide-white/[0.04]">
-                {recentUsers.length > 0 ? recentUsers.map((u: any, i: number) => (
+                {recentUsers.length > 0 ? recentUsers.map((u: DashboardUser, i: number) => (
                   <div key={i} className="flex items-center gap-4 px-4 py-3 hover:bg-gray-50 dark:hover:bg-white/[0.02] transition-colors">
                     <div className={`w-9 h-9 rounded-xl flex items-center justify-center text-xs font-black shrink-0 ${u.role === 'Manager' ? 'bg-blue-500/10 text-blue-500' : 'bg-[#8CE600]/10 text-[#6aad00] dark:text-[#8CE600]'
                       }`}>
@@ -334,7 +377,7 @@ export default function AdminDashboard() {
                     </span>
                     <div className="text-right shrink-0">
                       <p className="text-[11px] text-gray-400">{u.joinedAt}</p>
-                      {u.reservations > 0 && <p className="text-[10px] text-[#8CE600] font-bold">{u.reservations} {t('admin.dashboard.reservations')}</p>}
+                      {u.reservations !== undefined && u.reservations > 0 && <p className="text-[10px] text-[#8CE600] font-bold">{u.reservations} {t('admin.dashboard.reservations')}</p>}
                     </div>
                   </div>
                 )) : (
@@ -360,8 +403,8 @@ export default function AdminDashboard() {
               </div>
               <div className="space-y-3">
                 {[
-                  { label: t('admin.dashboard.resConfirmed'), value: reservationsData?.items?.filter((r: any) => r.status === 2).length || 0, total: reservationsData?.items?.length || 1, color: '#8CE600' },
-                  { label: t('admin.dashboard.paymentApproved'), value: paymentsData.filter((p: any) => p.status === 2).length || 0, total: paymentsData.length || 1, color: '#60a5fa' },
+                  { label: t('admin.dashboard.resConfirmed'), value: reservationsData?.items?.filter((r: DashboardReservation) => r.status === 2).length || 0, total: reservationsData?.items?.length || 1, color: '#8CE600' },
+                  { label: t('admin.dashboard.paymentApproved'), value: paymentsData.filter((p: DashboardPayment) => p.status === 2).length || 0, total: paymentsData.length || 1, color: '#60a5fa' },
                   { label: t('admin.dashboard.kpi.users'), value: usersCount, total: usersCount || 1, color: '#a78bfa' },
                 ].map(item => (
                   <div key={item.label}>
@@ -386,7 +429,7 @@ export default function AdminDashboard() {
                 <Star className="w-4 h-4 text-amber-400" fill="currentColor" />
               </div>
               <div className="space-y-3">
-                {topCourts.slice(0, 4).map((court: any, i: number) => (
+                {topCourts.slice(0, 4).map((court: { name: string; city: string; sport: string; revenue: number; reservations: number; }, i: number) => (
                   <div key={court.name} className="flex items-center gap-3">
                     <span className="text-xs font-black text-gray-300 dark:text-gray-700 w-4 shrink-0">{i + 1}</span>
                     <div className="flex-1 min-w-0">
@@ -439,7 +482,7 @@ export default function AdminDashboard() {
               </Link>
             </div>
             <div className="space-y-3">
-              {topCourts.slice(0, 10).map((court: any) => {
+              {topCourts.slice(0, 10).map((court: { name: string; city: string; revenue: number; rating: number; }) => {
                 const maxRev = topCourts[0]?.revenue || 1;
                 const pct = Math.round((court.revenue / maxRev) * 100);
                 return (

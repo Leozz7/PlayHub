@@ -185,14 +185,15 @@ export default function AdminUsers() {
       toast.success(t('admin.users.toasts.createSuccess'));
       setIsModalOpen(false);
     },
-    onError: (error: any) => {
+    onError: (error: unknown) => {
+      const err = error as { response?: { data?: string } };
       setStatusModal({
         isOpen: true,
         status: 'error',
         title: t('admin.users.modals.errorTitle'),
-        message: error?.response?.data || t('admin.users.modals.createErrorMessage')
+        message: err?.response?.data || t('admin.users.modals.createErrorMessage')
       });
-      toast.error(error?.response?.data || t('admin.users.toasts.createError'));
+      toast.error(err?.response?.data || t('admin.users.toasts.createError'));
     }
   });
 

@@ -2,6 +2,7 @@ import { useState, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Users, Search, Mail, Phone, FileText, UserPlus, CreditCard, Activity } from 'lucide-react';
 import { useReservations } from '@/features/reservations/hooks/useReservations';
+import { Reservation } from '@/features/reservations/types/reservation.types';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Input } from '@/components/ui/input';
 import {
@@ -20,10 +21,22 @@ export default function GestorClients() {
 
     const [searchTerm, setSearchTerm] = useState('');
     const { data: reservationsData, isLoading } = useReservations({ pageSize: 500 });
+    interface ClientData {
+        id: string;
+        name: string;
+        email: string;
+        phone: string;
+        cpf: string;
+        totalSpent: number;
+        totalReservations: number;
+        lastVisit: string;
+        createdAt: string;
+    }
+
     const clients = useMemo(() => {
         const reservations = reservationsData?.items || [];
-        const map = new Map<string, Record<string, unknown>>();
-        reservations.forEach((r: { userId: string; userName?: string; status: number; totalPrice: number; startTime: string; }) => {
+        const map = new Map<string, ClientData>();
+        reservations.forEach((r: Reservation) => {
             if (!map.has(r.userId)) {
                 map.set(r.userId, {
                     id: r.userId,
@@ -38,12 +51,14 @@ export default function GestorClients() {
                 });
             }
             const c = map.get(r.userId);
-            c.totalReservations += 1;
-            if (r.status === 2 || r.status === 4) {
-                c.totalSpent += r.totalPrice;
-            }
-            if (new Date(r.startTime) > new Date(c.lastVisit)) {
-                c.lastVisit = r.startTime;
+            if (c) {
+                c.totalReservations += 1;
+                if (Number(r.status) === 2 || Number(r.status) === 4) {
+                    c.totalSpent += r.totalPrice;
+                }
+                if (new Date(r.startTime) > new Date(c.lastVisit)) {
+                    c.lastVisit = r.startTime;
+                }
             }
         });
         return Array.from(map.values()).filter(c => 

@@ -20,16 +20,12 @@ import {
 } from 'lucide-react';
 
 
-function ToastIcon({ icon: Icon, color }: { icon: React.ElementType; color: string }) {
-  return (
-    <div
-      className="shrink-0 w-8 h-8 rounded-xl flex items-center justify-center"
-      style={{ background: `${color}18` }}
-    >
-      <Icon className="w-4 h-4" style={{ color }} />
-    </div>
+const ToastIcon = ({ icon: Icon, color }: { icon: React.ElementType; color: string }) =>
+  React.createElement(
+    'div',
+    { className: 'shrink-0 w-8 h-8 rounded-xl flex items-center justify-center', style: { background: `${color}18` } },
+    React.createElement(Icon as React.FC<{ className: string; style: object }>, { className: 'w-4 h-4', style: { color } })
   );
-}
 
 // ─── Cores do Design System ───────────────────────────────────────────────────
 

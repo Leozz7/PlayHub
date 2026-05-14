@@ -153,9 +153,9 @@ export default function App() {
               <Route path="/courts/:id" element={<CourtsDetails />} />
               <Route path="/terms" element={<Terms />} />
               <Route path="/privacy" element={<Privacy />} />
-              <Route path="/booking/confirm" element={<BookingConfirmation />} />
 
               <Route element={<ProtectedRoute />}>
+                <Route path="/booking/confirm" element={<BookingConfirmation />} />
                 <Route element={<UserLayoutShell />}>
                   <Route path="/my-bookings" element={<MyBookings />} />
                   <Route path="/lz_user">

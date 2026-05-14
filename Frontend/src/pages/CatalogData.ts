@@ -11,7 +11,7 @@ export type Court = {
     reviewCount: number;
     price: number;
     oldPrice?: number;
-    status: 'available' | 'busy' | 'closed' | any;
+    status: 'available' | 'busy' | 'closed' | string | number;
     frontendStatus?: 'available' | 'busy' | 'closed';
     badge?: string;
     amenities: string[];

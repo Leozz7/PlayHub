@@ -7,9 +7,9 @@ import { Input } from '@/components/ui/input';
 import { DatePicker } from '@/components/ui/date-picker';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
-import { SPORTS_LIST as HARDCODED_SPORTS, CITIES as HARDCODED_CITIES } from '@/pages/CatalogData';
+import { SPORTS_LIST as HARDCODED_SPORTS, CITIES as HARDCODED_CITIES } from '@/features/courts/constants';
 import { useCourts, useCourtsFilters } from '@/features/courts/hooks/useCourts';
-import { SPORT_ICONS } from '@/components/SportIcons';
+import { SPORT_ICONS } from '@/components/SportIconsMap';
 import { CourtCard, CourtRow } from '@/components/CourtCard';
 import { SEO } from '@/components/SEO';
 
@@ -187,19 +187,17 @@ export default function Catalog() {
 
 
     const { data: pagedData, isLoading, isError } = useCourts(queryParams);
-    const courts = pagedData?.items ?? [];
-
-
     const filtered = useMemo(() => {
+        const courts = pagedData?.items ?? [];
         if (!Array.isArray(courts)) return [];
         return [...courts].sort((a, b) => {
-            if (sortBy === 'rating') return b.rating - a.rating;
-            if (sortBy === 'price_asc') return a.price - b.price;
-            if (sortBy === 'price_desc') return b.price - a.price;
-            if (sortBy === 'reviews') return b.reviewCount - a.reviewCount;
+            if (sortBy === 'rating') return (b.rating ?? 0) - (a.rating ?? 0);
+            if (sortBy === 'price_asc') return (a.price ?? 0) - (b.price ?? 0);
+            if (sortBy === 'price_desc') return (b.price ?? 0) - (a.price ?? 0);
+            if (sortBy === 'reviews') return (b.reviewCount ?? 0) - (a.reviewCount ?? 0);
             return 0;
         });
-    }, [courts, sortBy]);
+    }, [pagedData?.items, sortBy]);
 
     const activeFilters = [
         ...selectedSports, ...selectedCities,

@@ -13,6 +13,13 @@ export interface Payment {
     paymentDate?: string;
     transactionId?: string;
     created: string;
+    courtName?: string;
+    courtSport?: string;
+    startTime?: string;
+    endTime?: string;
+    userPhone?: string;
+    userCpf?: string;
+    paymentId?: string; // External payment reference or transactionId
 }
 
 export function usePayments(filters?: { status?: number }) {

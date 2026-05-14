@@ -29,14 +29,14 @@ public class UsersController : ControllerBase
     }
 
     [HttpGet]
-    [Authorize(Roles = AppRoles.AdminOrManager)]
+    [Authorize(Roles = AppRoles.Admin)]
     public async Task<ActionResult<PagedResult<UserDto>>> Get([FromQuery] GetUsersQuery query)
     {
         return await Mediator.Send(query);
     }
 
     [HttpPost]
-    [Authorize(Roles = AppRoles.AdminOrManager)]
+    [Authorize(Roles = AppRoles.Admin)]
     public async Task<ActionResult<UserDto>> Create(CreateUserCommand command)
     {
         var result = await Mediator.Send(command);
@@ -44,7 +44,7 @@ public class UsersController : ControllerBase
     }
 
     [HttpPut("{id}")]
-    [Authorize(Roles = AppRoles.AdminOrManager)]
+    [Authorize(Roles = AppRoles.Admin)]
     public async Task<ActionResult> Update(Guid id, UpdateUserCommand command)
     {
         if (id != command.Id)
@@ -71,7 +71,7 @@ public class UsersController : ControllerBase
     }
 
     [HttpDelete("{id}")]
-    [Authorize(Roles = AppRoles.AdminOrManager)]
+    [Authorize(Roles = AppRoles.Admin)]
     public async Task<ActionResult> Delete(Guid id)
     {
         var result = await Mediator.Send(new DeleteUserCommand(id));

@@ -13,30 +13,12 @@ import { useAuthStore } from '@/data/useAuthStore';
 import { api } from '@/lib/api';
 import { usePlayHubToast } from '@/hooks/usePlayHubToast';
 import { Input } from '@/components/ui/input';
+import { Court } from '@/features/courts/types/court.types';
+import { Reservation } from '@/features/reservations/types/reservation.types';
 
-interface DashboardCourt {
-  id: string;
-  name: string;
-  sport: string;
-  openingHour: number;
-  closingHour: number;
-  mainImageBase64?: string;
-  img?: string;
-  hourlyRate?: number;
-  price?: number;
-}
+// Using official types from features layer
 
-interface DashboardReservation {
-  id: string;
-  userName?: string;
-  userPhone?: string;
-  startTime: string;
-  endTime: string;
-  totalPrice: number;
-  status: number;
-}
-
-function CourtScheduleModal({ court, isOpen, onClose }: { court: DashboardCourt | null, isOpen: boolean, onClose: () => void }) {
+function CourtScheduleModal({ court, isOpen, onClose }: { court: Court | null, isOpen: boolean, onClose: () => void }) {
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
   const { user } = useAuthStore();
   const phToast = usePlayHubToast();
@@ -44,7 +26,7 @@ function CourtScheduleModal({ court, isOpen, onClose }: { court: DashboardCourt 
   const [isBlocking, setIsBlocking] = useState(false);
   const [showBlockConfirm, setShowBlockConfirm] = useState(false);
   const [slotToBlock, setSlotToBlock] = useState<number | null>(null);
-  const [selectedReservation, setSelectedReservation] = useState<DashboardReservation | null>(null);
+  const [selectedReservation, setSelectedReservation] = useState<Reservation | null>(null);
   const [showReleaseConfirm, setShowReleaseConfirm] = useState(false);
   
   const dateLocale = i18n.language === 'pt' ? ptBR : i18n.language === 'es' ? es : enUS;
@@ -74,7 +56,7 @@ function CourtScheduleModal({ court, isOpen, onClose }: { court: DashboardCourt 
       end.setHours(slotToBlock + 1, 0, 0, 0);
 
       const payload = {
-        courtId: court.id,
+        courtId: court?.id,
         userId: user.id,
         startTime: start.toISOString(),
         endTime: end.toISOString(),
@@ -177,14 +159,14 @@ function CourtScheduleModal({ court, isOpen, onClose }: { court: DashboardCourt 
             ) : (
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                 {hours.map(hour => {
-                  const reservation = reservations.find((r: DashboardReservation) => {
+                  const reservation = reservations.find((r: Reservation) => {
                     const resDate = new Date(r.startTime);
-                    return resDate.getHours() === hour && r.status !== 3; 
+                    return resDate.getHours() === hour && Number(r.status) !== 3; 
                   });
 
                   const isOccupied = !!reservation;
-                  const isBlocked = reservation?.status === 5;
-                  const isConfirmed = reservation?.status === 2;
+                  const isBlocked = Number(reservation?.status) === 5;
+                  const isConfirmed = Number(reservation?.status) === 2;
 
                   return (
                     <div 
@@ -302,12 +284,12 @@ function CourtScheduleModal({ court, isOpen, onClose }: { court: DashboardCourt 
           <DialogContent className="max-w-md bg-white dark:bg-[#0a0f1a] border-gray-100 dark:border-white/10 rounded-[2rem] p-8 shadow-2xl">
             <DialogHeader className="mb-6">
               <div className="flex items-center gap-3 mb-4">
-                <div className={`w-12 h-12 rounded-2xl flex items-center justify-center ${selectedReservation?.status === 5 ? 'bg-gray-100 text-gray-500' : 'bg-red-50 text-red-500'}`}>
-                  {selectedReservation?.status === 5 ? <Lock className="w-6 h-6" /> : <User className="w-6 h-6" />}
+                <div className={`w-12 h-12 rounded-2xl flex items-center justify-center ${Number(selectedReservation?.status) === 5 ? 'bg-gray-100 text-gray-500' : 'bg-red-50 text-red-500'}`}>
+                  {Number(selectedReservation?.status) === 5 ? <Lock className="w-6 h-6" /> : <User className="w-6 h-6" />}
                 </div>
                 <div>
                   <DialogTitle className="text-xl font-black text-gray-900 dark:text-white">
-                    {selectedReservation?.status === 5 ? t('gestor.schedule.modal.details.blockedTitle') : t('gestor.schedule.modal.details.reservedTitle')}
+                    {Number(selectedReservation?.status) === 5 ? t('gestor.schedule.modal.details.blockedTitle') : t('gestor.schedule.modal.details.reservedTitle')}
                   </DialogTitle>
                   <p className="text-xs text-gray-400 font-bold uppercase tracking-widest">{t('gestor.schedule.modal.details.opInfo')}</p>
                 </div>
@@ -325,8 +307,8 @@ function CourtScheduleModal({ court, isOpen, onClose }: { court: DashboardCourt 
                 </div>
                 <div className="p-4 bg-gray-50 dark:bg-white/5 rounded-2xl border border-gray-100 dark:border-white/5">
                   <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">{t('gestor.schedule.modal.details.status')}</p>
-                  <p className={`text-sm font-black ${selectedReservation?.status === 5 ? 'text-gray-500' : 'text-red-500'}`}>
-                    {selectedReservation?.status === 5 ? t('gestor.schedule.modal.status.blocked') : t('gestor.schedule.modal.status.occupied')}
+                  <p className={`text-sm font-black ${Number(selectedReservation?.status) === 5 ? 'text-gray-500' : 'text-red-500'}`}>
+                    {Number(selectedReservation?.status) === 5 ? t('gestor.schedule.modal.status.blocked') : t('gestor.schedule.modal.status.occupied')}
                   </p>
                 </div>
               </div>
@@ -371,7 +353,7 @@ function CourtScheduleModal({ court, isOpen, onClose }: { court: DashboardCourt 
                   {t('gestor.schedule.modal.details.close')}
                 </Button>
                 
-                {selectedReservation?.status === 5 && (
+                {Number(selectedReservation?.status) === 5 && (
                   <Button 
                     variant="destructive" 
                     onClick={() => setShowReleaseConfirm(true)}
@@ -401,7 +383,7 @@ function CourtScheduleModal({ court, isOpen, onClose }: { court: DashboardCourt 
   );
 }
 
-function CourtCard({ court, onOpenSchedule }: { court: DashboardCourt, onOpenSchedule: () => void }) {
+function CourtCard({ court, onOpenSchedule }: { court: Court, onOpenSchedule: () => void }) {
   const { t } = useTranslation();
   return (
     <div className="group bg-white dark:bg-white/[0.03] border border-gray-100 dark:border-white/[0.06] rounded-[2rem] overflow-hidden hover:shadow-2xl hover:shadow-gray-200/50 dark:hover:shadow-black/40 transition-all duration-500 flex flex-col h-full">
@@ -415,7 +397,7 @@ function CourtCard({ court, onOpenSchedule }: { court: DashboardCourt, onOpenSch
         
         <div className="absolute top-4 left-4 flex flex-col gap-2">
           <span className="px-3 py-1 bg-[#8CE600] text-gray-950 text-[10px] font-black uppercase tracking-widest rounded-full shadow-lg shadow-[#8CE600]/20">
-            {court.sport}
+            {court.sport || t('common.sport')}
           </span>
         </div>
         
@@ -458,15 +440,15 @@ function CourtCard({ court, onOpenSchedule }: { court: DashboardCourt, onOpenSch
 export default function GestorSchedule() {
     const [searchTerm, setSearchTerm] = useState('');
     const { data: pagedData, isLoading } = useManagementCourts({ pageSize: 100 });
-    const [selectedCourt, setSelectedCourt] = useState<DashboardCourt | null>(null);
+    const [selectedCourt, setSelectedCourt] = useState<Court | null>(null);
     const { t } = useTranslation();
 
     const courts = useMemo(() => pagedData?.items || [], [pagedData?.items]);
 
     const filteredCourts = useMemo(() => {
-        return courts.filter((c: DashboardCourt) =>
+        return courts.filter((c: Court) =>
             c.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            c.sport.toLowerCase().includes(searchTerm.toLowerCase())
+            (c.sport || '').toLowerCase().includes(searchTerm.toLowerCase())
         );
     }, [courts, searchTerm]);
 
@@ -509,7 +491,7 @@ export default function GestorSchedule() {
                 </div>
             ) : (
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
-                    {filteredCourts.map((court: DashboardCourt) => (
+                    {filteredCourts.map((court: Court) => (
                         <CourtCard
                             key={court.id}
                             court={court}

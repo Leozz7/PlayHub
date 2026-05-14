@@ -146,7 +146,7 @@ export default function UserDashboard() {
         4: 'completed',
       };
       
-      let statusStr = statusMap[r.status] || 'pending';
+      let statusStr = statusMap[Number(r.status)] || 'pending';
       if (statusStr === 'confirmed' && end < new Date()) {
         statusStr = 'completed';
       }

@@ -35,22 +35,14 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { Badge } from '@/components/ui/badge';
 import { toast } from 'sonner';
 import { ConfirmDeleteModal, StatusModal } from '@/components/ui/PremiumModal';
-import { usePayments, useProcessPayment, useDeletePayment } from '@/features/payments/hooks/usePayments';
+import { usePayments, useProcessPayment, useDeletePayment, type Payment } from '@/features/payments/hooks/usePayments';
 
 export default function GestorPayments() {
     const { t, i18n } = useTranslation();
     const locale = i18n.language.startsWith('pt') ? 'pt-BR' : i18n.language.startsWith('es') ? 'es-ES' : 'en-US';
 
     const [searchTerm, setSearchTerm] = useState('');
-    interface DashboardPayment {
-        id: string;
-        amount: number;
-        status: number;
-        method: number | string;
-        created: string;
-        userName?: string;
-        reservationId?: string;
-    }
+    type DashboardPayment = Payment;
 
     interface DashboardPaymentExtended extends DashboardPayment {
         displayId: string;
@@ -376,8 +368,8 @@ export default function GestorPayments() {
                                         <Building2 className="w-4 h-4 text-gray-400 mt-0.5" />
                                         <div>
                                             <p className="text-[10px] font-bold uppercase tracking-tight text-gray-500">{t('gestor.payments.modal.labels.arena')}</p>
-                                            <p className="text-xs font-bold text-gray-900 dark:text-white">{selectedPayment.courtName}</p>
-                                            <p className="text-[10px] text-gray-500">{selectedPayment.courtSport}</p>
+                                            <p className="text-xs font-bold text-gray-900 dark:text-white">{selectedPayment.courtName || t('gestor.dashboard.table.deletedCourt')}</p>
+                                            <p className="text-[10px] text-gray-500">{selectedPayment.courtSport || t('gestor.dashboard.table.sport')}</p>
                                         </div>
                                     </div>
 
@@ -386,10 +378,12 @@ export default function GestorPayments() {
                                         <div>
                                             <p className="text-[10px] font-bold uppercase tracking-tight text-gray-500">{t('gestor.payments.modal.labels.schedule')}</p>
                                             <p className="text-xs font-bold text-gray-900 dark:text-white">
-                                                {new Date(selectedPayment.startTime).toLocaleDateString(locale)}
+                                                {selectedPayment.startTime ? new Date(selectedPayment.startTime).toLocaleDateString(locale) : '—'}
                                             </p>
                                             <p className="text-[10px] text-gray-500">
-                                                {new Date(selectedPayment.startTime).toLocaleTimeString(locale, { hour: '2-digit', minute: '2-digit', hour12: false })} – {new Date(selectedPayment.endTime).toLocaleTimeString(locale, { hour: '2-digit', minute: '2-digit', hour12: false })}
+                                                {selectedPayment.startTime && selectedPayment.endTime 
+                                                    ? `${new Date(selectedPayment.startTime).toLocaleTimeString(locale, { hour: '2-digit', minute: '2-digit', hour12: false })} – ${new Date(selectedPayment.endTime).toLocaleTimeString(locale, { hour: '2-digit', minute: '2-digit', hour12: false })}`
+                                                    : '—'}
                                             </p>
                                         </div>
                                     </div>

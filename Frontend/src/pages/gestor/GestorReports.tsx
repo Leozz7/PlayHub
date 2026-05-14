@@ -4,6 +4,7 @@ import { useReservations } from '@/features/reservations/hooks/useReservations';
 import { Button } from '@/components/ui/button';
 import { motion } from 'framer-motion';
 import { Skeleton } from '@/components/ui/skeleton';
+import { Reservation } from '@/features/reservations/types/reservation.types';
 
 export default function GestorReports() {
     const { t } = useTranslation();
@@ -11,17 +12,11 @@ export default function GestorReports() {
     const { data: reservationsData, isLoading } = useReservations({ pageSize: 500 });
     const reservations = reservationsData?.items || [];
 
-    interface ReportReservation {
-        status: number;
-        totalPrice: number;
-        userId: string;
-    }
-
     const revenue = reservations
-        .filter((r: ReportReservation) => r.status === 2 || r.status === 4)
-        .reduce((sum: number, r: ReportReservation) => sum + r.totalPrice, 0);
+        .filter((r: Reservation) => Number(r.status) === 2 || Number(r.status) === 4)
+        .reduce((sum: number, r: Reservation) => sum + r.totalPrice, 0);
     const totalReservations = reservations.length;
-    const uniqueClients = new Set(reservations.map((r: ReportReservation) => r.userId)).size;
+    const uniqueClients = new Set(reservations.map((r: Reservation) => r.userId)).size;
     const avgTicket = totalReservations > 0 ? revenue / totalReservations : 0;
 
     const handleExportPDF = () => {

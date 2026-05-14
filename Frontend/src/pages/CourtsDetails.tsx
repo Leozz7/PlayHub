@@ -16,7 +16,7 @@ import { useQueryClient } from '@tanstack/react-query';
 import { signalRService } from '@/lib/signalr';
 import { SEO } from '@/components/SEO';
 
-import { Court } from './CatalogData';
+import { Court } from '@/features/courts/types/court.types';
 
 const ClockIcon = () => <Clock className="w-4 h-4 text-[#8CE600]" strokeWidth={1.5} />;
 const CheckIcon = () => <CheckCircle2 className="w-3.5 h-3.5 text-[#8CE600]" strokeWidth={1.5} />;
@@ -43,7 +43,7 @@ function getNext7Days() {
 
 type SlotStatus = 'available' | 'busy' | 'selected';
 
-function formatSlots(slots: number[], t: any) {
+function formatSlots(slots: number[], t: (k: string) => string) {
     if (slots.length === 0) return t('details.noSlotSelected');
     const sorted = [...slots].sort((a, b) => a - b);
     const groups: number[][] = [];
@@ -102,7 +102,7 @@ function BookingSummary({ court, date, slots, onBook, isAuthenticated }: {
     isAuthenticated: boolean;
 }) {
     const { t } = useTranslation();
-    const total = slots.length * court.price;
+    const total = slots.length * (court.hourlyRate || 0);
     return (
         <div className="bg-white dark:bg-background rounded-3xl border border-gray-100 dark:border-white/10 p-6 shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-none sticky top-24">
             <h3 className="font-black text-lg tracking-tight text-gray-900 dark:text-white mb-1">{t('details.bookingSummary')}</h3>
@@ -124,7 +124,7 @@ function BookingSummary({ court, date, slots, onBook, isAuthenticated }: {
             {slots.length > 0 && (
                 <div className="bg-gray-50 dark:bg-gray-800/50 rounded-2xl p-4 mb-6 space-y-2 text-sm">
                     <div className="flex justify-between text-gray-600 dark:text-gray-400">
-                        <span>{slots.length} {t('details.hoursCount')} × R$ {court.price}/h</span>
+                        <span>{slots.length} {t('details.hoursCount')} × R$ {court.hourlyRate || 0}/h</span>
                         <span>R$ {total}</span>
                     </div>
                     <div className="h-px bg-gray-200 dark:bg-gray-700" />
@@ -213,7 +213,7 @@ export default function CourtsDetails() {
         return () => {
             connection.off("ReservationCreated", handleReservationCreated);
         };
-    }, [id, queryClient, phToast]);
+    }, [id, queryClient, phToast, t]);
 
     const alreadyReviewed = useMemo(() => {
         if (!user || reviews.length === 0) return false;
@@ -318,9 +318,9 @@ export default function CourtsDetails() {
                     address: court.address,
                     neighborhood: court.neighborhood,
                     city: court.city,
-                    price: court.price,
+                    hourlyRate: court.hourlyRate || 0,
                     img: court.img,
-                    sports: court.sports,
+                    sports: court.sports || [],
                 },
                 date: selectedDay.toISOString(),
                 slots: selectedSlots,
@@ -363,7 +363,7 @@ export default function CourtsDetails() {
         <div className="min-h-screen bg-white dark:bg-background text-gray-900 dark:text-gray-100 font-sans antialiased flex flex-col">
             <SEO
                 title={court.name}
-                description={`${court.name} em ${court.city} - ${court.neighborhood}. Agende agora sua partida de ${court.sports.join(', ')}. Preço: R$ ${court.price}/h.`}
+            description={`${court.name} em ${court.city} - ${court.neighborhood}. Agende agora sua partida de ${(court.sports || []).join(', ')}. Preço: R$ ${court.hourlyRate || 0}/h.`}
                 ogImage={allImages[0]}
                 ogType="article"
             />
@@ -490,9 +490,9 @@ export default function CourtsDetails() {
                     )}
 
                     <div className="flex items-center gap-3 mt-3">
-                        <Stars rating={court.rating} />
-                        <span className="text-gray-500 dark:text-gray-400 text-sm">({court.reviewCount} avaliações)</span>
-                        <span className="ml-auto flex items-center gap-1.5 text-xs text-gray-500 dark:text-gray-400"><ClockIcon />{court.openingHour}h – {court.closingHour}h</span>
+                        <Stars rating={court.rating || 5} />
+                        <span className="text-gray-500 dark:text-gray-400 text-sm">({court.reviewCount || 0} avaliações)</span>
+                        <span className="ml-auto flex items-center gap-1.5 text-xs text-gray-500 dark:text-gray-400"><ClockIcon />{court.openingHour || 0}h – {court.closingHour || 0}h</span>
                         <button
                             onClick={handleShare}
                             className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-white dark:bg-white/5 border border-gray-100 dark:border-white/10 text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-white/10 transition-colors text-xs font-bold uppercase tracking-widest"
@@ -509,10 +509,10 @@ export default function CourtsDetails() {
                 <div className="flex-1 min-w-0 space-y-10">
                     <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
                         {[
-                            { icon: <Star className="w-6 h-6 text-[#8CE600]" />, label: 'Avaliação', value: `${court.rating.toFixed(1)} / 5` },
-                            { icon: <CircleDollarSign className="w-6 h-6 text-[#8CE600]" />, label: 'Preço', value: `R$ ${court.price}/h` },
-                            { icon: <Clock className="w-6 h-6 text-[#8CE600]" />, label: 'Horário', value: `${court.openingHour}h – ${court.closingHour}h` },
-                            { icon: <MapPin className="w-6 h-6 text-[#8CE600]" />, label: 'Cidade', value: court.city },
+                            { icon: <Star className="w-6 h-6 text-[#8CE600]" />, label: 'Avaliação', value: `${(court.rating || 5).toFixed(1)} / 5` },
+                            { icon: <CircleDollarSign className="w-6 h-6 text-[#8CE600]" />, label: 'Preço', value: `R$ ${court.hourlyRate || 0}/h` },
+                            { icon: <Clock className="w-6 h-6 text-[#8CE600]" />, label: 'Horário', value: `${court.openingHour || 0}h – ${court.closingHour || 0}h` },
+                            { icon: <MapPin className="w-6 h-6 text-[#8CE600]" />, label: 'Cidade', value: court.city || '' },
                         ].map(item => (
                             <div key={item.label} className="bg-gray-50 dark:bg-background rounded-2xl p-4 border border-gray-100 dark:border-white/10">
                                 <div className="mb-2">{item.icon}</div>
@@ -525,7 +525,7 @@ export default function CourtsDetails() {
                     <div>
                         <h2 className="text-sm font-black uppercase tracking-widest text-gray-500 dark:text-gray-400 mb-3">Modalidades</h2>
                         <div className="flex flex-wrap gap-2">
-                            {court.sports.map(s => (
+                            {(court.sports || []).map(s => (
                                 <span key={s} className="px-3 py-1.5 rounded-full text-xs font-bold bg-[#8CE600]/10 text-[#8CE600] border border-[#8CE600]/20">{s}</span>
                             ))}
                         </div>
@@ -534,7 +534,7 @@ export default function CourtsDetails() {
                     <div>
                         <h2 className="text-sm font-black uppercase tracking-widest text-gray-500 dark:text-gray-400 mb-4">Comodidades</h2>
                         <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-                            {court.amenities.map(a => (
+                            {(court.amenities || []).map(a => (
                                 <div key={a} className="flex items-center gap-2.5 bg-gray-50 dark:bg-background rounded-2xl px-4 py-3 border border-gray-100 dark:border-white/10">
                                     {AMENITY_ICON_MAP[a] ?? <CheckCircle2 className="w-4 h-4 text-[#8CE600]" />}
                                     <span className="text-sm font-semibold text-gray-700 dark:text-gray-300">{a}</span>
@@ -682,7 +682,7 @@ export default function CourtsDetails() {
                                         <span className="leading-relaxed">
                                             <strong>{selectedSlots.length} hora{selectedSlots.length > 1 ? 's' : ''}</strong> selecionada{selectedSlots.length > 1 ? 's' : ''}:&nbsp;
                                             {formatSlots(selectedSlots, t)} —&nbsp;
-                                            <strong className="text-[#8CE600]">R$ {selectedSlots.length * court.price}</strong>
+                                            <strong className="text-[#8CE600]">R$ {selectedSlots.length * (court.hourlyRate || 0)}</strong>
                                         </span>
                                     </div>
                                 )}
@@ -695,8 +695,8 @@ export default function CourtsDetails() {
                             <h2 className="text-xl font-black tracking-tight text-gray-900 dark:text-white">Avaliações</h2>
                             <div className="flex items-center gap-2">
                                 <StarIcon />
-                                <span className="font-black text-gray-900 dark:text-white">{court.rating.toFixed(1)}</span>
-                                <span className="text-gray-500 dark:text-gray-400 text-sm">({court.reviewCount} {court.reviewCount === 1 ? 'avaliação' : 'avaliações'})</span>
+                                <span className="font-black text-gray-900 dark:text-white">{(court.rating || 5).toFixed(1)}</span>
+                                <span className="text-gray-500 dark:text-gray-400 text-sm">({court.reviewCount || 0} {court.reviewCount === 1 ? 'avaliação' : 'avaliações'})</span>
                             </div>
                         </div>
 
@@ -705,10 +705,10 @@ export default function CourtsDetails() {
                             <div className="mb-6 bg-gray-50 dark:bg-background/50 rounded-3xl p-5 border border-gray-100 dark:border-white/10">
                                 <div className="flex flex-col sm:flex-row items-center gap-6">
                                     <div className="text-center shrink-0">
-                                        <p className="text-5xl font-black text-gray-900 dark:text-white">{court.rating.toFixed(1)}</p>
+                                        <p className="text-5xl font-black text-gray-900 dark:text-white">{(court.rating || 5).toFixed(1)}</p>
                                         <div className="flex justify-center gap-0.5 my-1">
                                             {[1, 2, 3, 4, 5].map(n => (
-                                                <Star key={n} className="w-4 h-4" fill={n <= Math.round(court.rating) ? '#8CE600' : 'none'} stroke={n <= Math.round(court.rating) ? '#8CE600' : 'currentColor'} strokeWidth={1.5} />
+                                                <Star key={n} className="w-4 h-4" fill={n <= Math.round(court.rating || 5) ? '#8CE600' : 'none'} stroke={n <= Math.round(court.rating || 5) ? '#8CE600' : 'currentColor'} strokeWidth={1.5} />
                                             ))}
                                         </div>
                                         <p className="text-xs text-gray-500 dark:text-gray-400 font-bold">{reviews.length} avaliações</p>
@@ -799,7 +799,7 @@ export default function CourtsDetails() {
                                                 <div className="flex items-center gap-3">
                                                     <div className="flex items-center gap-1.5 bg-gray-50 dark:bg-white/5 rounded-2xl px-3 py-1.5 border border-gray-100 dark:border-white/10">
                                                         <Star className="w-4 h-4" fill="#8CE600" stroke="#8CE600" strokeWidth={1.5} />
-                                                        <span className="font-black text-gray-900 dark:text-white text-sm">{court.rating.toFixed(1)}</span>
+                                                        <span className="font-black text-gray-900 dark:text-white text-sm">{(court.rating || 5).toFixed(1)}</span>
                                                         <span className="text-gray-400 text-xs font-bold">({reviews.length})</span>
                                                     </div>
                                                     <button
@@ -815,10 +815,10 @@ export default function CourtsDetails() {
                                             <div className="px-6 py-4 border-b border-gray-100 dark:border-white/10 shrink-0">
                                                 <div className="flex items-center gap-5">
                                                     <div className="text-center shrink-0">
-                                                        <p className="text-4xl font-black text-gray-900 dark:text-white">{court.rating.toFixed(1)}</p>
+                                                        <p className="text-4xl font-black text-gray-900 dark:text-white">{(court.rating || 5).toFixed(1)}</p>
                                                         <div className="flex justify-center gap-0.5 my-1">
                                                             {[1, 2, 3, 4, 5].map(n => (
-                                                                <Star key={n} className="w-3.5 h-3.5" fill={n <= Math.round(court.rating) ? '#8CE600' : 'none'} stroke={n <= Math.round(court.rating) ? '#8CE600' : 'currentColor'} strokeWidth={1.5} />
+                                                                <Star key={n} className="w-3.5 h-3.5" fill={n <= Math.round(court.rating || 5) ? '#8CE600' : 'none'} stroke={n <= Math.round(court.rating || 5) ? '#8CE600' : 'currentColor'} strokeWidth={1.5} />
                                                             ))}
                                                         </div>
                                                         <p className="text-[10px] text-gray-500 dark:text-gray-400 font-bold">{reviews.length} avaliações</p>
@@ -928,9 +928,10 @@ export default function CourtsDetails() {
                                         setReviewText('');
                                         setReviewRating(0);
                                         phToast.reviewSuccess();
-                                    } catch (err: any) {
+                                    } catch (error: unknown) {
+                                        const err = error as { response?: { data?: { message?: string } } };
                                         const msg = err?.response?.data?.message || 'Erro ao publicar avaliação.';
-                                        phToast.error?.(msg) ?? alert(msg);
+                                        if (phToast.error) { phToast.error(msg); } else { alert(msg); }
                                     }
                                 }} className="bg-gray-50 dark:bg-background/50 rounded-3xl p-5 border border-gray-100 dark:border-white/10 space-y-4">
                                     <div className="flex items-center gap-1">

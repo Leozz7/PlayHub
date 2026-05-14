@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { useForm } from 'react-hook-form';
+import { useForm, Controller } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useTranslation } from 'react-i18next';
@@ -8,16 +8,56 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { usePlayHubToast } from '@/hooks/usePlayHubToast';
-import { ArrowLeft, User, Mail, Lock, ShieldCheck } from 'lucide-react';
+import { ArrowLeft, User, Mail, Lock, ShieldCheck, Info, CreditCard, Eye, EyeOff } from 'lucide-react';
+import { 
+  Tooltip, 
+  TooltipContent, 
+  TooltipProvider, 
+  TooltipTrigger 
+} from '@/components/ui/tooltip';
 import { HeroBackground } from '@/components/ui/HeroBackground';
 import logo from '/assets/logo.png';
 import { api } from '@/lib/api';
 import { useAuthStore } from '@/data/useAuthStore';
 
+const formatCpf = (val: string) => {
+  const digits = val.replace(/\D/g, '').slice(0, 11);
+  return digits
+    .replace(/(\d{3})(\d)/, '$1.$2')
+    .replace(/(\d{3})(\d)/, '$1.$2')
+    .replace(/(\d{3})(\d{1,2})$/, '$1-$2');
+};
+
+const isValidCpf = (cpf: string) => {
+  const cleanCpf = cpf.replace(/\D/g, '');
+  if (cleanCpf.length !== 11) return false;
+  if (/^(\d)\1{10}$/.test(cleanCpf)) return false;
+
+  let sum = 0;
+  let remainder;
+
+  for (let i = 1; i <= 9; i++) sum = sum + parseInt(cleanCpf.substring(i - 1, i)) * (11 - i);
+  remainder = (sum * 10) % 11;
+
+  if (remainder === 10 || remainder === 11) remainder = 0;
+  if (remainder !== parseInt(cleanCpf.substring(9, 10))) return false;
+
+  sum = 0;
+  for (let i = 1; i <= 10; i++) sum = sum + parseInt(cleanCpf.substring(i - 1, i)) * (12 - i);
+  remainder = (sum * 10) % 11;
+
+  if (remainder === 10 || remainder === 11) remainder = 0;
+  if (remainder !== parseInt(cleanCpf.substring(10, 11))) return false;
+
+  return true;
+};
+
 export default function Register() {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const phToast = usePlayHubToast();
   const setAuth = useAuthStore((state) => state.setAuth);
 
@@ -29,7 +69,13 @@ export default function Register() {
       .min(8, t('register.validation.passwordMin'))
       .regex(/[A-Z]/, t('register.validation.passwordUpper'))
       .regex(/[0-9]/, t('register.validation.passwordNumber')),
-    confirmPassword: z.string()
+    confirmPassword: z.string(),
+    cpf: z.string().optional().refine((val) => {
+      if (!val || val === "") return true;
+      return isValidCpf(val);
+    }, {
+      message: t('register.validation.cpfInvalid')
+    })
   }).refine((data) => data.password === data.confirmPassword, {
     message: t('register.validation.passwordMismatch'),
     path: ["confirmPassword"],
@@ -40,9 +86,18 @@ export default function Register() {
   const {
     register,
     handleSubmit,
+    control,
     formState: { errors },
   } = useForm<RegisterFormValues>({
     resolver: zodResolver(registerSchema),
+    defaultValues: {
+      firstName: '',
+      lastName: '',
+      email: '',
+      password: '',
+      confirmPassword: '',
+      cpf: ''
+    }
   });
 
   const onSubmit = async (data: RegisterFormValues) => {
@@ -51,7 +106,8 @@ export default function Register() {
       const payload = {
         name: `${data.firstName} ${data.lastName}`.trim(),
         email: data.email,
-        password: data.password
+        password: data.password,
+        cpf: data.cpf?.replace(/\D/g, '') || null
       };
 
       const response = await api.post('/auth/register', payload);
@@ -69,7 +125,8 @@ export default function Register() {
         phToast.registerSuccess();
         navigate('/login');
       }
-    } catch (err: any) {
+    } catch (error: unknown) {
+      const err = error as { response?: { data?: { message?: string } } };
       phToast.registerError(err?.response?.data?.message || t('register.validation.genericError'));
     } finally {
       setIsLoading(false);
@@ -176,6 +233,49 @@ export default function Register() {
                 {errors.email && <p className="text-xs text-red-500 font-medium">{errors.email.message}</p>}
               </div>
 
+              <div className="space-y-1.5">
+                <div className="flex items-center gap-2">
+                  <Label htmlFor="cpf" className="text-[10px] font-black uppercase tracking-widest text-gray-500 dark:text-gray-400">
+                    {t('register.cpfLabel')}
+                  </Label>
+                  <TooltipProvider>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <div className="cursor-help">
+                          <Info className="w-3.5 h-3.5 text-gray-400 hover:text-[#8CE600] transition-colors" />
+                        </div>
+                      </TooltipTrigger>
+                      <TooltipContent side="right" className="bg-white dark:bg-gray-800 border-gray-100 dark:border-white/10 shadow-xl max-w-[220px] p-3">
+                        <p className="text-[11px] font-medium leading-relaxed text-gray-600 dark:text-gray-300">
+                          {t('register.cpfInfo')}
+                        </p>
+                      </TooltipContent>
+                    </Tooltip>
+                  </TooltipProvider>
+                </div>
+                <div className="relative">
+                  <CreditCard className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
+                  <Controller
+                    name="cpf"
+                    control={control}
+                    render={({ field }) => (
+                      <Input
+                        {...field}
+                        id="cpf"
+                        placeholder="000.000.000-00"
+                        maxLength={14}
+                        className="pl-11 bg-gray-50/50 dark:bg-background/50 border-gray-200 dark:border-white/10 h-13 rounded-2xl font-medium transition-all focus:bg-white dark:focus:bg-gray-900 focus-visible:ring-2 focus-visible:ring-[#8CE600] focus-visible:ring-offset-2 dark:focus-visible:ring-offset-gray-950"
+                        onChange={(e) => {
+                          const formatted = formatCpf(e.target.value);
+                          field.onChange(formatted);
+                        }}
+                      />
+                    )}
+                  />
+                </div>
+                {errors.cpf && <p className="text-xs text-red-500 font-medium">{errors.cpf.message}</p>}
+              </div>
+
               <div className="flex items-center gap-3 py-1">
                 <div className="flex-1 h-px bg-gray-100 dark:bg-gray-800" />
                 <span className="text-[10px] font-bold uppercase tracking-widest text-gray-400">{t('register.securityDivider')}</span>
@@ -191,11 +291,18 @@ export default function Register() {
                     <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
                     <Input
                       id="password"
-                      type="password"
+                      type={showPassword ? "text" : "password"}
                       placeholder="••••••••"
-                      className="pl-11 bg-gray-50/50 dark:bg-background/50 border-gray-200 dark:border-white/10 h-13 rounded-2xl font-medium transition-all focus:bg-white dark:focus:bg-gray-900 focus-visible:ring-2 focus-visible:ring-[#8CE600] focus-visible:ring-offset-2 dark:focus-visible:ring-offset-gray-950"
+                      className="pl-11 pr-10 bg-gray-50/50 dark:bg-background/50 border-gray-200 dark:border-white/10 h-13 rounded-2xl font-medium transition-all focus:bg-white dark:focus:bg-gray-900 focus-visible:ring-2 focus-visible:ring-[#8CE600] focus-visible:ring-offset-2 dark:focus-visible:ring-offset-gray-950"
                       {...register('password')}
                     />
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword(!showPassword)}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
+                    >
+                      {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                    </button>
                   </div>
                   {errors.password && <p className="text-xs text-red-500 font-medium">{errors.password.message}</p>}
                 </div>
@@ -208,11 +315,18 @@ export default function Register() {
                     <ShieldCheck className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
                     <Input
                       id="confirmPassword"
-                      type="password"
+                      type={showConfirmPassword ? "text" : "password"}
                       placeholder="••••••••"
-                      className="pl-11 bg-gray-50/50 dark:bg-background/50 border-gray-200 dark:border-white/10 h-13 rounded-2xl font-medium transition-all focus:bg-white dark:focus:bg-gray-900 focus-visible:ring-2 focus-visible:ring-[#8CE600] focus-visible:ring-offset-2 dark:focus-visible:ring-offset-gray-950"
+                      className="pl-11 pr-10 bg-gray-50/50 dark:bg-background/50 border-gray-200 dark:border-white/10 h-13 rounded-2xl font-medium transition-all focus:bg-white dark:focus:bg-gray-900 focus-visible:ring-2 focus-visible:ring-[#8CE600] focus-visible:ring-offset-2 dark:focus-visible:ring-offset-gray-950"
                       {...register('confirmPassword')}
                     />
+                    <button
+                      type="button"
+                      onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
+                    >
+                      {showConfirmPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                    </button>
                   </div>
                   {errors.confirmPassword && <p className="text-xs text-red-500 font-medium">{errors.confirmPassword.message}</p>}
                 </div>
@@ -263,6 +377,3 @@ export default function Register() {
     </div>
   );
 }
-
-
-

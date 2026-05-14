@@ -197,8 +197,11 @@
       "passwordUpper": "Password must contain at least one uppercase letter",
       "passwordNumber": "Password must contain at least one number",
       "passwordMismatch": "Passwords do not match",
+      "cpfInvalid": "Invalid CPF.",
       "genericError": "An error occurred while creating the account."
-    }
+    },
+    "cpfLabel": "CPF (Optional)",
+    "cpfInfo": "To make a booking, it is mandatory to have a registered CPF."
   },
   "userProfile": {
     "back": "Back",
@@ -374,7 +377,7 @@
     },
     "favorites": {
       "collection": "My Collection",
-      "title": "Favorite <span class=\"text-[#8CE600]\">Courts</span>",
+      "title": "Favorite <1>Courts</1>",
       "subtitle": {
         "withItems": "You have selected {{count}} amazing arena for your next game.",
         "withItems_plural": "You have selected {{count}} amazing arenas for your next game.",

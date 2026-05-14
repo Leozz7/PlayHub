@@ -114,13 +114,15 @@ function FavoritesPopover() {
 }
 
 
+import { type User } from '@/features/auth/types/auth.types';
+
 function getInitials(name?: string) {
   if (!name) return 'U';
   const parts = name.trim().split(' ');
   return `${parts[0].charAt(0)}${parts.length > 1 ? parts[parts.length - 1].charAt(0) : ''}`.toUpperCase();
 }
 
-function DesktopUserMenu({ user, logout }: { user: any, logout: () => void }) {
+function DesktopUserMenu({ user, logout }: { user: User | null, logout: () => void }) {
   const navigate = useNavigate();
   const { t } = useTranslation();
   const phToast = usePlayHubToast();
