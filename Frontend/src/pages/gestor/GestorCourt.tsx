@@ -89,7 +89,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 
 
 
-const getCourtSchema = (t: any) => z.object({
+const getCourtSchema = (t: (k: string) => string) => z.object({
     name: z.string().min(3, t('register.validation.nameMin')),
     city: z.string().min(2, t('catalog.searchCity')),
     neighborhood: z.string().min(2, t('gestor.courts.form.neighborhood')),
@@ -198,7 +198,7 @@ export default function GestorCourt() {
         t('gestor.courts.form.amenities.bleachers')
     ];
 
-    const COURT_TYPES = [
+    const COURT_TYPES = useMemo(() => [
         { value: 1, label: t('sports.tennis') },
         { value: 2, label: t('sports.soccerSociety') },
         { value: 3, label: t('sports.footvolley') },
@@ -209,7 +209,7 @@ export default function GestorCourt() {
         { value: 8, label: t('sports.padel') },
         { value: 9, label: t('sports.handball') },
         { value: 99, label: t('common.other') },
-    ];
+    ], [t]);
 
     const COURT_STATUS_OPTIONS = [
         { value: 1, label: t('gestor.courts.active') },
@@ -397,7 +397,7 @@ export default function GestorCourt() {
         setSelectedAmenitiesList(prev => prev.includes(amenity) ? prev.filter(a => a !== amenity) : [...prev, amenity]);
     };
 
-    const updateSchedule = (day: number, field: keyof OperatingDay, value: any) => {
+    const updateSchedule = (day: number, field: keyof OperatingDay, value: OperatingDay[keyof OperatingDay]) => {
         setSchedules(prev => prev.map(s => s.day === day ? { ...s, [field]: value } : s));
     };
 
@@ -478,10 +478,10 @@ export default function GestorCourt() {
         if (editingCourt) {
             updateMutation.mutate({
                 id: editingCourt.id,
-                data: payload as any
+                data: payload as Partial<Court>
             });
         } else {
-            createMutation.mutate(payload as any);
+            createMutation.mutate(payload as unknown as Court);
         }
     };
 

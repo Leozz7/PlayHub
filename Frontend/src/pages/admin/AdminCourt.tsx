@@ -437,8 +437,13 @@ export default function AdminCourt() {
     const watchType = watch('type');
     useEffect(() => {
         const typeLabel = COURT_TYPES.find(t => t.value === watchType)?.label;
-        if (typeLabel && typeLabel !== 'Outro' && !selectedSportsList.includes(typeLabel)) {
-            setSelectedSportsList(prev => [...prev, typeLabel]);
+        if (typeLabel && typeLabel !== 'Outro') {
+            setSelectedSportsList(prev => {
+                if (!prev.includes(typeLabel)) {
+                    return [...prev, typeLabel];
+                }
+                return prev;
+            });
         }
     }, [watchType]);
 
@@ -450,7 +455,7 @@ export default function AdminCourt() {
         setSelectedAmenitiesList(prev => prev.includes(amenity) ? prev.filter(a => a !== amenity) : [...prev, amenity]);
     };
 
-    const updateSchedule = (day: number, field: keyof OperatingDay, value: any) => {
+    const updateSchedule = (day: number, field: keyof OperatingDay, value: OperatingDay[keyof OperatingDay]) => {
         setSchedules(prev => prev.map(s => s.day === day ? { ...s, [field]: value } : s));
     };
 
@@ -529,10 +534,10 @@ export default function AdminCourt() {
         if (editingCourt) {
             updateMutation.mutate({
                 id: editingCourt.id,
-                data: payload as any
+                data: payload as Partial<Court>
             });
         } else {
-            createMutation.mutate(payload as any);
+            createMutation.mutate(payload as unknown as Court);
         }
     };
 
@@ -1122,7 +1127,7 @@ export default function AdminCourt() {
                                                                 </TableCell>
                                                             </TableRow>
                                                         ) : (
-                                                            linkedManagers.map((manager: any) => (
+                                                            linkedManagers.map((manager: { id: string; name: string; email: string; role: string; }) => (
                                                                 <TableRow key={manager.id} className="border-b border-gray-50 dark:border-white/5">
                                                                     <TableCell className="px-6 py-4">
                                                                         <div className="flex items-center gap-3">

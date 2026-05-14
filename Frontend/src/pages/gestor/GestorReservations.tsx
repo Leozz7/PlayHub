@@ -39,7 +39,24 @@ export default function GestorReservations() {
     const [selectedCourt, setSelectedCourt] = useState('all');
     const [selectedStatus, setSelectedStatus] = useState('all');
     const [cancelModalOpen, setCancelModalOpen] = useState(false);
-    const [reservationToCancel, setReservationToCancel] = useState<any>(null);
+    interface DashboardCourt {
+        id: string;
+        name: string;
+    }
+
+    interface DashboardReservation {
+        id: string;
+        userName?: string;
+        courtName?: string;
+        courtId: string;
+        startTime: string;
+        endTime: string;
+        totalPrice: number;
+        status: number;
+        userId?: string;
+    }
+
+    const [reservationToCancel, setReservationToCancel] = useState<DashboardReservation | null>(null);
 
     const { data: courtsData } = useManagementCourts({ pageSize: 100 });
     const { data: reservationsData, isLoading, refetch } = useReservations({ pageSize: 100 });
@@ -59,11 +76,11 @@ export default function GestorReservations() {
         };
     }, [refetch, phToast, t]);
 
-    const courts = courtsData?.items || [];
-    const reservations = reservationsData?.items || [];
+    const courts = useMemo(() => courtsData?.items || [], [courtsData?.items]);
+    const reservations = useMemo(() => reservationsData?.items || [], [reservationsData?.items]);
 
     const filteredReservations = useMemo(() => {
-        return reservations.filter((r: any) => {
+        return reservations.filter((r: DashboardReservation) => {
             const matchSearch = r.userName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
                 r.id.toLowerCase().includes(searchTerm.toLowerCase());
             const matchCourt = selectedCourt === 'all' || r.courtId === selectedCourt;
@@ -75,11 +92,11 @@ export default function GestorReservations() {
 
     const stats = useMemo(() => {
         const total = reservations.length;
-        const confirmed = reservations.filter((r: any) => r.status === 2).length;
-        const pending = reservations.filter((r: any) => r.status === 1).length;
+        const confirmed = reservations.filter((r: DashboardReservation) => r.status === 2).length;
+        const pending = reservations.filter((r: DashboardReservation) => r.status === 1).length;
         const revenue = reservations
-            .filter((r: any) => r.status === 2 || r.status === 4)
-            .reduce((acc: number, r: any) => acc + r.totalPrice, 0);
+            .filter((r: DashboardReservation) => r.status === 2 || r.status === 4)
+            .reduce((acc: number, r: DashboardReservation) => acc + r.totalPrice, 0);
 
         return [
             { label: t('gestor.reservations.stats.total'), value: total, icon: CalendarDays, color: 'text-blue-500' },
@@ -155,7 +172,7 @@ export default function GestorReservations() {
                             </SelectTrigger>
                             <SelectContent className="rounded-2xl border-gray-100 dark:border-white/10">
                                 <SelectItem value="all">{t('gestor.reservations.allCourts')}</SelectItem>
-                                {courts.map((c: any) => (
+                                {courts.map((c: DashboardCourt) => (
                                     <SelectItem key={c.id} value={c.id}>{c.name}</SelectItem>
                                 ))}
                             </SelectContent>
@@ -216,7 +233,7 @@ export default function GestorReservations() {
                                 </TableRow>
                             ) : (
                                 <AnimatePresence>
-                                    {filteredReservations.map((r: any) => {
+                                    {filteredReservations.map((r: DashboardReservation) => {
                                         const cfg = STATUS_CONFIG[r.status as keyof typeof STATUS_CONFIG] || STATUS_CONFIG[1];
                                         let statusLabel = 'Pendente';
                                         if (r.status === 2) statusLabel = 'Confirmado';

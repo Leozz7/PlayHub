@@ -20,6 +20,23 @@ import { ChevronRight } from 'lucide-react';
 import { useAuthStore } from '@/data/useAuthStore';
 import { useQuery } from '@tanstack/react-query';
 import { api } from '@/lib/api';
+import { type Reservation } from '@/features/reservations/types/reservation.types';
+import { type Court } from '@/features/courts/types/court.types';
+
+interface MappedReservation {
+  id: string;
+  court: string;
+  sport: string;
+  location: string;
+  date: string;
+  time: string;
+  duration: string;
+  value: number;
+  status: string;
+  img: string;
+  rating: number | null;
+  courtId: string;
+}
 
 
 const STATUS_CONFIG = {
@@ -115,9 +132,9 @@ export default function UserDashboard() {
   const myReservations = useMemo(() => {
     if (!reservationsData?.items) return [];
     
-    return reservationsData.items.map((r: any) => {
+    return reservationsData.items.map((r: Reservation): MappedReservation => {
       const courtId = String(r.courtId).toLowerCase();
-      const court = courtsData?.items?.find((c: any) => String(c.id).toLowerCase() === courtId);
+      const court = courtsData?.items?.find((c: Court) => String(c.id).toLowerCase() === courtId);
       const start = new Date(r.startTime);
       const end = new Date(r.endTime);
       const durHours = (end.getTime() - start.getTime()) / (1000 * 60 * 60);
@@ -152,16 +169,16 @@ export default function UserDashboard() {
   }, [reservationsData, courtsData, locale, t]);
 
   const nextReservation = useMemo(
-    () => myReservations.find((r: any) => r.status === 'confirmed' || r.status === 'pending'),
+    () => myReservations.find((r: MappedReservation) => r.status === 'confirmed' || r.status === 'pending'),
     [myReservations]
   );
 
   const filteredReservations = useMemo(() => {
     let list = myReservations;
-    if (activeTab === 'upcoming') list = list.filter((r: any) => r.status === 'confirmed' || r.status === 'pending');
-    else if (activeTab === 'completed') list = list.filter((r: any) => r.status === 'completed');
-    else if (activeTab === 'cancelled') list = list.filter((r: any) => r.status === 'cancelled');
-    if (search) list = list.filter((r: any) =>
+    if (activeTab === 'upcoming') list = list.filter((r: MappedReservation) => r.status === 'confirmed' || r.status === 'pending');
+    else if (activeTab === 'completed') list = list.filter((r: MappedReservation) => r.status === 'completed');
+    else if (activeTab === 'cancelled') list = list.filter((r: MappedReservation) => r.status === 'cancelled');
+    if (search) list = list.filter((r: MappedReservation) =>
       r.court.toLowerCase().includes(search.toLowerCase()) ||
       r.sport.toLowerCase().includes(search.toLowerCase())
     );
@@ -169,16 +186,16 @@ export default function UserDashboard() {
   }, [myReservations, activeTab, search]);
 
   const totalSpent = useMemo(
-    () => myReservations.filter((r: any) => r.status === 'completed').reduce((acc: number, r: any) => acc + r.value, 0),
+    () => myReservations.filter((r: MappedReservation) => r.status === 'completed').reduce((acc: number, r: MappedReservation) => acc + r.value, 0),
     [myReservations]
   );
 
   const dynamicAchievements = useMemo(() => {
-    const completedOrConfirmed = myReservations.filter((r: any) => r.status === 'completed' || r.status === 'confirmed').length;
+    const completedOrConfirmed = myReservations.filter((r: MappedReservation) => r.status === 'completed' || r.status === 'confirmed').length;
     const currentMonth = new Date().getMonth();
     const currentYear = new Date().getFullYear();
     
-    const thisMonthRes = reservationsData?.items?.filter((r: any) => {
+    const thisMonthRes = reservationsData?.items?.filter((r: Reservation) => {
       const d = new Date(r.startTime);
       return d.getUTCMonth() === currentMonth && d.getUTCFullYear() === currentYear;
     }).length || 0;
@@ -216,11 +233,11 @@ export default function UserDashboard() {
             icon: CalendarDays, color: 'text-violet-500', bg: 'bg-violet-500/10', border: 'border-violet-500/20',
           },
           {
-            label: t('user.dashboard.stats.confirmed'), value: myReservations.filter((r: any) => r.status === 'confirmed').length,
+            label: t('user.dashboard.stats.confirmed'), value: myReservations.filter((r: MappedReservation) => r.status === 'confirmed').length,
             icon: CheckCircle2, color: 'text-emerald-600 dark:text-emerald-400', bg: 'bg-emerald-500/10', border: 'border-emerald-500/20',
           },
           {
-            label: t('user.dashboard.stats.sports'), value: new Set(myReservations.map((r: any) => r.sport)).size,
+            label: t('user.dashboard.stats.sports'), value: new Set(myReservations.map((r: MappedReservation) => r.sport)).size,
             icon: Trophy, color: 'text-amber-500', bg: 'bg-amber-500/10', border: 'border-amber-500/20',
           },
           {
@@ -315,8 +332,8 @@ export default function UserDashboard() {
                 {tab.key !== 'all' && (
                   <span className={`ml-1.5 text-[10px] ${activeTab === tab.key ? 'text-gray-950/60' : 'text-gray-400'}`}>
                     {tab.key === 'upcoming'
-                      ? myReservations.filter((r: any) => r.status === 'confirmed' || r.status === 'pending').length
-                      : myReservations.filter((r: any) => r.status === tab.key).length}
+                      ? myReservations.filter((r: MappedReservation) => r.status === 'confirmed' || r.status === 'pending').length
+                      : myReservations.filter((r: MappedReservation) => r.status === tab.key).length}
                   </span>
                 )}
               </button>
@@ -349,7 +366,7 @@ export default function UserDashboard() {
         )}
 
         <div className="divide-y divide-gray-100 dark:divide-white/[0.04]">
-          {filteredReservations.map((r: any) => {
+          {filteredReservations.map((r: MappedReservation) => {
             const cfg = STATUS_CONFIG[r.status as keyof typeof STATUS_CONFIG];
             const currentRating = ratings[r.id] ?? r.rating;
 

@@ -20,11 +20,10 @@ export default function GestorClients() {
 
     const [searchTerm, setSearchTerm] = useState('');
     const { data: reservationsData, isLoading } = useReservations({ pageSize: 500 });
-    const reservations = reservationsData?.items || [];
-
     const clients = useMemo(() => {
-        const map = new Map<string, any>();
-        reservations.forEach((r: any) => {
+        const reservations = reservationsData?.items || [];
+        const map = new Map<string, Record<string, unknown>>();
+        reservations.forEach((r: { userId: string; userName?: string; status: number; totalPrice: number; startTime: string; }) => {
             if (!map.has(r.userId)) {
                 map.set(r.userId, {
                     id: r.userId,
@@ -52,7 +51,7 @@ export default function GestorClients() {
             c.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
             c.cpf.includes(searchTerm)
         );
-    }, [reservations, searchTerm, t]);
+    }, [reservationsData?.items, searchTerm, t]);
 
     const stats = useMemo(() => {
         const now = new Date();

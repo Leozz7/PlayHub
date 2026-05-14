@@ -14,7 +14,29 @@ import { api } from '@/lib/api';
 import { usePlayHubToast } from '@/hooks/usePlayHubToast';
 import { Input } from '@/components/ui/input';
 
-function CourtScheduleModal({ court, isOpen, onClose }: { court: any, isOpen: boolean, onClose: () => void }) {
+interface DashboardCourt {
+  id: string;
+  name: string;
+  sport: string;
+  openingHour: number;
+  closingHour: number;
+  mainImageBase64?: string;
+  img?: string;
+  hourlyRate?: number;
+  price?: number;
+}
+
+interface DashboardReservation {
+  id: string;
+  userName?: string;
+  userPhone?: string;
+  startTime: string;
+  endTime: string;
+  totalPrice: number;
+  status: number;
+}
+
+function CourtScheduleModal({ court, isOpen, onClose }: { court: DashboardCourt | null, isOpen: boolean, onClose: () => void }) {
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
   const { user } = useAuthStore();
   const phToast = usePlayHubToast();
@@ -22,7 +44,7 @@ function CourtScheduleModal({ court, isOpen, onClose }: { court: any, isOpen: bo
   const [isBlocking, setIsBlocking] = useState(false);
   const [showBlockConfirm, setShowBlockConfirm] = useState(false);
   const [slotToBlock, setSlotToBlock] = useState<number | null>(null);
-  const [selectedReservation, setSelectedReservation] = useState<any | null>(null);
+  const [selectedReservation, setSelectedReservation] = useState<DashboardReservation | null>(null);
   const [showReleaseConfirm, setShowReleaseConfirm] = useState(false);
   
   const dateLocale = i18n.language === 'pt' ? ptBR : i18n.language === 'es' ? es : enUS;
@@ -155,7 +177,7 @@ function CourtScheduleModal({ court, isOpen, onClose }: { court: any, isOpen: bo
             ) : (
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                 {hours.map(hour => {
-                  const reservation = reservations.find((r: any) => {
+                  const reservation = reservations.find((r: DashboardReservation) => {
                     const resDate = new Date(r.startTime);
                     return resDate.getHours() === hour && r.status !== 3; 
                   });
@@ -379,7 +401,7 @@ function CourtScheduleModal({ court, isOpen, onClose }: { court: any, isOpen: bo
   );
 }
 
-function CourtCard({ court, onOpenSchedule }: { court: any, onOpenSchedule: () => void }) {
+function CourtCard({ court, onOpenSchedule }: { court: DashboardCourt, onOpenSchedule: () => void }) {
   const { t } = useTranslation();
   return (
     <div className="group bg-white dark:bg-white/[0.03] border border-gray-100 dark:border-white/[0.06] rounded-[2rem] overflow-hidden hover:shadow-2xl hover:shadow-gray-200/50 dark:hover:shadow-black/40 transition-all duration-500 flex flex-col h-full">
@@ -436,13 +458,13 @@ function CourtCard({ court, onOpenSchedule }: { court: any, onOpenSchedule: () =
 export default function GestorSchedule() {
     const [searchTerm, setSearchTerm] = useState('');
     const { data: pagedData, isLoading } = useManagementCourts({ pageSize: 100 });
-    const [selectedCourt, setSelectedCourt] = useState<any | null>(null);
+    const [selectedCourt, setSelectedCourt] = useState<DashboardCourt | null>(null);
     const { t } = useTranslation();
 
-    const courts = pagedData?.items || [];
+    const courts = useMemo(() => pagedData?.items || [], [pagedData?.items]);
 
     const filteredCourts = useMemo(() => {
-        return courts.filter((c: any) =>
+        return courts.filter((c: DashboardCourt) =>
             c.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
             c.sport.toLowerCase().includes(searchTerm.toLowerCase())
         );
@@ -487,7 +509,7 @@ export default function GestorSchedule() {
                 </div>
             ) : (
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
-                    {filteredCourts.map((court: any) => (
+                    {filteredCourts.map((court: DashboardCourt) => (
                         <CourtCard
                             key={court.id}
                             court={court}

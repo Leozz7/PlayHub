@@ -42,7 +42,26 @@ export default function GestorPayments() {
     const locale = i18n.language.startsWith('pt') ? 'pt-BR' : i18n.language.startsWith('es') ? 'es-ES' : 'en-US';
 
     const [searchTerm, setSearchTerm] = useState('');
-    const [selectedPayment, setSelectedPayment] = useState<any>(null);
+    interface DashboardPayment {
+        id: string;
+        amount: number;
+        status: number;
+        method: number | string;
+        created: string;
+        userName?: string;
+        reservationId?: string;
+    }
+
+    interface DashboardPaymentExtended extends DashboardPayment {
+        displayId: string;
+        clientName: string;
+        methodLabel: string;
+        statusLabel: string;
+        date: string;
+        statusCode: number;
+    }
+
+    const [selectedPayment, setSelectedPayment] = useState<DashboardPaymentExtended | null>(null);
     const [isDetailsOpen, setIsDetailsOpen] = useState(false);
 
     // Modal States
@@ -68,25 +87,27 @@ export default function GestorPayments() {
         setProcessModalOpen(true);
     };
 
-    const handleDelete = (payment: any) => {
+    const handleDelete = (payment: DashboardPaymentExtended) => {
         setPaymentToDelete({ id: payment.id, amount: payment.amount });
         setDeleteModalOpen(true);
     };
 
-    const getMethodText = (method: any) => {
-        if (!method) return t('gestor.payments.methods.credit');
-        if (typeof method === 'string') return method;
-        switch (method) {
-            case 1: return t('gestor.payments.methods.credit');
-            case 2: return t('gestor.payments.methods.debit');
-            case 3: return t('gestor.payments.methods.pix');
-            case 4: return t('gestor.payments.methods.cash');
-            default: return t('gestor.payments.methods.other');
-        }
-    };
+
 
     const payments = useMemo(() => {
-        return paymentsData.map((p: any) => ({
+        const getMethodText = (method: number | string) => {
+            if (!method) return t('gestor.payments.methods.credit');
+            if (typeof method === 'string') return method;
+            switch (method) {
+                case 1: return t('gestor.payments.methods.credit');
+                case 2: return t('gestor.payments.methods.debit');
+                case 3: return t('gestor.payments.methods.pix');
+                case 4: return t('gestor.payments.methods.cash');
+                default: return t('gestor.payments.methods.other');
+            }
+        };
+
+        return paymentsData.map((p: DashboardPayment) => ({
             ...p,
             displayId: p.id.split('-')[0].toUpperCase(),
             clientName: p.userName || 'Usuário Excluído',
@@ -108,15 +129,15 @@ export default function GestorPayments() {
 
     const stats = useMemo(() => {
         const totalRevenue = paymentsData
-            .filter((p: any) => p.status === 2)
-            .reduce((acc: number, p: any) => acc + p.amount, 0);
+            .filter((p: DashboardPayment) => p.status === 2)
+            .reduce((acc: number, p: DashboardPayment) => acc + p.amount, 0);
         
         const pendingRevenue = paymentsData
-            .filter((p: any) => p.status === 1)
-            .reduce((acc: number, p: any) => acc + p.amount, 0);
+            .filter((p: DashboardPayment) => p.status === 1)
+            .reduce((acc: number, p: DashboardPayment) => acc + p.amount, 0);
 
-        const successfulPayments = paymentsData.filter((p: any) => p.status === 2).length;
-        const failedPayments = paymentsData.filter((p: any) => p.status === 3 || p.status === 4).length;
+        const successfulPayments = paymentsData.filter((p: DashboardPayment) => p.status === 2).length;
+        const failedPayments = paymentsData.filter((p: DashboardPayment) => p.status === 3 || p.status === 4).length;
 
         return [
             { label: t('gestor.payments.stats.revenue'), value: `R$ ${totalRevenue.toLocaleString()}`, icon: DollarSign, color: 'text-[#8CE600]' },
@@ -212,7 +233,7 @@ export default function GestorPayments() {
                                 </TableRow>
                             ) : (
                                 <AnimatePresence>
-                                    {payments.map((p: any) => (
+                                    {payments.map((p: DashboardPaymentExtended) => (
                                         <motion.tr
                                             key={p.id}
                                             initial={{ opacity: 0 }}

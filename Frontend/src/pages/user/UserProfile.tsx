@@ -29,7 +29,7 @@ function getInitials(name?: string) {
   return `${parts[0].charAt(0)}${parts.length > 1 ? parts[parts.length - 1].charAt(0) : ''}`.toUpperCase();
 }
 
-function getRoleBadge(role?: string, t?: any) {
+function getRoleBadge(role?: string, t?: (k: string) => string) {
   switch (role?.toLowerCase()) {
     case 'admin': return { label: t('userProfile.role.admin'), className: 'bg-red-500/10 text-red-500 border-red-500/20' };
     case 'manager': return { label: t('userProfile.role.manager'), className: 'bg-blue-500/10 text-blue-500 border-blue-500/20' };
@@ -132,7 +132,7 @@ function PasswordInput({
 }
 
 
-function PasswordStrength({ password, t }: { password: string, t: any }) {
+function PasswordStrength({ password, t }: { password: string, t: (k: string) => string }) {
   if (!password) return null;
 
   const checks = [
@@ -292,9 +292,10 @@ export default function UserProfile() {
         navigate('/login');
       }, 2000);
 
-    } catch (error: any) {
+    } catch (error: unknown) {
+      const err = error as { response?: { data?: { message?: string } } };
       console.error(error);
-      const errorMessage = error.response?.data?.message || t('userProfile.feedbacks.updateError');
+      const errorMessage = err.response?.data?.message || t('userProfile.feedbacks.updateError');
       setPassFeedback({ type: 'error', message: errorMessage });
     } finally {
       setPassLoading(false);
